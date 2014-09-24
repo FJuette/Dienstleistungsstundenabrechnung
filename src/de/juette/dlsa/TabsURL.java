@@ -44,7 +44,7 @@ public class TabsURL extends TabSheet {
 			setSelectedTab(0);
 			return;
 		}
-		Iterator<Component> iterator = getComponentIterator();
+		Iterator<Component> iterator = iterator();
 		while (iterator.hasNext()) {
 			Component tab = iterator.next();
 			String name = convertNameToFragment(tab.getCaption().toLowerCase());
