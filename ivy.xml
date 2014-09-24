@@ -40,5 +40,18 @@
 		<!-- Compiler for custom widget sets. Should not be deployed -->
 		<dependency org="com.vaadin" name="vaadin-client-compiler"
 			rev="&vaadin.version;" conf="widgetset-compile->default" />
+			
+		<!-- Jar for the  Postgresql database -->
+		<dependency org="postgresql" name="postgresql" 
+			rev="9.1-901.jdbc4" />
+			
+		<!-- Hibernate Dependencys --> 
+		<dependency org="org.hibernate" name="hibernate-core" 
+			rev="4.3.6.Final"/>
+		<dependency org="org.hibernate" name="hibernate-entitymanager" 
+			rev="4.3.6.Final"/>
+		<dependency org="org.hibernate" name="hibernate-validator" 
+			rev="5.1.2.Final"/>
+		
 	</dependencies>
 </ivy-module>
