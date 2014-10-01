@@ -87,7 +87,7 @@ public class MainUI extends UI {
 		
 		center.setFirstComponent(buildSidebar());
 		center.setSecondComponent(content);
-		center.setSplitPosition(11, Unit.PERCENTAGE);
+		center.setSplitPosition(210, Unit.PIXELS);
 		center.setLocked(true);
 		
 		content.setSizeFull();
