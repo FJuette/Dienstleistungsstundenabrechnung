@@ -74,7 +74,7 @@ public class MainUI extends UI {
 	
 	private void buildMainView() {
 		Label lblHeader = new Label("Dienstleistungsstundenabrechungsverwaltung");
-		lblHeader.setStyleName("h2");
+		lblHeader.setStyleName("h2"); 
 		
 		layout.addComponents(lblHeader, center);
 		
