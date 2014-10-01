@@ -1,7 +1,10 @@
 package de.juette.dlsa;
 
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -26,13 +29,37 @@ public class MainUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 	
-	private HorizontalLayout layout = new HorizontalLayout();
+	private VerticalLayout layout = new VerticalLayout();
+	private HorizontalSplitPanel center = new HorizontalSplitPanel();
 	private Navigator navigator;
 	private CssLayout content = new CssLayout(); // Placeholder for the views of the Navigator
-	private String[] viewNames = new String[] { "main", "help" }; // All Views should be writte in low case
+	
+	// All Views should be writte in low case
+	Map<String, String> viewNames = new LinkedHashMap<String, String>() {
+		{
+			put("main", "Startseite");
+			put("booking", "Journal");
+			put("groups", "Gruppenverwaltung");
+			put("subject", "Spartenverwaltung");
+			put("user", "Benutzerverwaltung");
+			put("member", "Mitgliederverwaltung");
+			put("settings", "Einstellungen");
+			put("log", "Historie");
+			put("search", "Suche");
+			put("help", "Hilfe");
+		}
+	};
 	private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
 		{
 			put("", MainView.class);
+			put("booking", BookingView.class);
+			put("groups", GroupsView.class);
+			put("subject", SubjectView.class);
+			put("user", UserView.class);
+			put("member", MemberView.class);
+			put("settings", SettingsView.class);
+			put("log", LogView.class);
+			put("search", SearchView.class);
 			put("help", HelpView.class);
 		}
 	};
@@ -46,26 +73,35 @@ public class MainUI extends UI {
 	}
 	
 	private void buildMainView() {
+		Label lblHeader = new Label("Dienstleistungsstundenabrechungsverwaltung");
+		lblHeader.setStyleName("h2");
+		
+		layout.addComponents(lblHeader, center);
+		
+		
 		navigator = new Navigator(this, content);
 		// Add all routes dynamically to the navigator
 		for (String route : routes.keySet()) {
 			navigator.addView(route, routes.get(route));
 		}
 		
-		layout.addComponent(buildSidebar());
+		center.setFirstComponent(buildSidebar());
+		center.setSecondComponent(content);
+		center.setSplitPosition(11, Unit.PERCENTAGE);
+		center.setLocked(true);
 		
-		layout.addComponent(content);
 		content.setSizeFull();
-		layout.setExpandRatio(content, 1);
+		//layout.setExpandRatio(content, 1);
 	}
 	
 	private VerticalLayout buildSidebar() {
 		VerticalLayout sidebar = new VerticalLayout();
-		sidebar.setWidth(150, Unit.PIXELS);
+		//sidebar.setWidth(200, Unit.PIXELS);
 		
 		// Adding the Buttons for the navigation
-		for (final String view : viewNames) {
-			Button b = new Button(view);
+		for (final String view : viewNames.keySet()) {
+			Button b = new NativeButton(viewNames.get(view));
+			b.setWidth("90%");
 			b.addClickListener(event -> {
 				if (view.equals("main")) {
 					navigator.navigateTo("");
@@ -75,6 +111,13 @@ public class MainUI extends UI {
 			});
 			sidebar.addComponent(b);
 		}
+		Button btnLogout = new NativeButton("Logout");
+		btnLogout.setWidth("90%");
+		btnLogout.addClickListener(event -> {
+			//TODO: Logout code here when Shiro is active
+			Notification.show("Ausloggen erfolgreich.", Notification.Type.TRAY_NOTIFICATION);
+		});
+		sidebar.addComponent(btnLogout);
 		return sidebar;
 	}
 }
