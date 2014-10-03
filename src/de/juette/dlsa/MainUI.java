@@ -1,6 +1,5 @@
 package de.juette.dlsa;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -8,21 +7,39 @@ import java.util.Map;
 
 import javax.servlet.annotation.WebServlet;
 
-import Views.*;
+import Views.BookingView;
+import Views.GroupsView;
+import Views.HelpView;
+import Views.LogView;
+import Views.MainView;
+import Views.MemberView;
+import Views.SearchView;
+import Views.SettingsView;
+import Views.SubjectView;
+import Views.UserView;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.NativeButton;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 @SuppressWarnings("serial")
 @Theme("dlsaTheme")
 @Title("Dienstleistungsstundenabrechung")
-public class MainUI extends UI {
+public class MainUI extends UI implements ViewChangeListener {
 	
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = MainUI.class)
@@ -67,8 +84,9 @@ public class MainUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		setLocale(Locale.GERMANY);
-		
+
 		buildMainView();
+		buildSidebar();
 		setContent(layout);
 	}
 	
@@ -77,6 +95,7 @@ public class MainUI extends UI {
 		lblHeader.setStyleName("h2"); 
 		
 		layout.addComponents(lblHeader, center);
+		layout.setComponentAlignment(center, Alignment.TOP_LEFT);
 		
 		
 		navigator = new Navigator(this, content);
@@ -103,11 +122,10 @@ public class MainUI extends UI {
 			Button b = new NativeButton(viewNames.get(view));
 			b.setWidth("90%");
 			b.addClickListener(event -> {
-				if (view.equals("main")) {
+				if ("main".equals(view))
 					navigator.navigateTo("");
-				} else {
+				else
 					navigator.navigateTo(view);
-				}
 			});
 			sidebar.addComponent(b);
 		}
@@ -119,5 +137,17 @@ public class MainUI extends UI {
 		});
 		sidebar.addComponent(btnLogout);
 		return sidebar;
+	}
+
+	@Override
+	public boolean beforeViewChange(ViewChangeEvent event) {
+		
+		return true;
+	}
+
+	@Override
+	public void afterViewChange(ViewChangeEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 }
