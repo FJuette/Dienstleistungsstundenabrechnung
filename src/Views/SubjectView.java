@@ -17,6 +17,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.ComponentHelper;
+
 @SuppressWarnings("serial")
 public class SubjectView extends HorizontalSplitPanel implements View {
 
@@ -36,7 +38,7 @@ public class SubjectView extends HorizontalSplitPanel implements View {
 	}
 	
 	private void initTable() {
-		createDummySubjects();
+		subjects = ComponentHelper.getDummySubjects();
 		
 		tblSubjects.setContainerDataSource(subjects);
 		tblSubjects.setSelectable(true);
@@ -75,13 +77,6 @@ public class SubjectView extends HorizontalSplitPanel implements View {
 		return layout;
 	}
 	
-	
-	private void createDummySubjects() {
-		subjects.addItem(new Subject("Spasstänzer"));
-		subjects.addItem(new Subject("Standdardstänzer"));
-		subjects.addItem(new Subject("Rutinetänzer"));
-		subjects.addItem(new Subject("Proditänzer"));
-	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
