@@ -18,6 +18,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 
 import de.juette.dlsa.BooleanToGermanConverter;
+import de.juette.dlsa.ComponentHelper;
 
 @SuppressWarnings("serial")
 public class GroupsView extends HorizontalSplitPanel implements View {
@@ -41,7 +42,7 @@ public class GroupsView extends HorizontalSplitPanel implements View {
 	}
 	
 	private void initTable() {
-		createDummyGroups();
+		groups = ComponentHelper.getDummyGroups();
 		
 		tblGroups.setContainerDataSource(groups);
 		tblGroups.setSelectable(true);
@@ -81,12 +82,6 @@ public class GroupsView extends HorizontalSplitPanel implements View {
 		return layout;
 	}
 
-	private void createDummyGroups() {
-		groups.addItem(new Group("Trainer", true));
-		groups.addItem(new Group("Vorstand", true));
-		groups.addItem(new Group("Mitglied", false));
-		groups.addItem(new Group("Aufsicht", false));
-	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
