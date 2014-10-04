@@ -35,6 +35,8 @@ import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
 @Theme("dlsaTheme")
@@ -121,6 +123,7 @@ public class MainUI extends UI implements ViewChangeListener {
 		for (final String view : viewNames.keySet()) {
 			Button b = new NativeButton(viewNames.get(view));
 			b.setWidth("90%");
+			b.setStyleName(ValoTheme.BUTTON_LINK);
 			b.addClickListener(event -> {
 				if ("main".equals(view))
 					navigator.navigateTo("");
