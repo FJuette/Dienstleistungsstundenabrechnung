@@ -1,11 +1,12 @@
 package de.juette.dlsa;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Map.Entry;
+
 
 import javax.servlet.annotation.WebServlet;
+
 
 import Views.BookingView;
 import Views.GroupsView;
@@ -18,24 +19,27 @@ import Views.SettingsView;
 import Views.SubjectView;
 import Views.UserView;
 
+
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeButton;
+import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
@@ -48,29 +52,10 @@ public class MainUI extends UI implements ViewChangeListener {
 	public static class Servlet extends VaadinServlet {
 	}
 	
-	private VerticalLayout layout = new VerticalLayout();
-	private HorizontalSplitPanel center = new HorizontalSplitPanel();
 	private Navigator navigator;
-	private CssLayout content = new CssLayout(); // Placeholder for the views of the Navigator
-	
-	// All Views should be writte in low case
-	Map<String, String> viewNames = new LinkedHashMap<String, String>() {
+	private LinkedHashMap<String, Class<? extends View>> routes = new LinkedHashMap<String, Class<? extends View>>() {
 		{
-			put("main", "Startseite");
-			put("booking", "Journal");
-			put("groups", "Gruppenverwaltung");
-			put("subject", "Spartenverwaltung");
-			put("user", "Benutzerverwaltung");
-			put("member", "Mitgliederverwaltung");
-			put("settings", "Einstellungen");
-			put("log", "Historie");
-			put("search", "Suche");
-			put("help", "Hilfe");
-		}
-	};
-	private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
-		{
-			put("", MainView.class);
+			put("main", MainView.class);
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
 			put("subject", SubjectView.class);
@@ -82,75 +67,125 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("help", HelpView.class);
 		}
 	};
+	
+	ValoMenuLayout root = new ValoMenuLayout();
+	ComponentContainer viewDisplay = root.getContentContainer();
+	CssLayout menu = new CssLayout();
+	CssLayout menuItemsLayout = new CssLayout();
+	{
+		menu.setId("MainMenu");
+	}
+	private LinkedHashMap<String, String> menuItems;
 		
 	@Override
 	protected void init(VaadinRequest request) {
 		setLocale(Locale.GERMANY);
-
-		buildMainView();
-		buildSidebar();
-		setContent(layout);
-	}
-	
-	private void buildMainView() {
-		Label lblHeader = new Label("Dienstleistungsstundenabrechungsverwaltung");
-		lblHeader.setStyleName("h2"); 
 		
-		layout.addComponents(lblHeader, center);
-		layout.setComponentAlignment(center, Alignment.TOP_LEFT);
-		
-		
-		navigator = new Navigator(this, content);
-		// Add all routes dynamically to the navigator
+		setContent(root);
+		root.setWidth("100%");
+		root.addMenu(buildMenu());
+		navigator = new Navigator(this, viewDisplay);
 		for (String route : routes.keySet()) {
 			navigator.addView(route, routes.get(route));
 		}
-		
-		center.setFirstComponent(buildSidebar());
-		center.setSecondComponent(content);
-		center.setSplitPosition(210, Unit.PIXELS);
-		center.setLocked(true);
-		
-		content.setSizeFull();
-		//layout.setExpandRatio(content, 1);
+
+		final String f = Page.getCurrent().getUriFragment();
+		if (f == null || f.equals("")) {
+			navigator.navigateTo("main");
+		}
+
+		navigator.setErrorView(MainView.class);
 	}
 	
-	private VerticalLayout buildSidebar() {
-		VerticalLayout sidebar = new VerticalLayout();
-		//sidebar.setWidth(200, Unit.PIXELS);
-		
-		// Adding the Buttons for the navigation
-		for (final String view : viewNames.keySet()) {
-			Button b = new NativeButton(viewNames.get(view));
-			b.setWidth("90%");
-			b.setStyleName(ValoTheme.BUTTON_LINK);
-			b.addClickListener(event -> {
-				if ("main".equals(view))
-					navigator.navigateTo("");
-				else
-					navigator.navigateTo(view);
-			});
-			sidebar.addComponent(b);
-		}
-		Button btnLogout = new NativeButton("Logout");
-		btnLogout.setWidth("90%");
-		btnLogout.addClickListener(event -> {
-			//TODO: Logout code here when Shiro is active
-			Notification.show("Ausloggen erfolgreich.", Notification.Type.TRAY_NOTIFICATION);
-		});
-		sidebar.addComponent(btnLogout);
-		return sidebar;
-	}
+	CssLayout buildMenu() {
+		menuItems = new LinkedHashMap<String, String>() {
+			{
+				put("main", "Startseite");
+				put("booking", "Journal");
+				put("groups", "Gruppenverwaltung");
+				put("subject", "Spartenverwaltung");
+				put("user", "Benutzerverwaltung");
+				put("member", "Mitgliederverwaltung");
+				put("settings", "Einstellungen");
+				put("log", "Historie");
+				put("search", "Suche");
+				put("help", "Hilfe");
+			}
+		};
 
+		final HorizontalLayout top = new HorizontalLayout();
+		top.setWidth("100%");
+		top.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+		top.addStyleName("valo-menu-title");
+		menu.addComponent(top);
+
+		final Button showMenu = new Button("Menu");
+		showMenu.addClickListener(event -> {
+			if (menu.getStyleName().contains("valo-menu-visible")) {
+				menu.removeStyleName("valo-menu-visible");
+			} else {
+				menu.addStyleName("valo-menu-visible");
+			}
+		});
+
+		showMenu.addStyleName(ValoTheme.BUTTON_PRIMARY);
+		showMenu.addStyleName(ValoTheme.BUTTON_SMALL);
+		showMenu.addStyleName("valo-menu-toggle");
+		showMenu.setIcon(FontAwesome.LIST);
+		menu.addComponent(showMenu);
+		
+		final Label title = new Label(
+				"<h3><strong>DLS-Verwaltung</strong></h3>", ContentMode.HTML);
+		title.setSizeUndefined();
+		top.addComponent(title);
+		top.setExpandRatio(title, 1);
+		
+		final MenuBar settings = new MenuBar();
+		settings.addStyleName("user-menu");
+		
+		/*
+		final MenuItem settingsItem = settings.addItem("Fabian Juette",
+				new ThemeResource("../valomenutest/img/profile-pic-300px.jpg"),
+				null);
+		
+		settingsItem.addItem("Edit Profile", null);
+		settingsItem.addItem("Preferences", null);
+		settingsItem.addSeparator();
+		settingsItem.addItem("Sign Out", null);
+		menu.addComponent(settings);
+		*/
+		
+		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
+		menu.addComponent(menuItemsLayout);
+		
+		for (final Entry<String, String> item : menuItems.entrySet()) {
+			final Button b = new Button(item.getValue());
+			b.addClickListener(event -> {
+				navigator.navigateTo(item.getKey());
+			});
+			b.setHtmlContentAllowed(true);
+			b.setPrimaryStyleName("valo-menu-item");
+			menuItemsLayout.addComponent(b);
+		}
+		
+		// Logout Button
+		final Button b = new Button("Ausloggen");
+		b.addClickListener(event -> {
+			Notification.show("Erfolgreich ausgeloggt.", Notification.Type.TRAY_NOTIFICATION);
+		});
+		b.setHtmlContentAllowed(true);
+		b.setPrimaryStyleName("valo-menu-item");
+		menuItemsLayout.addComponent(b);
+		
+		return menu;
+	}
+	
 	@Override
 	public boolean beforeViewChange(ViewChangeEvent event) {
-		
 		return true;
 	}
 
 	@Override
 	public void afterViewChange(ViewChangeEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 }
