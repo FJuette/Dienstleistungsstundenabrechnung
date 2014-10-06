@@ -123,6 +123,17 @@ public class SubjectView extends VerticalLayout implements View {
 				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
+
+		btnDelete.setStyleName("danger");
+		btnDelete.addClickListener(event -> {
+			try {
+				subjects.removeItem(tblSubjects.getValue());
+				updateTable();
+				editorLayout.setVisible(false);
+			} catch (Exception e2) {
+				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
+		});
 		
 		editorFields.setBuffered(false);
 	}
@@ -156,17 +167,6 @@ public class SubjectView extends VerticalLayout implements View {
 			subjects.addItem(new Subject(txtNewSubject.getValue()));
 			updateTable();
 			window.close();
-		});
-		
-		btnDelete.setStyleName("danger");
-		btnDelete.addClickListener(event -> {
-			try {
-				subjects.removeItem(tblSubjects.getValue());
-				updateTable();
-				editorLayout.setVisible(false);
-			} catch (Exception e2) {
-				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
-			}
 		});
 		
 		getUI().addWindow(window);
