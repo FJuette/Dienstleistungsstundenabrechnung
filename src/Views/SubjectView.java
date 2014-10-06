@@ -1,9 +1,7 @@
 package Views;
 
-import model.Group;
 import model.Subject;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
@@ -13,68 +11,140 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
 
 @SuppressWarnings("serial")
-public class SubjectView extends HorizontalSplitPanel implements View {
+public class SubjectView extends VerticalLayout implements View {
 
 	private final Table tblSubjects = new Table();
 	@PropertyId("spartenname")
-	private TextField txtSpartenname = new TextField("Spartenname:");
-	private FieldGroup fieldGroup;
+	private TextField txtSpartenname = new TextField("Spartenname");
+	
+	private FormLayout editorLayout = new FormLayout();
+	private FieldGroup editorFields = new FieldGroup();
 	private BeanItemContainer<Subject> subjects = new BeanItemContainer<>(Subject.class);
 	
+	private final Button btnNewSubject = new Button("Neue Sparte");
+	private final Button btnSave = new Button("Speichern");
+	
 	public SubjectView() {
+		initLayout();
 		initTable();
-		setFirstComponent(tblSubjects);
-		setSecondComponent(createEditFields());
-		
-		setSplitPosition(15, Unit.PERCENTAGE);
-		setLocked(true);
+		initEditor();
 	}
 	
+	private void initLayout() {
+		setSpacing(true);
+		setMargin(true);
+		
+		Label title = new Label("Spartenverwaltung");
+		title.addStyleName("h1");
+		addComponent(title);
+		
+		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+		addComponent(splitPanel);
+		
+		VerticalLayout leftLayout = new VerticalLayout();
+		splitPanel.addComponent(leftLayout);
+		splitPanel.addComponent(editorLayout);
+		leftLayout.addComponent(tblSubjects);
+		
+		splitPanel.setSplitPosition(25, Unit.PERCENTAGE);
+		splitPanel.setLocked(true);
+		
+		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
+		leftLayout.addComponent(bottomLeftLayout);
+		bottomLeftLayout.addComponent(btnNewSubject);
+		
+		btnNewSubject.addClickListener(event -> {
+			newSubjectWindow();
+		});
+		
+		leftLayout.setWidth("100%");
+		
+		leftLayout.setExpandRatio(tblSubjects, 1);
+		tblSubjects.setSizeFull();
+		
+		bottomLeftLayout.setWidth("100%");
+		editorLayout.setMargin(true);
+		editorLayout.setVisible(false);
+	}
+		
 	private void initTable() {
 		subjects = ComponentHelper.getDummySubjects();
 		
 		tblSubjects.setContainerDataSource(subjects);
 		tblSubjects.setSelectable(true);
+		tblSubjects.setImmediate(true);
+		tblSubjects.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblSubjects.setVisibleColumns( new Object[] {"spartenname"} );
 		tblSubjects.setColumnHeaders("Sparte");
-		tblSubjects.setHeight("400");
 		
 		tblSubjects.addItemClickListener(event -> {
-			fieldGroup.setItemDataSource(event.getItem());
-			fieldGroup.bindMemberFields(this);
+			editorFields.setItemDataSource(event.getItem());
+			editorFields.bindMemberFields(this);
+			editorLayout.setVisible(event.getItem() != null);
 		});
+		
+		updateTable();
 	}
 	
-	private FormLayout createEditFields() {
-		// Set the Caption of the TextField on the Top
-		HorizontalLayout txtLayout = new HorizontalLayout();
-		txtLayout.addComponent(txtSpartenname);
-		
-		FormLayout layout = new FormLayout();
-		layout.setSizeUndefined();
-		layout.setMargin(true);
-		
-		fieldGroup = new BeanFieldGroup<Group>(Group.class);
-		
-		Button btnSave = new Button("Speichern");
+	private void initEditor() {
+		editorLayout.addComponent(txtSpartenname);
+		editorLayout.addComponent(btnSave);
+		editorLayout.setWidth("100%");
+				
 		btnSave.addClickListener(event -> {
 			try {
-				fieldGroup.commit();
+				editorFields.commit();
 				Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
 			} catch (Exception e) {
 				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
 		
-		layout.addComponents(txtLayout, btnSave);
-		return layout;
+		editorFields.setBuffered(false);
+	}
+	
+	private void updateTable() {
+		if (tblSubjects.size() > 15) {
+			tblSubjects.setPageLength(15);
+		} else {
+			tblSubjects.setPageLength(tblSubjects.size());
+		}
+		tblSubjects.markAsDirtyRecursive();
+	}
+	
+	private void newSubjectWindow() {
+		Window window = new Window("Anlegen einer neuen Sparte");
+		window.setModal(true);
+		window.setWidth("400");
+		
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		
+		TextField txtNewSubject = new TextField("Name");
+		txtNewSubject.setWidth("100%");
+		layout.addComponent(txtNewSubject);
+				
+		Button btnSaveNewSubject = new Button("Speichern");
+		layout.addComponent(btnSaveNewSubject);
+		
+		btnSaveNewSubject.addClickListener(event -> {
+			subjects.addItem(new Subject(txtNewSubject.getValue()));
+			updateTable();
+			window.close();
+		});
+		
+		getUI().addWindow(window);
 	}
 	
 
