@@ -102,13 +102,13 @@ public class MainUI extends UI implements ViewChangeListener {
 			{
 				put("main", "Startseite");
 				put("booking", "Journal");
-				put("groups", "Gruppenverwaltung");
-				put("subject", "Spartenverwaltung");
-				put("user", "Benutzerverwaltung");
-				put("member", "Mitgliederverwaltung");
+				put("user", "Benutzer");
+				put("member", "Mitglieder");
+				put("groups", "Gruppen");
+				put("subject", "Sparten");
 				put("settings", "Einstellungen");
-				put("log", "Historie");
 				put("search", "Suche");
+				put("log", "Historie");
 				put("help", "Hilfe");
 			}
 		};
@@ -158,7 +158,23 @@ public class MainUI extends UI implements ViewChangeListener {
 		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
 		menu.addComponent(menuItemsLayout);
 		
+		Label label = null;
 		for (final Entry<String, String> item : menuItems.entrySet()) {
+			if (item.getKey().equals("user")) {
+				label = new Label("Einstellungen", ContentMode.HTML);
+				label.setPrimaryStyleName("valo-menu-subtitle");
+				label.addStyleName("h4");
+				label.setSizeUndefined();
+				menuItemsLayout.addComponent(label);
+			}
+			if (item.getKey().equals("search")) {
+				label = new Label("Sonstiges", ContentMode.HTML);
+				label.setPrimaryStyleName("valo-menu-subtitle");
+				label.addStyleName("h4");
+				label.setSizeUndefined();
+				menuItemsLayout.addComponent(label);
+			}
+			
 			final Button b = new Button(item.getValue());
 			b.addClickListener(event -> {
 				navigator.navigateTo(item.getKey());
@@ -169,7 +185,7 @@ public class MainUI extends UI implements ViewChangeListener {
 		}
 		
 		// Logout Button
-		final Button b = new Button("Ausloggen");
+		final Button b = new Button("Abmelden");
 		b.addClickListener(event -> {
 			Notification.show("Erfolgreich ausgeloggt.", Notification.Type.TRAY_NOTIFICATION);
 		});
