@@ -18,6 +18,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
@@ -45,18 +46,19 @@ public class GroupsView extends VerticalLayout implements View {
 	}
 	
 	private void initLayout() {
-		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-		addComponent(splitPanel);
+		setSpacing(true);
+		setMargin(true);
 		
 		Label title = new Label("Gruppenverwaltung");
 		title.addStyleName("h1");
 		addComponent(title);
 		
+		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
+		addComponent(splitPanel);
+		
 		VerticalLayout leftLayout = new VerticalLayout();
-		setSpacing(true);
-		setMargin(true);
-		addComponent(leftLayout);
-		addComponent(editorLayout);
+		splitPanel.addComponent(leftLayout);
+		splitPanel.addComponent(editorLayout);
 		leftLayout.addComponent(tblGroups);
 		
 		splitPanel.setSplitPosition(25, Unit.PERCENTAGE);
@@ -65,6 +67,10 @@ public class GroupsView extends VerticalLayout implements View {
 		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
 		leftLayout.addComponent(bottomLeftLayout);
 		bottomLeftLayout.addComponent(btnNewGroup);
+		
+		btnNewGroup.addClickListener(event -> {
+			newGroupWindow();
+		});
 		
 		leftLayout.setWidth("100%");
 		
@@ -82,8 +88,9 @@ public class GroupsView extends VerticalLayout implements View {
 		tblGroups.setContainerDataSource(groups);
 		tblGroups.setSelectable(true);
 		tblGroups.setImmediate(true);
+		tblGroups.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblGroups.setVisibleColumns( new Object[] {"gruppenname", "befreit"} );
-		tblGroups.setColumnHeaders("Gruppe", "Befreit");
+		tblGroups.setColumnHeaders("Gruppe", "DLS Befreit");
 		tblGroups.setConverter("befreit", new BooleanToGermanConverter());
 		
 		tblGroups.addItemClickListener(event -> {
@@ -100,7 +107,7 @@ public class GroupsView extends VerticalLayout implements View {
 		editorLayout.addComponent(cbBefreit);
 		editorLayout.addComponent(btnSave);
 		editorLayout.setWidth("100%");
-		
+				
 		btnSave.addClickListener(event -> {
 			try {
 				editorFields.commit();
@@ -120,6 +127,34 @@ public class GroupsView extends VerticalLayout implements View {
 			tblGroups.setPageLength(tblGroups.size());
 		}
 		tblGroups.markAsDirtyRecursive();
+	}
+	
+	private void newGroupWindow() {
+		Window window = new Window("Anlegen einer neuen Gruppe");
+		window.setModal(true);
+		window.setWidth("400");
+		
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		
+		TextField txtNewGroup = new TextField("Name");
+		txtNewGroup.setWidth("100%");
+		layout.addComponent(txtNewGroup);
+		
+		CheckBox cbNewGroup = new CheckBox("DLS befreit");
+		layout.addComponent(cbNewGroup);
+		
+		Button btnSaveNewGroup = new Button("Speichern");
+		layout.addComponent(btnSaveNewGroup);
+		
+		btnSaveNewGroup.addClickListener(event -> {
+			groups.addItem(new Group(txtNewGroup.getValue(), cbNewGroup.getValue()));
+			updateTable();
+			window.close();
+		});
+		
+		getUI().addWindow(window);
 	}
 
 	@Override
