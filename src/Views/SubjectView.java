@@ -33,6 +33,7 @@ public class SubjectView extends VerticalLayout implements View {
 	
 	private final Button btnNewSubject = new Button("Neue Sparte");
 	private final Button btnSave = new Button("Speichern");
+	private final Button btnDelete = new Button("Löschen");
 	
 	public SubjectView() {
 		initLayout();
@@ -68,7 +69,7 @@ public class SubjectView extends VerticalLayout implements View {
 		});
 		
 		leftLayout.setWidth("100%");
-		
+		leftLayout.setSpacing(true);
 		leftLayout.setExpandRatio(tblSubjects, 1);
 		tblSubjects.setSizeFull();
 		
@@ -98,7 +99,10 @@ public class SubjectView extends VerticalLayout implements View {
 	
 	private void initEditor() {
 		editorLayout.addComponent(txtSpartenname);
-		editorLayout.addComponent(btnSave);
+		HorizontalLayout buttonLayout = new HorizontalLayout();
+		buttonLayout.setSpacing(true);
+		buttonLayout.addComponents(btnSave, btnDelete);
+		editorLayout.addComponent(buttonLayout);
 		editorLayout.setWidth("100%");
 				
 		btnSave.addClickListener(event -> {
@@ -107,6 +111,16 @@ public class SubjectView extends VerticalLayout implements View {
 				Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
 			} catch (Exception e) {
 				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
+		});
+		
+		btnDelete.setStyleName("danger");
+		btnDelete.addClickListener(event -> {
+			try {
+				subjects.removeItem(tblSubjects.getValue());
+				updateTable();
+			} catch (Exception e2) {
+				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
 		
@@ -142,6 +156,17 @@ public class SubjectView extends VerticalLayout implements View {
 			subjects.addItem(new Subject(txtNewSubject.getValue()));
 			updateTable();
 			window.close();
+		});
+		
+		btnDelete.setStyleName("danger");
+		btnDelete.addClickListener(event -> {
+			try {
+				subjects.removeItem(tblSubjects.getValue());
+				updateTable();
+				editorLayout.setVisible(false);
+			} catch (Exception e2) {
+				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
 		});
 		
 		getUI().addWindow(window);
