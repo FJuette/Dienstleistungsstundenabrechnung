@@ -2,7 +2,6 @@ package Views;
 
 import model.Group;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
@@ -38,6 +37,7 @@ public class GroupsView extends VerticalLayout implements View {
 	
 	private final Button btnNewGroup = new Button("Neue Gruppe");
 	private final Button btnSave = new Button("Speichern");
+	private final Button btnDelete = new Button("Löschen");
 	
 	public GroupsView() {
 		initLayout();
@@ -73,7 +73,7 @@ public class GroupsView extends VerticalLayout implements View {
 		});
 		
 		leftLayout.setWidth("100%");
-		
+		leftLayout.setSpacing(true);
 		leftLayout.setExpandRatio(tblGroups, 1);
 		tblGroups.setSizeFull();
 		
@@ -104,8 +104,12 @@ public class GroupsView extends VerticalLayout implements View {
 	
 	private void initEditor() {
 		editorLayout.addComponent(txtGruppenname);
+		txtGruppenname.setWidth("25%");
 		editorLayout.addComponent(cbBefreit);
-		editorLayout.addComponent(btnSave);
+		HorizontalLayout buttonLayout = new HorizontalLayout();
+		buttonLayout.setSpacing(true);
+		buttonLayout.addComponents(btnSave, btnDelete);
+		editorLayout.addComponent(buttonLayout);
 		editorLayout.setWidth("100%");
 				
 		btnSave.addClickListener(event -> {
@@ -114,6 +118,17 @@ public class GroupsView extends VerticalLayout implements View {
 				Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
 			} catch (Exception e) {
 				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
+		});
+		
+		btnDelete.setStyleName("danger");
+		btnDelete.addClickListener(event -> {
+			try {
+				groups.removeItem(tblGroups.getValue());
+				updateTable();
+				editorLayout.setVisible(false);
+			} catch (Exception e2) {
+				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
 		
