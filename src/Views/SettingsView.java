@@ -49,7 +49,7 @@ public class SettingsView extends VerticalLayout implements View {
 		txtCostDls.setWidth("25%");
 		form.addComponent(txtCostDls);
 		
-		section = new Label("Buchungsverwalten");
+		section = new Label("Buchungsverhalten");
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
