@@ -1,7 +1,10 @@
 package de.juette.dlsa;
 
 import java.util.ArrayList;
+import java.util.Date;
 
+import model.Activity;
+import model.Booking;
 import model.Group;
 import model.Member;
 import model.Subject;
@@ -58,8 +61,36 @@ public class ComponentHelper {
 		
 		members.addItem(new Member("Sander", "Thorsten", "123456", sGroups, sSubjects));
 		members.addItem(new Member("Juette", "Fabian", "987654", jGroups, jSubjects));
+		members.addItem(new Member("Tester", "Tom", "565645", sGroups, sSubjects));
+		members.addItem(new Member("Juppie", "Jörn", "848484", jGroups, jSubjects));
 
 		return members;
+	}
+		
+	public static BeanItemContainer<Activity> getDummyActivities() {
+		BeanItemContainer<Activity> activities = new BeanItemContainer<>(Activity.class);
+		activities.addItem(new Activity(
+				"2014", "Erste Aktion", 
+				5, getDummyMembers().getIdByIndex(1), 
+				getDummyMembers().getIdByIndex(2)));
+		activities.addItem(new Activity(
+				"2014", "Zweite Aktion", 
+				(float) 3.5, getDummyMembers().getIdByIndex(2), 
+				getDummyMembers().getIdByIndex(3)));
+		activities.addItem(new Activity(
+				"2014", "Dritte Aktion", 
+				(float) 2.5, getDummyMembers().getIdByIndex(3), 
+				getDummyMembers().getIdByIndex(1)));
+		return activities;
+	}
+	
+	public static BeanItemContainer<Booking> getDummyBookings() {
+		BeanItemContainer<Booking> bookings = new BeanItemContainer<Booking>(Booking.class);
+		bookings.addItem(new Booking(
+				2, "Erste Buchung", 
+				new Date(114, 10, 01), getDummyMembers().getIdByIndex(3), 
+				getDummyActivities().getIdByIndex(1), getDummyMembers().getIdByIndex(2)));
+		return bookings;
 	}
 	
 }

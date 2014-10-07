@@ -55,7 +55,6 @@ public class MainUI extends UI implements ViewChangeListener {
 	private Navigator navigator;
 	private LinkedHashMap<String, Class<? extends View>> routes = new LinkedHashMap<String, Class<? extends View>>() {
 		{
-			put("main", MainView.class);
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
 			put("subject", SubjectView.class);
@@ -91,7 +90,7 @@ public class MainUI extends UI implements ViewChangeListener {
 
 		final String f = Page.getCurrent().getUriFragment();
 		if (f == null || f.equals("")) {
-			navigator.navigateTo("main");
+			navigator.navigateTo("booking");
 		}
 
 		navigator.setErrorView(MainView.class);
@@ -100,7 +99,6 @@ public class MainUI extends UI implements ViewChangeListener {
 	CssLayout buildMenu() {
 		menuItems = new LinkedHashMap<String, String>() {
 			{
-				put("main", "Startseite");
 				put("booking", "Journal");
 				put("user", "Benutzer");
 				put("member", "Mitglieder");
