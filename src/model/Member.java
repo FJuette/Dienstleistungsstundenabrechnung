@@ -3,7 +3,10 @@ package model;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Member {
+import javax.persistence.Entity;
+
+@Entity
+public class Member extends AbstractEntity {
 	private String nachname;
 	private String vorname;
 	private String mitgliedsnummer;

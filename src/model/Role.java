@@ -1,6 +1,9 @@
 package model;
 
-public class Role {
+import javax.persistence.Entity;
+
+@Entity
+public class Role extends AbstractEntity {
 	private String rollenname;
 
 	public Role(String rollenname) {

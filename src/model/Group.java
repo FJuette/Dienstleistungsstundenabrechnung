@@ -1,6 +1,9 @@
 package model;
 
-public class Group {
+import javax.persistence.Entity;
+
+@Entity
+public class Group extends AbstractEntity {
 	private String gruppenname;
 	private Boolean befreit = false;
 	

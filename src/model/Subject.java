@@ -1,6 +1,9 @@
 package model;
 
-public class Subject {
+import javax.persistence.Entity;
+
+@Entity
+public class Subject extends AbstractEntity {
 	private String spartenname;
 
 	public String getSpartenname() {

@@ -1,6 +1,9 @@
 package model;
 
-public class User {
+import javax.persistence.Entity;
+
+@Entity
+public class User extends AbstractEntity {
 	private String benutzername;
 	private String passwort;
 	private Boolean aktiv = true;
