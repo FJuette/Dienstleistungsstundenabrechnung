@@ -1,7 +1,8 @@
 package de.juette.dlsa;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import model.Activity;
 import model.Booking;
@@ -86,10 +87,19 @@ public class ComponentHelper {
 	
 	public static BeanItemContainer<Booking> getDummyBookings() {
 		BeanItemContainer<Booking> bookings = new BeanItemContainer<Booking>(Booking.class);
-		bookings.addItem(new Booking(
-				2, "Erste Buchung", 
-				new Date(114, 10, 01), getDummyMembers().getIdByIndex(3), 
-				getDummyActivities().getIdByIndex(1), getDummyMembers().getIdByIndex(2)));
+		try {
+			bookings.addItem(new Booking(
+					2, "Erste Buchung", 
+					new SimpleDateFormat("dd.MM.yyyy").parse("01.10.2014"), getDummyMembers().getIdByIndex(3), 
+					getDummyActivities().getIdByIndex(1), getDummyMembers().getIdByIndex(2)));
+			bookings.addItem(new Booking(
+					3, "Zweite Buchung", 
+					new SimpleDateFormat("dd.MM.yyyy").parse("11.01.2014"), getDummyMembers().getIdByIndex(2), 
+					getDummyActivities().getIdByIndex(2), getDummyMembers().getIdByIndex(1)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return bookings;
 	}
 	
