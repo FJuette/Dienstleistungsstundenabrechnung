@@ -13,7 +13,9 @@ public class Member extends AbstractEntity {
 	private Collection<Group> gruppen = new ArrayList<Group>();
 	private Collection<Subject> sparten = new ArrayList<Subject>();
 	
-	
+	public Member() {
+		
+	}
 	
 	public Member(String nachname, String vorname, String mitgliedsnummer,
 			Collection<Group> gruppen, Collection<Subject> sparten) {

@@ -1,9 +1,12 @@
 package Views;
 
+import java.util.Collection;
+
 import model.Group;
 import model.Member;
 import model.Subject;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -11,20 +14,33 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
+
+
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
+
+import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 
 @SuppressWarnings("serial")
-public class MemberView extends HorizontalSplitPanel implements View {
+public class MemberView extends VerticalLayout implements View {
 
 	private final Table tblMembers = new Table();
 	@PropertyId("mitgliedsnummer")
@@ -50,134 +66,89 @@ public class MemberView extends HorizontalSplitPanel implements View {
 	
 	private static final int MAX_PAGE_LENGTH = 15;
 	
-	private Button btnImport = new Button("Mitglieder einlesen");
+	private Button btnImport = new Button("Mitglieder aus CSV-Datei einlesen");
+	private Button btnNewMember = new Button("Neues Mitglied");
 	
 	public MemberView() {
-		initTables();
+		initLayout();
+		initTable();
+	}
+
+	private void initLayout() {
+		setSpacing(true);
+		setMargin(true);
 		
-		VerticalLayout leftLayout = new VerticalLayout();
-		leftLayout.addComponent(tblMembers);
-		leftLayout.addComponent(btnImport);
+		Label title = new Label("Mitgliederverwaltung");
+		title.addStyleName("h1");
+		addComponent(title);
+				
+		addComponent(tblMembers);
+		
+		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
+		bottomLeftLayout.setSpacing(true);
+		addComponent(bottomLeftLayout);
+		bottomLeftLayout.addComponents(btnImport, btnNewMember);
+		
 		btnImport.addClickListener(event -> {
-			//CsvImportWindow upload = new CsvImportWindow();
 			UI.getCurrent().addWindow(new CsvImportWindow());
 		});
 		
-		setFirstComponent(leftLayout);
-		setSecondComponent(createEditFields());
-		
-		setSplitPosition(25, Unit.PERCENTAGE);
-		setLocked(true);
+		btnNewMember.addClickListener(event -> {
+			openMemberWindow(new BeanItem<Member>(new Member()), "Anlegen eines neuen Mitglieds");
+		});
 	}
 
-	private void initTables() {
+	private void initTable() {
 		members = ComponentHelper.getDummyMembers();
-		groups = ComponentHelper.getDummyGroups();
-		subjects = ComponentHelper.getDummySubjects();
-		
-		cbAllGroups.setContainerDataSource(groups);
-		cbAllGroups.setItemCaptionPropertyId("gruppenname");
-		cbAllGroups.setImmediate(true);
-		
-		cbAllSubjects.setContainerDataSource(subjects);
-		cbAllSubjects.setItemCaptionPropertyId("spartenname");
-		cbAllSubjects.setImmediate(true);
 		
 		tblMembers.setContainerDataSource(members);
-		
 		tblMembers.setSelectable(true);
+		tblMembers.setImmediate(true);
+		tblMembers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblMembers.setVisibleColumns( new Object[] {"mitgliedsnummer", "nachname", "vorname"} );
 		tblMembers.setColumnHeaders("Mitgliedsnummer", "Nachname", "Vorname");
-		tblMembers.setHeight("100%");
-		tblMembers.setWidth("100%");
-		
-		tblMemberGroups.setHeight("0");
-		tblMemberGroups.setSelectable(true);
-		tblMemberGroups.setWidth("190");
-		
-		tblMemberSubjects.setHeight("0");
-		tblMemberSubjects.setSelectable(true);
-		tblMemberSubjects.setWidth("190");
-		
+		tblMembers.setWidth("80%");
 		tblMembers.addItemClickListener(event -> {
-			fieldGroup.setItemDataSource(event.getItem());
-			fieldGroup.bindMemberFields(this);
-			
-			mGroups.removeAllItems();
-			mGroups.addAll(((BeanItem<Member>)event.getItem()).getBean().getGruppen());
-			tblMemberGroups.setContainerDataSource(mGroups);
-			tblMemberGroups.setVisibleColumns( new Object[] {"gruppenname"} );
-			tblMemberGroups.setColumnHeaders("Gruppen");
-			tblMemberGroups.setHeightUndefined();
-			updateTable(tblMemberGroups);
-			
-			mSubjects.removeAllItems();
-			mSubjects.addAll(((BeanItem<Member>)event.getItem()).getBean().getSparten());
-			tblMemberSubjects.setContainerDataSource(mSubjects);
-			tblMemberSubjects.setVisibleColumns( new Object[] {"spartenname"} );
-			tblMemberSubjects.setColumnHeaders("Sparten");
-			tblMemberSubjects.setHeightUndefined();
-			updateTable(tblMemberSubjects);
+			if(event.isDoubleClick()) {
+				openMemberWindow(event.getItem(), "Mitarbeiter bearbeiten");
+			}
 		});
+		
+		updateTable(tblMembers);
+		
 	}
 	
-	private FormLayout createEditFields() {
+	private void openMemberWindow(Item beanItem, String caption) {
+		Window window = new Window(caption);
+		window.setModal(true);
+		window.setWidth("400");
 		
 		FormLayout layout = new FormLayout();
-		layout.setSizeUndefined();
 		layout.setMargin(true);
+		window.setContent(layout);
 		
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
+		fieldGroup.setItemDataSource(beanItem);
 		
-		Button btnAddGroup = new Button("+");
-		btnAddGroup.addClickListener(event -> {
-			// Compare the Strings because the Object ID is different even on the same Object types
-			if (cbAllGroups.getValue() != null && !groupsContainItem(((Group)cbAllGroups.getValue()).getGruppenname())) {
-				mGroups.addItem(cbAllGroups.getValue());
-				updateTable(tblMemberGroups);
-			}
-		});
+		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer);
 		
-		Button btnAddSubject = new Button("+");
-		btnAddSubject.addClickListener(event -> {
-			if (cbAllSubjects.getValue() != null && !subjectsContainItem(((Subject)cbAllSubjects.getValue()).getSpartenname())) {
-				mSubjects.addItem(cbAllSubjects.getValue());
-				updateTable(tblMemberSubjects);
-			}
-		});
+		Button btnSaveNewMember = new Button("Speichern");
+		layout.addComponent(btnSaveNewMember);
 		
-		Button btnDeleteGroup = new Button("-");
-		btnDeleteGroup.addClickListener(event -> {
-			if (tblMemberGroups.getValue() != null) {
-				tblMemberGroups.removeItem(tblMemberGroups.getValue());
-				updateTable(tblMemberGroups);
-			}
-		});
-
-		Button btnDeleteSubject = new Button("-");
-		btnDeleteSubject.addClickListener(event -> {
-			if (tblMemberSubjects.getValue() != null) {
-				tblMemberSubjects.removeItem(tblMemberSubjects.getValue());
-				updateTable(tblMemberSubjects);
-			}
-		});
-		
-		Button btnSave = new Button("Speichern");
-		btnSave.addClickListener(event -> {
+		btnSaveNewMember.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
-				Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
+				members.addItem(fieldGroup.getItemDataSource());
+				updateTable(tblMembers);
+				window.close();
 			} catch (Exception e) {
-				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		});
 		
-		layout.addComponents(txtMitgliedsnummer, txtNachname, txtVorname, 
-				cbAllGroups, btnAddGroup, tblMemberGroups, btnDeleteGroup,
-				cbAllSubjects, btnAddSubject, 
-				tblMemberSubjects, btnDeleteSubject, btnSave);
-		return layout;
-	}	
+		getUI().addWindow(window);
+	}
+	
 	
 	private boolean groupsContainItem(String search) {
 		for (Group group : mGroups.getItemIds()) {
@@ -198,10 +169,10 @@ public class MemberView extends HorizontalSplitPanel implements View {
 	}
 		
 	private void updateTable(Table table) {
-		if (table.size() > MAX_PAGE_LENGTH) {
-			table.setPageLength(MAX_PAGE_LENGTH);
+		if (table.size() > 15) {
+			table.setPageLength(15);
 		} else {
-			table.setPageLength(table.size());
+			table.setPageLength(table.size() + 1);
 		}
 		table.markAsDirtyRecursive();
 	}
