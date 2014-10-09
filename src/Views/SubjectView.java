@@ -2,15 +2,14 @@ package Views;
 
 import model.Subject;
 
-import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.Action;
+import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
@@ -24,21 +23,33 @@ import de.juette.dlsa.ComponentHelper;
 public class SubjectView extends VerticalLayout implements View {
 
 	private final Table tblSubjects = new Table();
-	@PropertyId("spartenname")
-	private TextField txtSpartenname = new TextField("Spartenname");
-	
-	private FormLayout editorLayout = new FormLayout();
-	private FieldGroup editorFields = new FieldGroup();
 	private BeanItemContainer<Subject> subjects = new BeanItemContainer<>(Subject.class);
 	
 	private final Button btnNewSubject = new Button("Neue Sparte");
-	private final Button btnSave = new Button("Speichern");
-	private final Button btnDelete = new Button("Löschen");
+	private final Button btnChange = new Button("Bearbeiten");
+	
+	private Handler actionHandler = new Handler() {
+		private final Action REMOVE = new Action("Entfernen");
+		private final Action[] ACTIONS = new Action[] { REMOVE };
+
+		@Override
+		public void handleAction(final Action action, final Object sender,
+				final Object target) {
+			if (action.getCaption().equals("Entfernen")) {
+				subjects.removeItem(tblSubjects.getValue());
+				updateTable();
+			}
+		}
+
+		@Override
+		public Action[] getActions(final Object target, final Object sender) {
+			return ACTIONS;
+		}
+	};
 	
 	public SubjectView() {
 		initLayout();
 		initTable();
-		initEditor();
 	}
 	
 	private void initLayout() {
@@ -49,33 +60,34 @@ public class SubjectView extends VerticalLayout implements View {
 		title.addStyleName("h1");
 		addComponent(title);
 		
-		HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-		addComponent(splitPanel);
-		
-		VerticalLayout leftLayout = new VerticalLayout();
-		splitPanel.addComponent(leftLayout);
-		splitPanel.addComponent(editorLayout);
-		leftLayout.addComponent(tblSubjects);
-		
-		splitPanel.setSplitPosition(25, Unit.PERCENTAGE);
-		splitPanel.setLocked(true);
+		addComponent(tblSubjects);
 		
 		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
-		leftLayout.addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponent(btnNewSubject);
+		bottomLeftLayout.setSpacing(true);
+		addComponent(bottomLeftLayout);
+		bottomLeftLayout.addComponents(btnChange, btnNewSubject);
+		
+		btnChange.addClickListener(event -> {
+			try {
+				if("Bearbeiten".equals(btnChange.getCaption())) {
+					tblSubjects.setEditable(true);
+					btnChange.setCaption("Speichern");
+					updateTable();
+				} else {
+					tblSubjects.setEditable(false);
+					btnChange.setCaption("Bearbeiten");
+					Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
+					updateTable();
+				}
+			} catch (Exception e) {
+				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+			}
+		});
 		
 		btnNewSubject.addClickListener(event -> {
 			newSubjectWindow();
 		});
 		
-		leftLayout.setWidth("100%");
-		leftLayout.setSpacing(true);
-		leftLayout.setExpandRatio(tblSubjects, 1);
-		tblSubjects.setSizeFull();
-		
-		bottomLeftLayout.setWidth("100%");
-		editorLayout.setMargin(true);
-		editorLayout.setVisible(false);
 	}
 		
 	private void initTable() {
@@ -87,62 +99,17 @@ public class SubjectView extends VerticalLayout implements View {
 		tblSubjects.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblSubjects.setVisibleColumns( new Object[] {"spartenname"} );
 		tblSubjects.setColumnHeaders("Sparte");
-		
-		tblSubjects.addItemClickListener(event -> {
-			editorFields.setItemDataSource(event.getItem());
-			editorFields.bindMemberFields(this);
-			editorLayout.setVisible(event.getItem() != null);
-		});
+		tblSubjects.setWidth("40%");
+		tblSubjects.addActionHandler(getActionHandler());
 		
 		updateTable();
-	}
-	
-	private void initEditor() {
-		editorLayout.addComponent(txtSpartenname);
-		HorizontalLayout buttonLayout = new HorizontalLayout();
-		buttonLayout.setSpacing(true);
-		buttonLayout.addComponents(btnSave, btnDelete);
-		editorLayout.addComponent(buttonLayout);
-		editorLayout.setWidth("100%");
-				
-		btnSave.addClickListener(event -> {
-			try {
-				editorFields.commit();
-				Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
-			} catch (Exception e) {
-				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
-			}
-		});
-		
-		btnDelete.setStyleName("danger");
-		btnDelete.addClickListener(event -> {
-			try {
-				subjects.removeItem(tblSubjects.getValue());
-				updateTable();
-			} catch (Exception e2) {
-				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
-			}
-		});
-
-		btnDelete.setStyleName("danger");
-		btnDelete.addClickListener(event -> {
-			try {
-				subjects.removeItem(tblSubjects.getValue());
-				updateTable();
-				editorLayout.setVisible(false);
-			} catch (Exception e2) {
-				Notification.show("Fehler: " + e2.getMessage(), Notification.Type.ERROR_MESSAGE);
-			}
-		});
-		
-		editorFields.setBuffered(false);
 	}
 	
 	private void updateTable() {
 		if (tblSubjects.size() > 15) {
 			tblSubjects.setPageLength(15);
 		} else {
-			tblSubjects.setPageLength(tblSubjects.size());
+			tblSubjects.setPageLength(tblSubjects.size() + 1);
 		}
 		tblSubjects.markAsDirtyRecursive();
 	}
@@ -170,6 +137,10 @@ public class SubjectView extends VerticalLayout implements View {
 		});
 		
 		getUI().addWindow(window);
+	}
+	
+	private Handler getActionHandler() {
+		return actionHandler;
 	}
 	
 
