@@ -43,22 +43,17 @@ import de.juette.dlsa.ComponentHelper;
 public class MemberView extends VerticalLayout implements View {
 
 	private final Table tblMembers = new Table();
-	@PropertyId("mitgliedsnummer")
-	private TextField txtMitgliedsnummer = new TextField("Mitgliedsnummer:");
-	@PropertyId("nachname")
-	private TextField txtNachname = new TextField("Nachname:");
-	@PropertyId("vorname")
-	private TextField txtVorname = new TextField("Vorname:");
+	
 	
 	private final ComboBox cbAllGroups = new ComboBox("Alle Gruppen:");
-	private final Table tblMemberGroups = new Table("Zugeordnete Gruppen:");
+	//private final Table tblMemberGroups = new Table("Zugeordnete Gruppen:");
 	
 	private final ComboBox cbAllSubjects = new ComboBox("Alle Sparten:");
 	private final Table tblMemberSubjects = new Table("Zugeordnete Sparten:");
 	
 	private FieldGroup fieldGroup;
 	private BeanItemContainer<Member> members = new BeanItemContainer<>(Member.class);
-	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(Group.class);
+	//private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(Group.class);
 	private BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(Subject.class);
 	
 	private BeanItemContainer<Group> mGroups = new BeanItemContainer<Group>(Group.class);
@@ -121,7 +116,7 @@ public class MemberView extends VerticalLayout implements View {
 	private void openMemberWindow(Item beanItem, String caption) {
 		Window window = new Window(caption);
 		window.setModal(true);
-		window.setWidth("400");
+		//window.setWidth("400");
 		
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
@@ -130,7 +125,24 @@ public class MemberView extends VerticalLayout implements View {
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
 		
-		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer);
+		TextField txtMitgliedsnummer = new TextField("Mitgliedsnummer:");
+		fieldGroup.bind(txtMitgliedsnummer, "mitgliedsnummer");
+		
+		TextField txtNachname = new TextField("Nachname:");
+		fieldGroup.bind(txtNachname, "nachname");
+		
+		TextField txtVorname = new TextField("Vorname:");
+		fieldGroup.bind(txtVorname, "vorname");
+		
+		Table tblMemberGroups = new Table("Zugeordnete Gruppen:");
+		BeanItemContainer<Group> groups = new BeanItemContainer<Group>(Group.class);
+		groups.addAll(((BeanItem<Member>)beanItem).getBean().getGruppen());
+		tblMemberGroups.setContainerDataSource(groups);
+		tblMemberGroups.setVisibleColumns( new Object[] {"gruppenname"} );
+		tblMemberGroups.setColumnHeaders("Gruppen");
+		updateTable(tblMemberGroups);
+		
+		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer, tblMemberGroups);
 		
 		Button btnSaveNewMember = new Button("Speichern");
 		layout.addComponent(btnSaveNewMember);
