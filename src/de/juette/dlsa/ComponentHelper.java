@@ -8,7 +8,9 @@ import model.Activity;
 import model.Booking;
 import model.Group;
 import model.Member;
+import model.Role;
 import model.Subject;
+import model.User;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Component;
@@ -111,6 +113,21 @@ public class ComponentHelper {
 			e.printStackTrace();
 		}
 		return bookings;
+	}
+	
+	public static BeanItemContainer<User> getDummyUsers() {
+		BeanItemContainer<User> users = new BeanItemContainer<User>(User.class);
+		users.addItem(new User("Administrator", "geheim", true, getDummyRoles().getIdByIndex(0)));
+		users.addItem(new User("Benutzer1", "nochgeheimer", true, getDummyRoles().getIdByIndex(1)));
+		users.addItem(new User("Inaktiver", "geheim", false, getDummyRoles().getIdByIndex(1)));
+		return users;
+	}
+	
+	public static BeanItemContainer<Role> getDummyRoles() {
+		BeanItemContainer<Role> roles = new BeanItemContainer<Role>(Role.class);
+		roles.addItem(new Role("Admin"));
+		roles.addItem(new Role("Benutzer"));
+		return roles;
 	}
 	
 }
