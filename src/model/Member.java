@@ -17,6 +17,13 @@ public class Member extends AbstractEntity {
 		
 	}
 	
+	public Member(String nachname, String vorname, String mitgliedsnummer) {
+		super();
+		this.nachname = nachname;
+		this.vorname = vorname;
+		this.mitgliedsnummer = mitgliedsnummer;
+	}
+	
 	public Member(String nachname, String vorname, String mitgliedsnummer,
 			Collection<Group> gruppen, Collection<Subject> sparten) {
 		super();
