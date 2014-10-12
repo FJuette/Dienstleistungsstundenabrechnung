@@ -13,6 +13,7 @@ import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -225,7 +226,7 @@ public class MemberView extends VerticalLayout implements View {
 
 		layout.addComponent(cbAllGroups);
 
-		Button btnAddGroup = new Button("+");
+		Button btnAddGroup = new Button(FontAwesome.PLUS);
 		layout.addComponent(btnAddGroup);
 
 		mGroups = new BeanItemContainer<Group>(Group.class);
@@ -252,7 +253,7 @@ public class MemberView extends VerticalLayout implements View {
 				}
 			});
 
-		Button btnDeleteGroup = new Button("-");
+		Button btnDeleteGroup = new Button(FontAwesome.MINUS);
 		btnDeleteGroup.addClickListener(event -> {
 			if (tblMemberGroups.getValue() != null) {
 				tblMemberGroups.removeItem(tblMemberGroups.getValue());
@@ -303,7 +304,7 @@ public class MemberView extends VerticalLayout implements View {
 
 		layout.addComponent(cbAllSubjects);
 
-		Button btnAddSubject = new Button("+");
+		Button btnAddSubject = new Button(FontAwesome.PLUS);
 		layout.addComponent(btnAddSubject);
 
 		mSubjects = new BeanItemContainer<Subject>(Subject.class);
@@ -329,7 +330,7 @@ public class MemberView extends VerticalLayout implements View {
 					}
 				});
 
-		Button btnDeleteSubject = new Button("-");
+		Button btnDeleteSubject = new Button(FontAwesome.MINUS);
 		btnDeleteSubject.addClickListener(event -> {
 			if (tblMemberSubjects.getValue() != null) {
 				tblMemberSubjects.removeItem(tblMemberSubjects.getValue());
