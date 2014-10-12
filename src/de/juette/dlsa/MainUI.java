@@ -4,14 +4,15 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-
 import javax.servlet.annotation.WebServlet;
 
-
+import model.Group;
+import model.User;
 import Views.BookingView;
 import Views.GroupsView;
 import Views.HelpView;
 import Views.LogView;
+import Views.LoginView;
 import Views.MainView;
 import Views.MemberView;
 import Views.SearchView;
@@ -19,39 +20,50 @@ import Views.SettingsView;
 import Views.SubjectView;
 import Views.UserView;
 
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ValoTheme;
 
 @SuppressWarnings("serial")
 @Theme("dlsaTheme")
 @Title("Dienstleistungsstundenabrechung")
 public class MainUI extends UI implements ViewChangeListener {
-	
+
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = MainUI.class)
 	public static class Servlet extends VaadinServlet {
 	}
-	
+
 	private Navigator navigator;
 	private LinkedHashMap<String, Class<? extends View>> routes = new LinkedHashMap<String, Class<? extends View>>() {
 		{
@@ -66,7 +78,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("help", HelpView.class);
 		}
 	};
-	
+
 	ValoMenuLayout root = new ValoMenuLayout();
 	ComponentContainer viewDisplay = root.getContentContainer();
 	CssLayout menu = new CssLayout();
@@ -75,11 +87,11 @@ public class MainUI extends UI implements ViewChangeListener {
 		menu.setId("MainMenu");
 	}
 	private LinkedHashMap<String, String> menuItems;
-		
+
 	@Override
 	protected void init(VaadinRequest request) {
 		setLocale(Locale.GERMANY);
-		
+
 		setContent(root);
 		root.setWidth("100%");
 		root.addMenu(buildMenu());
@@ -91,11 +103,12 @@ public class MainUI extends UI implements ViewChangeListener {
 		final String f = Page.getCurrent().getUriFragment();
 		if (f == null || f.equals("")) {
 			navigator.navigateTo("booking");
+			LoginWindow();
 		}
 
 		navigator.setErrorView(MainView.class);
 	}
-	
+
 	CssLayout buildMenu() {
 		menuItems = new LinkedHashMap<String, String>() {
 			{
@@ -131,31 +144,29 @@ public class MainUI extends UI implements ViewChangeListener {
 		showMenu.addStyleName("valo-menu-toggle");
 		showMenu.setIcon(FontAwesome.LIST);
 		menu.addComponent(showMenu);
-		
+
 		final Label title = new Label(
 				"<h3><strong>DLS-Verwaltung</strong></h3>", ContentMode.HTML);
 		title.setSizeUndefined();
 		top.addComponent(title);
 		top.setExpandRatio(title, 1);
-		
+
 		final MenuBar settings = new MenuBar();
 		settings.addStyleName("user-menu");
-		
+
 		/*
-		final MenuItem settingsItem = settings.addItem("Fabian Juette",
-				new ThemeResource("../valomenutest/img/profile-pic-300px.jpg"),
-				null);
-		
-		settingsItem.addItem("Edit Profile", null);
-		settingsItem.addItem("Preferences", null);
-		settingsItem.addSeparator();
-		settingsItem.addItem("Sign Out", null);
-		menu.addComponent(settings);
-		*/
-		
+		 * final MenuItem settingsItem = settings.addItem("Fabian Juette", new
+		 * ThemeResource("../valomenutest/img/profile-pic-300px.jpg"), null);
+		 * 
+		 * settingsItem.addItem("Edit Profile", null);
+		 * settingsItem.addItem("Preferences", null);
+		 * settingsItem.addSeparator(); settingsItem.addItem("Sign Out", null);
+		 * menu.addComponent(settings);
+		 */
+
 		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
 		menu.addComponent(menuItemsLayout);
-		
+
 		Label label = null;
 		for (final Entry<String, String> item : menuItems.entrySet()) {
 			if (item.getKey().equals("user")) {
@@ -172,7 +183,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				label.setSizeUndefined();
 				menuItemsLayout.addComponent(label);
 			}
-			
+
 			final Button b = new Button(item.getValue());
 			b.addClickListener(event -> {
 				navigator.navigateTo(item.getKey());
@@ -181,19 +192,76 @@ public class MainUI extends UI implements ViewChangeListener {
 			b.setPrimaryStyleName("valo-menu-item");
 			menuItemsLayout.addComponent(b);
 		}
-		
+
 		// Logout Button
 		final Button b = new Button("Abmelden");
 		b.addClickListener(event -> {
-			Notification.show("Erfolgreich ausgeloggt.", Notification.Type.TRAY_NOTIFICATION);
+			LoginWindow();
+			Notification.show("Erfolgreich ausgeloggt.",
+					Notification.Type.TRAY_NOTIFICATION);
 		});
 		b.setHtmlContentAllowed(true);
 		b.setPrimaryStyleName("valo-menu-item");
 		menuItemsLayout.addComponent(b);
-		
+
 		return menu;
 	}
-	
+
+	private void LoginWindow() {
+		Window window = new Window("");
+		window.setModal(true);
+		window.setWidth("600");
+		window.setHeight("250");
+		
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+
+		final VerticalLayout loginPanel = new VerticalLayout();
+		loginPanel.setSizeUndefined();
+		loginPanel.setSpacing(true);
+		Responsive.makeResponsive(loginPanel);
+		loginPanel.addStyleName("login-panel");
+		
+		CssLayout labels = new CssLayout();
+		labels.addStyleName("labels");
+		Label title = new Label("DLS-Verwaltung Login");
+		title.setSizeUndefined();
+		title.addStyleName(ValoTheme.LABEL_H3);
+		title.addStyleName(ValoTheme.LABEL_LIGHT);
+		labels.addComponent(title);
+		loginPanel.addComponent(labels);
+		
+		HorizontalLayout fields = new HorizontalLayout();
+		fields.setSpacing(true);
+		fields.addStyleName("fields");
+		final TextField username = new TextField("Benutzername");
+		username.setIcon(FontAwesome.USER);
+		username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+		final PasswordField password = new PasswordField("Passwort");
+		password.setIcon(FontAwesome.LOCK);
+		password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+		final Button signin = new Button("Einloggen");
+		signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
+		signin.setClickShortcut(KeyCode.ENTER);
+		signin.focus();
+		fields.addComponents(username, password, signin);
+		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
+		signin.addClickListener(new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				window.close();
+				UI.getCurrent().getNavigator().navigateTo("booking");
+			}
+		});
+		
+		loginPanel.addComponent(fields);
+		loginPanel.addComponent(new CheckBox("Angemeldet bleiben", true));
+
+		layout.addComponent(loginPanel);
+		getUI().addWindow(window);
+	}
+
 	@Override
 	public boolean beforeViewChange(ViewChangeEvent event) {
 		return true;
