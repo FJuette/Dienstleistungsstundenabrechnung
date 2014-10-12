@@ -1,5 +1,13 @@
 package Views;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import model.Group;
 import model.Member;
 import model.Subject;
@@ -14,16 +22,20 @@ import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Upload.Receiver;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -41,7 +53,6 @@ public class MemberView extends VerticalLayout implements View {
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Subject> mSubjects;
 
-	private Button btnImport = new Button("Mitglieder aus CSV-Datei einlesen");
 	private Button btnNewMember = new Button("Neues Mitglied");
 
 	private ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
@@ -98,28 +109,32 @@ public class MemberView extends VerticalLayout implements View {
 
 		HorizontalLayout filterLayout = new HorizontalLayout();
 		filterLayout.setSpacing(true);
-		
+
 		cbFilterGroup.setContainerDataSource(ComponentHelper.getDummyGroups());
 		cbFilterGroup.setItemCaptionPropertyId("gruppenname");
 		cbFilterGroup.setImmediate(true);
 		filterLayout.addComponent(cbFilterGroup);
-		
-		cbFilterSubject.setContainerDataSource(ComponentHelper.getDummySubjects());
+
+		cbFilterSubject.setContainerDataSource(ComponentHelper
+				.getDummySubjects());
 		cbFilterSubject.setItemCaptionPropertyId("spartenname");
 		cbFilterSubject.setImmediate(true);
 		filterLayout.addComponent(cbFilterSubject);
-		
+
 		addComponent(filterLayout);
 		addComponent(tblMembers);
 
-		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
+		VerticalLayout bottomLeftLayout = new VerticalLayout();
 		bottomLeftLayout.setSpacing(true);
 		addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponents(btnImport, btnNewMember);
 
-		btnImport.addClickListener(event -> {
-			UI.getCurrent().addWindow(new CsvImportWindow());
-		});
+		FileUploader reciever = new FileUploader();
+		// Create the upload with a caption and set reciever later
+		Upload upload = new Upload("", reciever);
+		upload.setButtonCaption("Einlesen");
+		upload.addSucceededListener(reciever);
+
+		bottomLeftLayout.addComponents(btnNewMember, upload);
 
 		btnNewMember.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
@@ -127,12 +142,86 @@ public class MemberView extends VerticalLayout implements View {
 		});
 
 		cbFilterGroup.addValueChangeListener(event -> {
-			Notification.show("Noch nicht implementiert", Notification.Type.HUMANIZED_MESSAGE);
+			Notification.show("Noch nicht implementiert",
+					Notification.Type.HUMANIZED_MESSAGE);
 		});
-		
+
 		cbFilterSubject.addValueChangeListener(event -> {
-			Notification.show("Noch nicht implementiert", Notification.Type.HUMANIZED_MESSAGE);
+			Notification.show("Noch nicht implementiert",
+					Notification.Type.HUMANIZED_MESSAGE);
 		});
+	}
+
+	class FileUploader implements Receiver, SucceededListener {
+
+		public File file;
+
+		@Override
+		public OutputStream receiveUpload(String filename, String mimeType) {
+			// Create upload stream
+			FileOutputStream fos = null; // Stream to write to
+			try {
+				// Open the file for writing
+				System.out.println(VaadinService.getCurrent()
+						.getBaseDirectory().getAbsolutePath()
+						+ "/WEB-INF/Files/" + filename);
+				file = new File(VaadinService.getCurrent().getBaseDirectory()
+						.getAbsolutePath()
+						+ "/WEB-INF/Files/" + filename);
+				fos = new FileOutputStream(file);
+			} catch (final FileNotFoundException ex) {
+				new Notification("Datei nicht gefunden:<br/>", ex.getMessage(),
+						Notification.Type.ERROR_MESSAGE);
+				return null;
+			} catch (final Exception ex) {
+				new Notification("Fehler:<br/>", ex.getMessage(),
+						Notification.Type.ERROR_MESSAGE);
+				return null;
+			}
+			return fos;
+		}
+
+		public void uploadSucceeded(SucceededEvent e) {
+			/*
+			 * Für jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
+			 * allen Feldern Rechte Combobox mit allen Spalten aus der CSV
+			 */
+			Notification.show(file.getName(),
+					Notification.Type.TRAY_NOTIFICATION);
+			for (String col : getColumnNames(VaadinService.getCurrent()
+					.getBaseDirectory().getAbsolutePath()
+					+ "/WEB-INF/Files/" + file.getName())) {
+				System.out.println(col);
+			}
+		}
+	}
+
+	// http://www.mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
+	private String[] getColumnNames(String file) {
+		// Make a class for handling CSV files
+		// Path as property
+		// Content as Object?
+		BufferedReader br = null;
+		String cvsSplitBy = ";";
+
+		try {
+
+			br = new BufferedReader(new FileReader(file));
+			return br.readLine().split(cvsSplitBy);
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	private void initTable() {
@@ -187,7 +276,9 @@ public class MemberView extends VerticalLayout implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					members.addItem(new Member(txtNachname.getValue(), txtVorname.getValue(), txtMitgliedsnummer.getValue()));
+					members.addItem(new Member(txtNachname.getValue(),
+							txtVorname.getValue(), txtMitgliedsnummer
+									.getValue()));
 				} else {
 					members.addItem((BeanItem<Member>) fieldGroup
 							.getItemDataSource());
