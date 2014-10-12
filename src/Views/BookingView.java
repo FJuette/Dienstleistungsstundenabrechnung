@@ -110,12 +110,17 @@ public class BookingView extends VerticalLayout implements View {
 		TextField txtFilterDls = new TextField("Anzahl DLS:");
 		txtFilterDls.setConverter(Integer.class);
 		txtFilterDls.setConversionError("Die Anzahl der Dienstleistungsstunden muss eine Zahl sein.");
+		txtFilterDls.setNullRepresentation("");
 		txtFilterDls.addTextChangeListener(event -> {
 			filterTable("anzahlDLS", event.getText());
 		});
 		
 		TextField txtFilterDate = new TextField("Datum:");
+		txtFilterDate.setNullRepresentation("");
 		txtFilterDate.setConverter(Date.class);
+		txtFilterDate.addTextChangeListener(event -> {
+			
+		});
 		
 		TextField txtFilterNote = new TextField("Bemerkung:");
 		txtFilterNote.setConverter(String.class);
