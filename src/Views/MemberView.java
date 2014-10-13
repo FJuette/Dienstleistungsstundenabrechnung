@@ -107,21 +107,7 @@ public class MemberView extends VerticalLayout implements View {
 		title.addStyleName("h1");
 		addComponent(title);
 
-		HorizontalLayout filterLayout = new HorizontalLayout();
-		filterLayout.setSpacing(true);
-
-		cbFilterGroup.setContainerDataSource(ComponentHelper.getDummyGroups());
-		cbFilterGroup.setItemCaptionPropertyId("gruppenname");
-		cbFilterGroup.setImmediate(true);
-		filterLayout.addComponent(cbFilterGroup);
-
-		cbFilterSubject.setContainerDataSource(ComponentHelper
-				.getDummySubjects());
-		cbFilterSubject.setItemCaptionPropertyId("spartenname");
-		cbFilterSubject.setImmediate(true);
-		filterLayout.addComponent(cbFilterSubject);
-
-		addComponent(filterLayout);
+		addComponent(initFilter());
 		addComponent(tblMembers);
 
 		VerticalLayout bottomLeftLayout = new VerticalLayout();
@@ -141,6 +127,27 @@ public class MemberView extends VerticalLayout implements View {
 					"Anlegen eines neuen Mitglieds");
 		});
 
+	}
+	
+	private HorizontalLayout initFilter() {
+		HorizontalLayout filterLayout = new HorizontalLayout();
+		filterLayout.setSpacing(true);
+		
+		TextField txtFilterName = new TextField("Name");
+		filterLayout.addComponent(txtFilterName);
+
+		cbFilterGroup.setContainerDataSource(ComponentHelper.getDummyGroups());
+		cbFilterGroup.setItemCaptionPropertyId("gruppenname");
+		cbFilterGroup.setImmediate(true);
+		filterLayout.addComponent(cbFilterGroup);
+
+		cbFilterSubject.setContainerDataSource(ComponentHelper
+				.getDummySubjects());
+		cbFilterSubject.setItemCaptionPropertyId("spartenname");
+		cbFilterSubject.setImmediate(true);
+		filterLayout.addComponent(cbFilterSubject);
+		
+
 		cbFilterGroup.addValueChangeListener(event -> {
 			Notification.show("Noch nicht implementiert",
 					Notification.Type.HUMANIZED_MESSAGE);
@@ -150,6 +157,18 @@ public class MemberView extends VerticalLayout implements View {
 			Notification.show("Noch nicht implementiert",
 					Notification.Type.HUMANIZED_MESSAGE);
 		});
+		
+		txtFilterName.addTextChangeListener(event -> {
+			filterTable("nachname", event.getText());
+		});
+		return filterLayout;
+	}
+	
+	private void filterTable(Object columnId, String value) {
+		members.removeAllContainerFilters();
+		members.addContainerFilter(columnId, value, true, false);
+		
+		ComponentHelper.updateTable(tblMembers);
 	}
 
 	class FileUploader implements Receiver, SucceededListener {
@@ -183,7 +202,7 @@ public class MemberView extends VerticalLayout implements View {
 
 		public void uploadSucceeded(SucceededEvent e) {
 			/*
-			 * Für jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
+			 * Fï¿½r jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
 			 * allen Feldern Rechte Combobox mit allen Spalten aus der CSV
 			 */
 			Notification.show(file.getName(),
@@ -232,9 +251,9 @@ public class MemberView extends VerticalLayout implements View {
 		tblMembers.setImmediate(true);
 		tblMembers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblMembers.setVisibleColumns(new Object[] { "mitgliedsnummer",
-				"nachname", "vorname" });
-		tblMembers.setColumnHeaders("Mitgliedsnummer", "Nachname", "Vorname");
-		tblMembers.setWidth("80%");
+				"fullName" });
+		tblMembers.setColumnHeaders("Mitgliedsnummer", "Name");
+		tblMembers.setWidth("60%");
 		tblMembers.addActionHandler(getActionHandler());
 		tblMembers.addItemClickListener(event -> {
 			if (event.isDoubleClick()) {
