@@ -3,6 +3,7 @@ package Views;
 import model.Role;
 import model.User;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
@@ -11,6 +12,9 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.DefaultFieldFactory;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -22,6 +26,7 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.RoleToRolenameConverter;
 
 @SuppressWarnings("serial")
 public class UserView extends VerticalLayout implements View {
@@ -96,17 +101,35 @@ public class UserView extends VerticalLayout implements View {
 
 	private void initTable() {
 		users = ComponentHelper.getDummyUsers();
-		users.addNestedContainerProperty("rolle.rollenname");
+		//users.addNestedContainerProperty("rolle.rollenname");
 		
 		tblUsers.setContainerDataSource(users);
 		tblUsers.setSelectable(true);
 		tblUsers.setImmediate(true);
 		tblUsers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-		tblUsers.setVisibleColumns( new Object[] {"benutzername", "aktiv", "rolle.rollenname"} );
+		tblUsers.setVisibleColumns( new Object[] {"benutzername", "aktiv", "rolle"} );
 		tblUsers.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
 		tblUsers.setConverter("aktiv", new BooleanToGermanConverter());
+		tblUsers.setConverter("rolle", new RoleToRolenameConverter());
 		tblUsers.addActionHandler(getActionHandler());
-		tblUsers.setWidth("40%");
+		tblUsers.setWidth("60%");
+		tblUsers.setTableFieldFactory(new DefaultFieldFactory() {
+			@Override
+            public Field createField(Container container, Object itemId,
+                    Object propertyId, Component uiContext) {
+                if ("rolle".equals(propertyId)) {
+                    final ComboBox select = new ComboBox();
+                    select.setImmediate(true);
+                    select.setNullSelectionAllowed(false);
+                    BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
+                    select.setContainerDataSource(roles);
+                    select.setItemCaptionPropertyId("rollenname");
+                    return select;
+                }
+                
+                return super.createField(container, itemId, propertyId, uiContext);
+            }
+		});
 		
 		ComponentHelper.updateTable(tblUsers);
 	}
@@ -133,7 +156,11 @@ public class UserView extends VerticalLayout implements View {
 		layout.addComponent(cbActive);
 		
 		ComboBox cbRoles = new ComboBox("Rollen");
-		cbRoles.setContainerDataSource(ComponentHelper.getDummyRoles());
+		BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
+		cbRoles.setContainerDataSource(roles);
+		cbRoles.setItemCaptionPropertyId("rollenname");
+		cbRoles.setNullSelectionAllowed(false);
+		cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
 		layout.addComponent(cbRoles);
 		
 		Button btnSaveNewGroup = new Button("Speichern");
