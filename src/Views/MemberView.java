@@ -24,6 +24,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -128,12 +129,12 @@ public class MemberView extends VerticalLayout implements View {
 		});
 
 	}
-	
+
 	private HorizontalLayout initFilter() {
 		HorizontalLayout filterLayout = new HorizontalLayout();
 		filterLayout.setSpacing(true);
-		
-		TextField txtFilterName = new TextField("Name");
+
+		TextField txtFilterName = new TextField("Filter nach Name:");
 		filterLayout.addComponent(txtFilterName);
 
 		cbFilterGroup.setContainerDataSource(ComponentHelper.getDummyGroups());
@@ -146,7 +147,6 @@ public class MemberView extends VerticalLayout implements View {
 		cbFilterSubject.setItemCaptionPropertyId("spartenname");
 		cbFilterSubject.setImmediate(true);
 		filterLayout.addComponent(cbFilterSubject);
-		
 
 		cbFilterGroup.addValueChangeListener(event -> {
 			Notification.show("Noch nicht implementiert",
@@ -157,17 +157,17 @@ public class MemberView extends VerticalLayout implements View {
 			Notification.show("Noch nicht implementiert",
 					Notification.Type.HUMANIZED_MESSAGE);
 		});
-		
+
 		txtFilterName.addTextChangeListener(event -> {
 			filterTable("nachname", event.getText());
 		});
 		return filterLayout;
 	}
-	
+
 	private void filterTable(Object columnId, String value) {
 		members.removeAllContainerFilters();
 		members.addContainerFilter(columnId, value, true, false);
-		
+
 		ComponentHelper.updateTable(tblMembers);
 	}
 
@@ -202,16 +202,16 @@ public class MemberView extends VerticalLayout implements View {
 
 		public void uploadSucceeded(SucceededEvent e) {
 			/*
-			 * F�r jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
-			 * allen Feldern Rechte Combobox mit allen Spalten aus der CSV
+			 * F�r jede Spalte links aus der Klasse/DB eine Combobox mit
+			 * jeweils allen Feldern Rechte Combobox mit allen Spalten aus der
+			 * CSV
 			 */
 			Notification.show(file.getName(),
 					Notification.Type.TRAY_NOTIFICATION);
-			for (String col : getColumnNames(VaadinService.getCurrent()
+			ImportWindow(getColumnNames(VaadinService.getCurrent()
 					.getBaseDirectory().getAbsolutePath()
-					+ "/WEB-INF/Files/" + file.getName())) {
-				System.out.println(col);
-			}
+					+ "/WEB-INF/Files/" + file.getName()), new String[] {
+					"Nachname", "Vorname", "Mitgliedsnummer" });
 		}
 	}
 
@@ -262,6 +262,54 @@ public class MemberView extends VerticalLayout implements View {
 		});
 
 		ComponentHelper.updateTable(tblMembers);
+
+	}
+
+	protected void ImportWindow(String[] csvCols, String[] database) {
+		Window window = new Window("Zuordnung der Spalten");
+		window.setModal(true);
+		window.setWidth("600");
+
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+
+		BeanItemContainer<String> db = new BeanItemContainer<String>(
+				String.class);
+		for (String col : database) {
+			db.addItem(col);
+		}
+		BeanItemContainer<String> csv = new BeanItemContainer<String>(
+				String.class);
+		for (String col : csvCols) {
+			csv.addItem(col);
+		}
+
+		int i = 1;
+		for (String col : database) {
+			HorizontalLayout boxesLayout = new HorizontalLayout();
+			boxesLayout.setSpacing(true);
+			layout.addComponent(boxesLayout);
+
+			ComboBox cb = new ComboBox("DB-Spalte " + i);
+			cb.setContainerDataSource(db);
+			boxesLayout.addComponent(cb);
+
+			ComboBox cb2 = new ComboBox("CSV-Spalte " + i);
+			cb2.setContainerDataSource(csv);
+			boxesLayout.addComponent(cb2);
+
+			i++;
+		}
+
+		Button btnSaveNewGroup = new Button("Speichern");
+		layout.addComponent(btnSaveNewGroup);
+
+		btnSaveNewGroup.addClickListener(event -> {
+			window.close();
+		});
+
+		getUI().addWindow(window);
 
 	}
 

@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.persistence.Entity;
 
@@ -10,6 +11,9 @@ public class Member extends AbstractEntity {
 	private String nachname;
 	private String vorname;
 	private String mitgliedsnummer;
+	private Date eintrittsdatum;
+	private Date austrittsdatum;
+	private Boolean ausgetreten = false;
 	private Collection<Group> gruppen = new ArrayList<Group>();
 	private Collection<Subject> sparten = new ArrayList<Subject>();
 	
@@ -67,6 +71,29 @@ public class Member extends AbstractEntity {
 	}
 	public void setSparten(Collection<Subject> sparten) {
 		this.sparten = sparten;
+	}
+	public Date getEintrittsdatum() {
+		return eintrittsdatum;
+	}
+
+	public void setEintrittsdatum(Date eintrittsdatum) {
+		this.eintrittsdatum = eintrittsdatum;
+	}
+
+	public Date getAustrittsdatum() {
+		return austrittsdatum;
+	}
+
+	public void setAustrittsdatum(Date austrittsdatum) {
+		this.austrittsdatum = austrittsdatum;
+	}
+
+	public Boolean getAusgetreten() {
+		return ausgetreten;
+	}
+
+	public void setAusgetreten(Boolean ausgetreten) {
+		this.ausgetreten = ausgetreten;
 	}
 	
 	
