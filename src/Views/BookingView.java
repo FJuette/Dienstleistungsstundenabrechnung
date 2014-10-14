@@ -110,6 +110,10 @@ public class BookingView extends VerticalLayout implements View {
 				new DateToShortGermanStringConverter());
 		tblBookings.setWidth("80%");
 		tblBookings.addActionHandler(getActionHandler());
+		tblBookings.setColumnExpandRatio("anzahlDLS", (float) 0.1);
+		tblBookings.setColumnExpandRatio("ableistungsDatum", (float) 0.2);
+		tblBookings.setColumnExpandRatio("bemerkung", (float) 0.5);
+		tblBookings.setColumnExpandRatio("mitglied.mitgliedsnummer", (float) 0.2);
 
 		updateTable();
 	}
