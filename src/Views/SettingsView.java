@@ -31,7 +31,7 @@ public class SettingsView extends VerticalLayout implements View {
 		setSpacing(true);
 		setMargin(true);
 		
-		Label title = new Label("Einstellungen");
+		Label title = new Label("Grundeinstellungen");
 		title.addStyleName("h1");
 		addComponent(title);
 		
