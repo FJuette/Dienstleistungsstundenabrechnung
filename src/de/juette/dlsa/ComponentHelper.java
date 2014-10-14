@@ -75,7 +75,7 @@ public class ComponentHelper {
 		members.addItem(new Member("Sander", "Thorsten", "123456", sGroups, sSubjects));
 		members.addItem(new Member("Juette", "Fabian", "987654", jGroups, jSubjects));
 		members.addItem(new Member("Tester", "Tom", "565645", sGroups, sSubjects));
-		members.addItem(new Member("Juppie", "J�rn", "848484", jGroups, jSubjects));
+		members.addItem(new Member("Juppie", "Jörn", "848484", jGroups, jSubjects));
 
 		return members;
 	}
