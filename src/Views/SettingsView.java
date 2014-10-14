@@ -24,7 +24,7 @@ public class SettingsView extends VerticalLayout implements View {
 	private final TextField txtCostDls = new TextField("Kosten pro Dienstleistungsstunde");
 	private final OptionGroup groupKind = new OptionGroup();
 	private final CheckBox cbAusgleich = new CheckBox("Ausgleichungsbuchungen beim Jahreslauf");
-	private final CheckBox cbUebername = new CheckBox("Übername von DLS beim Jahreswechsel");
+	private final CheckBox cbUebername = new CheckBox("Ãœbername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
 	
 	public SettingsView() {
@@ -75,7 +75,7 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-		wrap.setCaption("Übernahme von DLS");
+		wrap.setCaption("Ãœbernahme von DLS");
 		wrap.addComponent(cbUebername);
 		form.addComponent(wrap);
 		
@@ -99,7 +99,7 @@ public class SettingsView extends VerticalLayout implements View {
 	private void addDummyData() {
 		dfStichtag.setValue(new Date(114, 11, 31));
 		txtCountDls.setValue("5");
-		txtCostDls.setValue("10 €");
+		txtCostDls.setValue("10 â‚¬");
 		groupKind.select("Volles Jahr zum Stichtag");
 		cbUebername.setValue(true);
 	}
