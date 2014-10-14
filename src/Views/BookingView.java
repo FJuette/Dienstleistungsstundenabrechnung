@@ -12,6 +12,7 @@ import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
@@ -19,6 +20,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -54,6 +56,7 @@ public class BookingView extends VerticalLayout implements View {
 	private final Table tblBookings = new Table();
 	private final HorizontalLayout filterLayout = new HorizontalLayout();
 	private final Button btnNewBookings = new Button("Neue Buchung(en)");
+	private final Button btnYear = new Button("Jahreslauf durchführen");
 
 	private BeanItemContainer<Booking> bookings = new BeanItemContainer<>(
 			Booking.class);
@@ -82,6 +85,12 @@ public class BookingView extends VerticalLayout implements View {
 		addComponent(lblFilter);
 		addComponent(filterLayout);
 		addComponent(tblBookings);
+		addComponent(btnYear);
+		
+		btnYear.addClickListener(event -> {
+			YearWindow();
+		});
+		
 	}
 
 	private void initTable() {
@@ -170,7 +179,7 @@ public class BookingView extends VerticalLayout implements View {
 		cbMembers.setFilteringMode(FilteringMode.CONTAINS);
 		layout.addComponent(cbMembers);
 		
-		TextField txtContent = new TextField("Bemerkung");
+		TextArea txtContent = new TextArea("Bemerkung");
 		txtContent.setWidth("100%");
 		layout.addComponent(txtContent);
 		
@@ -190,6 +199,44 @@ public class BookingView extends VerticalLayout implements View {
 			txtContent.setValue("");
 			cbMembers.setValue(null);
 			cbMembers.focus();
+		});
+		
+		getUI().addWindow(window);
+	}
+	
+	private void YearWindow() {
+		Window window = new Window("Bestätigung");
+		window.setModal(true);
+		window.setWidth("500");
+		
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		
+		Label lblQuestion = new Label("Soll der Jahreslauf jetzt durchgeführt werden?<br /> "
+				+ "Ein erneuter Durchlauf für dieses Jahr ist dann <strong>nicht</strong> mehr möglich.");
+		lblQuestion.setStyleName("h4");
+		lblQuestion.setContentMode(ContentMode.HTML);
+		lblQuestion.setStyleName("center");
+		layout.addComponent(lblQuestion);
+		
+		HorizontalLayout btnLayout = new HorizontalLayout();
+		btnLayout.setSpacing(true);
+		btnLayout.setStyleName("center");
+		layout.addComponent(btnLayout);
+		
+		Button btnYes = new Button("Ja");
+		btnLayout.addComponent(btnYes);
+		
+		Button btnNo = new Button("Nein");
+		btnLayout.addComponent(btnNo);
+	
+		btnYes.addClickListener(event -> {
+			window.close();
+		});
+		
+		btnNo.addClickListener(event -> {
+			window.close();
 		});
 		
 		getUI().addWindow(window);
