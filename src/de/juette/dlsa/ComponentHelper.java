@@ -37,10 +37,10 @@ public class ComponentHelper {
 	
 	public static BeanItemContainer<Subject> getDummySubjects() {
 		BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(Subject.class);
-		subjects.addItem(new Subject("Spasst‰nzer"));
-		subjects.addItem(new Subject("Standdardst‰nzer"));
-		subjects.addItem(new Subject("Rutinet‰nzer"));
-		subjects.addItem(new Subject("Prodit‰nzer"));
+		subjects.addItem(new Subject("Spasst√§nzer"));
+		subjects.addItem(new Subject("Standdardst√§nzer"));
+		subjects.addItem(new Subject("Rutinet√§nzer"));
+		subjects.addItem(new Subject("Prodit√§nzer"));
 		return subjects;
 	}
 	
@@ -75,7 +75,7 @@ public class ComponentHelper {
 		members.addItem(new Member("Sander", "Thorsten", "123456", sGroups, sSubjects));
 		members.addItem(new Member("Juette", "Fabian", "987654", jGroups, jSubjects));
 		members.addItem(new Member("Tester", "Tom", "565645", sGroups, sSubjects));
-		members.addItem(new Member("Juppie", "Jˆrn", "848484", jGroups, jSubjects));
+		members.addItem(new Member("Juppie", "JÔøΩrn", "848484", jGroups, jSubjects));
 
 		return members;
 	}
