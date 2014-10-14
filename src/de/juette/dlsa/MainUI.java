@@ -6,8 +6,10 @@ import java.util.Map.Entry;
 
 import javax.servlet.annotation.WebServlet;
 
+import model.Activity;
 import model.Group;
 import model.User;
+import Views.ActivityView;
 import Views.BookingView;
 import Views.GroupsView;
 import Views.HelpView;
@@ -70,6 +72,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
 			put("subject", SubjectView.class);
+			put("acitivies", ActivityView.class);
 			put("user", UserView.class);
 			put("member", MemberView.class);
 			put("settings", SettingsView.class);
@@ -115,6 +118,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("booking", "Journal");
 				put("user", "Benutzer");
 				put("member", "Mitglieder");
+				put("acitivies", "Aktionen");
 				put("groups", "Gruppen");
 				put("subject", "Sparten");
 				put("settings", "Einstellungen");
@@ -170,7 +174,7 @@ public class MainUI extends UI implements ViewChangeListener {
 		Label label = null;
 		for (final Entry<String, String> item : menuItems.entrySet()) {
 			if (item.getKey().equals("user")) {
-				label = new Label("Einstellungen", ContentMode.HTML);
+				label = new Label("Verwaltung", ContentMode.HTML);
 				label.setPrimaryStyleName("valo-menu-subtitle");
 				label.addStyleName("h4");
 				label.setSizeUndefined();
