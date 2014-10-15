@@ -1,5 +1,6 @@
 package Views;
 
+import java.io.File;
 import java.util.Date;
 
 import model.Activity;
@@ -11,6 +12,10 @@ import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -235,10 +240,17 @@ public class BookingView extends VerticalLayout implements View {
 		Button btnNo = new Button("Nein");
 		btnLayout.addComponent(btnNo);
 	
-		btnYes.addClickListener(event -> {
+		String basepath = VaadinService.getCurrent().getBaseDirectory()
+				.getAbsolutePath();
+		Resource res = new FileResource(new File(basepath
+				+ "/WEB-INF/Files/ExampleResult.csv"));
+		FileDownloader fd = new FileDownloader(res);
+		fd.extend(btnYes);
+		
+		btnYes.addClickListener(evnet -> {
 			window.close();
 		});
-		
+			
 		btnNo.addClickListener(event -> {
 			window.close();
 		});
