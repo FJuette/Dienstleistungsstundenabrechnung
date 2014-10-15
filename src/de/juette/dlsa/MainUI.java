@@ -78,7 +78,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("settings", SettingsView.class);
 			put("log", LogView.class);
 			put("search", SearchView.class);
-			put("help", HelpView.class);
+			//put("help", HelpView.class);
 		}
 	};
 
@@ -124,7 +124,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("settings", "Einstellungen");
 				put("search", "Suche");
 				put("log", "Historie");
-				put("help", "Hilfe");
+				//put("help", "Hilfe");
 			}
 		};
 
