@@ -80,15 +80,23 @@ public class ComponentHelper {
 		jSubjects.add(getDummySubjects().getIdByIndex(0));
 		jSubjects.add(getDummySubjects().getIdByIndex(1));
 
-		members.addItem(new Member("Sander", "Thorsten", "123456", sGroups,
-				sSubjects));
-		members.addItem(new Member("Juette", "Fabian", "987654", jGroups,
-				jSubjects));
-		members.addItem(new Member("Tester", "Tom", "565645", sGroups,
-				sSubjects));
-		members.addItem(new Member("Juppie", "Jörn", "848484", jGroups,
-				jSubjects));
-
+		try {
+			members.addItem(new Member("Sander", "Thorsten", "123456",
+					new SimpleDateFormat("dd.MM.yyyy").parse("11.01.2014"),
+					sGroups, sSubjects));
+			members.addItem(new Member("Juette", "Fabian", "987654",
+					new SimpleDateFormat("dd.MM.yyyy").parse("01.01.2014"),
+					jGroups, jSubjects));
+			members.addItem(new Member("Tester", "Tom", "565645",
+					new SimpleDateFormat("dd.MM.yyyy").parse("25.03.2000"),
+					sGroups, sSubjects));
+			members.addItem(new Member("Juppie", "Jörn", "848484",
+					new SimpleDateFormat("dd.MM.yyyy").parse("14.12.19987"),
+					jGroups, jSubjects));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return members;
 	}
 
