@@ -12,6 +12,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
@@ -25,24 +26,6 @@ import de.juette.dlsa.ComponentHelper;
 
 @SuppressWarnings("serial")
 public class LogView extends VerticalLayout implements View {
-
-	private Handler actionHandler = new Handler() {
-		private final Action REVERT = new Action("Rückgängig");
-		private final Action[] ACTIONS = new Action[] { REVERT };
-
-		@Override
-		public void handleAction(final Action action, final Object sender,
-				final Object target) {
-			if (action.getCaption().equals("Rückgängig")) {
-				Notification.show("Änderung erfolgreich Rückgängig gemacht");
-			}
-		}
-
-		@Override
-		public Action[] getActions(final Object target, final Object sender) {
-			return ACTIONS;
-		}
-	};
 
 	private final Table tblLog = new Table();
 	private BeanItemContainer<Log> logEntrys = new BeanItemContainer<>(
@@ -72,6 +55,8 @@ public class LogView extends VerticalLayout implements View {
 		addComponent(oldCycles);
 
 		Button saveFile = new Button("Download");
+		saveFile.setIcon(FontAwesome.DOWNLOAD);
+		saveFile.setStyleName("friendly");
 		addComponent(saveFile);
 
 		oldCycles.addValueChangeListener(event -> {
@@ -97,16 +82,10 @@ public class LogView extends VerticalLayout implements View {
 		tblLog.setVisibleColumns(new Object[] { "timestamp", "beschreibung",
 				"bearbeiter.fullName" });
 		tblLog.setColumnHeaders("Zeitpunkt", "Beschreibung", "Bearbeiter");
-		tblLog.setWidth("80%");
-		tblLog.addActionHandler(getActionHandler());
+		tblLog.setWidth("100%");
 
 		ComponentHelper.updateTable(tblLog);
 	}
-
-	private Handler getActionHandler() {
-		return actionHandler;
-	}
-
 	@Override
 	public void enter(ViewChangeEvent event) {
 	}
