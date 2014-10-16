@@ -53,6 +53,7 @@ public class GroupsView extends EditableTable<Group> implements View {
 		layout.addComponent(cbNewGroup);
 		
 		Button btnSaveNewGroup = new Button("Speichern");
+		btnSaveNewGroup.setStyleName("friendly");
 		layout.addComponent(btnSaveNewGroup);
 		
 		btnSaveNewGroup.addClickListener(event -> {
