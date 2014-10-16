@@ -75,6 +75,7 @@ public class ActivityView extends EditableTable<Activity> implements View {
 		layout.addComponent(cbAuthorised);
 
 		Button btnSaveNewGroup = new Button("Speichern");
+		btnSaveNewGroup.setStyleName("friendly");
 		layout.addComponent(btnSaveNewGroup);
 
 		btnSaveNewGroup.addClickListener(event -> {
