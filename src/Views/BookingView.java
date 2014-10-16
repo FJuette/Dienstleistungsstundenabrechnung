@@ -1,11 +1,16 @@
 package Views;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+
 
 import model.Activity;
 import model.Booking;
 import model.Member;
+
+
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
@@ -14,6 +19,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -30,8 +36,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+
+
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.DateToShortGermanStringConverter;
+
 
 @SuppressWarnings("serial")
 public class BookingView extends VerticalLayout implements View {
@@ -48,7 +57,7 @@ public class BookingView extends VerticalLayout implements View {
 						-((Booking)tblBookings.getValue()).getAnzahlDLS(), "Stornierung", 
 						new Date(), ((Booking)tblBookings.getValue()).getMitglied(), 
 						((Booking)tblBookings.getValue()).getAktion(), ((Booking)tblBookings.getValue()).getAbzeichner()));
-				updateTable();
+				ComponentHelper.updateTable(tblBookings);
 			}
 		}
 
@@ -81,6 +90,7 @@ public class BookingView extends VerticalLayout implements View {
 		addComponent(title);
 		
 		addComponent(btnNewBookings);
+		btnNewBookings.setIcon(FontAwesome.PLUS);
 		btnNewBookings.addClickListener(event -> {
 			newBookingsWindow();
 		});
@@ -92,6 +102,7 @@ public class BookingView extends VerticalLayout implements View {
 		addComponent(tblBookings);
 		addComponent(btnYear);
 		
+		btnYear.setStyleName("primary");
 		btnYear.addClickListener(event -> {
 			YearWindow();
 		});
@@ -113,14 +124,14 @@ public class BookingView extends VerticalLayout implements View {
 				"Bemerkung", "Mitgliedsnummer");
 		tblBookings.setConverter("ableistungsDatum",
 				new DateToShortGermanStringConverter());
-		tblBookings.setWidth("80%");
+		tblBookings.setWidth("100%");
 		tblBookings.addActionHandler(getActionHandler());
 		tblBookings.setColumnExpandRatio("anzahlDLS", (float) 0.1);
 		tblBookings.setColumnExpandRatio("ableistungsDatum", (float) 0.2);
 		tblBookings.setColumnExpandRatio("bemerkung", (float) 0.5);
 		tblBookings.setColumnExpandRatio("mitglied.mitgliedsnummer", (float) 0.2);
 
-		updateTable();
+		ComponentHelper.updateTable(tblBookings);
 	}
 
 	private void initFilter() {
@@ -130,29 +141,42 @@ public class BookingView extends VerticalLayout implements View {
 		txtFilterDls.setConversionError("Die Anzahl der Dienstleistungsstunden muss eine Zahl sein.");
 		txtFilterDls.setNullRepresentation("");
 		txtFilterDls.addTextChangeListener(event -> {
-			filterTable("anzahlDLS", event.getText());
+			if (!event.getText().equals("")) {
+				filterTable("anzahlDLS", event.getText());
+			} else {
+				bookings.removeContainerFilters("anzahlDLS");
+			}
+			
 		});
 		
-		TextField txtFilterDate = new TextField("Datum:");
-		txtFilterDate.setNullRepresentation("");
-		txtFilterDate.setConverter(Date.class);
-		txtFilterDate.addTextChangeListener(event -> {
+		DateField dfFilterDate = new DateField("Datum:");
+		dfFilterDate.addValueChangeListener(event -> {
+			if (((DateField)event.getProperty()).getValue() != null) {
+				filterTable("ableistungsDatum", ((DateField)event.getProperty()).getValue().toString());
+			} else {
+				bookings.removeContainerFilters("ableistungsDatum");
+			}
 			
 		});
 		
 		TextField txtFilterNote = new TextField("Bemerkung:");
 		txtFilterNote.setConverter(String.class);
 		txtFilterNote.addTextChangeListener(event -> {
-			filterTable("bemerkung", event.getText());
+			if (!event.getText().equals("")) {
+				filterTable("bemerkung", event.getText());
+			} else {
+				bookings.removeContainerFilters("bemerkung");
+			}
+			
 		});
-		filterLayout.addComponents(txtFilterDls, txtFilterDate, txtFilterNote);
+		filterLayout.addComponents(txtFilterDls, dfFilterDate, txtFilterNote);
 	}
 	
 	private void filterTable(Object columnId, String value) {
-		bookings.removeAllContainerFilters();
+		//bookings.removeAllContainerFilters();
 		bookings.addContainerFilter(columnId, value, true, false);
 		
-		updateTable();
+		ComponentHelper.updateTable(tblBookings);
 	}
 	
 	private void newBookingsWindow() {
@@ -192,10 +216,11 @@ public class BookingView extends VerticalLayout implements View {
 		txtContent.setWidth("100%");
 		layout.addComponent(txtContent);
 		
-		Button btnSaveNewGroup = new Button("Speichern");
-		layout.addComponent(btnSaveNewGroup);
+		Button btnSaveNewBooking = new Button("Speichern");
+		btnSaveNewBooking.setStyleName("friendly");
+		layout.addComponent(btnSaveNewBooking);
 		
-		btnSaveNewGroup.addClickListener(event -> {
+		btnSaveNewBooking.addClickListener(event -> {
 			bookings.addItem(new Booking(
 					Integer.parseInt(txtCountDls.getValue()), 
 					txtContent.getValue(), 
@@ -203,7 +228,7 @@ public class BookingView extends VerticalLayout implements View {
 					(Member)cbMembers.getValue(), 
 					(Activity)cbActivities.getValue(), 
 					(Member)cbMembers.getValue()));
-			updateTable();
+			ComponentHelper.updateTable(tblBookings);
 			
 			txtContent.setValue("");
 			cbMembers.setValue(null);
@@ -256,15 +281,6 @@ public class BookingView extends VerticalLayout implements View {
 		});
 		
 		getUI().addWindow(window);
-	}
-
-	private void updateTable() {
-		if (tblBookings.size() > 15) {
-			tblBookings.setPageLength(15);
-		} else {
-			tblBookings.setPageLength(tblBookings.size());
-		}
-		tblBookings.markAsDirtyRecursive();
 	}
 	
 	private Handler getActionHandler() {
