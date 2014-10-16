@@ -46,6 +46,7 @@ public class SubjectView extends EditableTable<Subject> implements View {
 		layout.addComponent(txtNewSubject);
 				
 		Button btnSaveNewSubject = new Button("Speichern");
+		btnSaveNewSubject.setStyleName("friendly");
 		layout.addComponent(btnSaveNewSubject);
 		
 		btnSaveNewSubject.addClickListener(event -> {
