@@ -164,6 +164,7 @@ public class UserView extends VerticalLayout implements View {
 		layout.addComponent(cbRoles);
 		
 		Button btnSaveNewGroup = new Button("Speichern");
+		btnSaveNewGroup.setStyleName("friendly");
 		layout.addComponent(btnSaveNewGroup);
 		
 		btnSaveNewGroup.addClickListener(event -> {
