@@ -8,9 +8,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 
+
 import model.Group;
 import model.Member;
 import model.Subject;
+
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -26,6 +28,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -40,7 +43,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.ComponentHelper;
+
+import de.juette.dlsa.ComponentHelper;import de.juette.dlsa.MyGroupFilter;
+
 
 @SuppressWarnings("serial")
 public class MemberView extends VerticalLayout implements View {
@@ -149,8 +154,10 @@ public class MemberView extends VerticalLayout implements View {
 		filterLayout.addComponent(cbFilterSubject);
 
 		cbFilterGroup.addValueChangeListener(event -> {
-			Notification.show("Noch nicht implementiert",
-					Notification.Type.HUMANIZED_MESSAGE);
+			members.removeContainerFilters("gruppen");
+			if (cbFilterGroup.getValue() != null && !cbFilterGroup.getValue().equals("")) {
+				members.addContainerFilter(new MyGroupFilter("gruppen", (Group)cbFilterGroup.getValue()));
+			}
 		});
 
 		cbFilterSubject.addValueChangeListener(event -> {
@@ -202,16 +209,16 @@ public class MemberView extends VerticalLayout implements View {
 
 		public void uploadSucceeded(SucceededEvent e) {
 			/*
-			 * F�r jede Spalte links aus der Klasse/DB eine Combobox mit
-			 * jeweils allen Feldern Rechte Combobox mit allen Spalten aus der
-			 * CSV
+			 * Für jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
+			 * allen Feldern Rechte Combobox mit allen Spalten aus der CSV
 			 */
 			Notification.show(file.getName(),
 					Notification.Type.TRAY_NOTIFICATION);
 			ImportWindow(getColumnNames(VaadinService.getCurrent()
 					.getBaseDirectory().getAbsolutePath()
 					+ "/WEB-INF/Files/" + file.getName()), new String[] {
-					"Nachname", "Vorname", "Mitgliedsnummer" });
+					"Nachname", "Vorname", "Mitgliedsnummer", "Eintrittsdatum",
+					"Austrittsdatum", "Ausgetreten" });
 		}
 	}
 
@@ -285,24 +292,37 @@ public class MemberView extends VerticalLayout implements View {
 			csv.addItem(col);
 		}
 
-		int i = 1;
+		HorizontalLayout headLayout = new HorizontalLayout();
+		headLayout.setSpacing(true);
+		layout.addComponent(headLayout);
+
+		Label lblDbHead = new Label("Datenbankfelder");
+		lblDbHead.setStyleName("h4");
+		lblDbHead.setWidth("200");
+		headLayout.addComponent(lblDbHead);
+
+		Label lblCsvHead = new Label("CSV-Spalten");
+		lblCsvHead.setStyleName("h4");
+		lblCsvHead.setWidth("300");
+		headLayout.addComponent(lblCsvHead);
+
 		for (String col : database) {
 			HorizontalLayout boxesLayout = new HorizontalLayout();
 			boxesLayout.setSpacing(true);
 			layout.addComponent(boxesLayout);
 
-			ComboBox cb = new ComboBox("DB-Spalte " + i);
-			cb.setContainerDataSource(db);
-			boxesLayout.addComponent(cb);
+			Label lblDb = new Label(col);
+			lblDb.setWidth("200");
+			boxesLayout.addComponent(lblDb);
 
-			ComboBox cb2 = new ComboBox("CSV-Spalte " + i);
-			cb2.setContainerDataSource(csv);
-			boxesLayout.addComponent(cb2);
-
-			i++;
+			ComboBox cbCsv = new ComboBox();
+			cbCsv.setContainerDataSource(csv);
+			cbCsv.setWidth("300");
+			boxesLayout.addComponent(cbCsv);
 		}
 
 		Button btnSaveNewGroup = new Button("Speichern");
+		btnSaveNewGroup.setStyleName("friendly");
 		layout.addComponent(btnSaveNewGroup);
 
 		btnSaveNewGroup.addClickListener(event -> {
@@ -333,10 +353,24 @@ public class MemberView extends VerticalLayout implements View {
 
 		TextField txtVorname = new TextField("Vorname:");
 		fieldGroup.bind(txtVorname, "vorname");
+		
+		DateField dfEintrittsdatum = new DateField("Eintrittsdatum");
+		fieldGroup.bind(dfEintrittsdatum, "eintrittsdatum");
 
-		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer);
+		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer, dfEintrittsdatum);
+		
+		if (caption.equals("Mitarbeiter bearbeiten")) {
+			DateField dfAustrittsdatum = new DateField("Austrittsdatum");
+			fieldGroup.bind(dfAustrittsdatum, "austrittsdatum");
+			layout.addComponent(dfAustrittsdatum);
+			
+			CheckBox cbAusgetreten = new CheckBox("Ausgetreten");
+			fieldGroup.bind(cbAusgetreten, "ausgetreten");
+			layout.addComponent(cbAusgetreten);
+		}
 
 		Button btnSaveNewMember = new Button("Speichern");
+		btnSaveNewMember.setStyleName("friendly");
 		layout.addComponent(btnSaveNewMember);
 
 		btnSaveNewMember.addClickListener(event -> {
@@ -345,7 +379,7 @@ public class MemberView extends VerticalLayout implements View {
 				if (caption.equals("Anlegen eines neuen Mitglieds")) {
 					members.addItem(new Member(txtNachname.getValue(),
 							txtVorname.getValue(), txtMitgliedsnummer
-									.getValue()));
+									.getValue(), dfEintrittsdatum.getValue()));
 				} else {
 					members.addItem((BeanItem<Member>) fieldGroup
 							.getItemDataSource());
@@ -422,6 +456,7 @@ public class MemberView extends VerticalLayout implements View {
 		layout.addComponent(btnDeleteGroup);
 
 		Button btnSaveChanges = new Button("Speichern");
+		btnSaveChanges.setStyleName("friendly");
 		layout.addComponent(btnSaveChanges);
 
 		btnSaveChanges.addClickListener(event -> {
@@ -499,6 +534,7 @@ public class MemberView extends VerticalLayout implements View {
 		layout.addComponent(btnDeleteSubject);
 
 		Button btnSaveChanges = new Button("Speichern");
+		btnSaveChanges.setStyleName("friendly");
 		layout.addComponent(btnSaveChanges);
 
 		btnSaveChanges.addClickListener(event -> {
