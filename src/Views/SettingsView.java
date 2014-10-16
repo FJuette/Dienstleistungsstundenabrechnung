@@ -81,6 +81,7 @@ public class SettingsView extends VerticalLayout implements View {
 		
 		form.addComponent(btnSave);
 		
+		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
 			Notification.show("Speichern erfolgreich.", Notification.Type.TRAY_NOTIFICATION);
 		});
