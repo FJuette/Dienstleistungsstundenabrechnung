@@ -43,10 +43,10 @@ public class ComponentHelper {
 	public static BeanItemContainer<Subject> getDummySubjects() {
 		BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
 				Subject.class);
-		subjects.addItem(new Subject("Spasstänzer"));
-		subjects.addItem(new Subject("Standdardstänzer"));
-		subjects.addItem(new Subject("Rutinetänzer"));
-		subjects.addItem(new Subject("Proditänzer"));
+		subjects.addItem(new Subject("Freizeitsportler"));
+		subjects.addItem(new Subject("Gelegenheitssportler"));
+		subjects.addItem(new Subject("Rutinesportler"));
+		subjects.addItem(new Subject("Leistungssportler"));
 		return subjects;
 	}
 

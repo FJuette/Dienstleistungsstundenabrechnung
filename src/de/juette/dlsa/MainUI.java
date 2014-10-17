@@ -77,7 +77,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("member", MemberView.class);
 			put("settings", SettingsView.class);
 			put("log", LogView.class);
-			put("search", SearchView.class);
+			//put("search", SearchView.class);
 			//put("help", HelpView.class);
 		}
 	};
@@ -122,7 +122,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("groups", "Gruppen");
 				put("subject", "Sparten");
 				put("settings", "Einstellungen");
-				put("search", "Suche");
+				//put("search", "Suche");
 				put("log", "Historie");
 				//put("help", "Hilfe");
 			}
@@ -180,7 +180,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				label.setSizeUndefined();
 				menuItemsLayout.addComponent(label);
 			}
-			if (item.getKey().equals("search")) {
+			if (item.getKey().equals("settings")) {
 				label = new Label("Sonstiges", ContentMode.HTML);
 				label.setPrimaryStyleName("valo-menu-subtitle");
 				label.addStyleName("h4");
