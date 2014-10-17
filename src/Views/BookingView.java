@@ -230,9 +230,10 @@ public class BookingView extends VerticalLayout implements View {
 					(Member)cbMembers.getValue()));
 			ComponentHelper.updateTable(tblBookings);
 			
+			txtCountDls.setValue("");
 			txtContent.setValue("");
 			cbMembers.setValue(null);
-			cbMembers.focus();
+			txtCountDls.focus();
 		});
 		
 		getUI().addWindow(window);
