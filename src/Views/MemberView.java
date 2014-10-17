@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 
+
 import model.Group;
 import model.Member;
 import model.Subject;
+
 
 
 import com.vaadin.data.Item;
@@ -25,6 +27,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
+import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -42,6 +45,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+
 
 
 import de.juette.dlsa.ComponentHelper;import de.juette.dlsa.MyGroupFilter;
@@ -69,8 +73,9 @@ public class MemberView extends VerticalLayout implements View {
 		private final Action GROUPS = new Action("Gruppen zuordnen");
 		private final Action SUBJECS = new Action("Sparten zuordnen");
 		private final Action REMOVE = new Action("Entfernen");
+		private final Action MASS_CHANGE = new Action("DLS Buchen");
 		private final Action[] ACTIONS = new Action[] { EDIT, GROUPS, SUBJECS,
-				REMOVE };
+				MASS_CHANGE, REMOVE };
 
 		@Override
 		public void handleAction(final Action action, final Object sender,
@@ -91,6 +96,8 @@ public class MemberView extends VerticalLayout implements View {
 			} else if (action.getCaption().equals("Entfernen")) {
 				members.removeItem(tblMembers.getValue());
 				ComponentHelper.updateTable(tblMembers);
+			} else if (action.getCaption().equals("DLS Buchen")) {
+				Notification.show("Noch nicht implementiert.", Notification.Type.HUMANIZED_MESSAGE);
 			}
 		}
 
@@ -218,7 +225,7 @@ public class MemberView extends VerticalLayout implements View {
 					.getBaseDirectory().getAbsolutePath()
 					+ "/WEB-INF/Files/" + file.getName()), new String[] {
 					"Nachname", "Vorname", "Mitgliedsnummer", "Eintrittsdatum",
-					"Austrittsdatum", "Ausgetreten" });
+					"Austrittsdatum", "Aktiv" });
 		}
 	}
 
@@ -255,6 +262,8 @@ public class MemberView extends VerticalLayout implements View {
 
 		tblMembers.setContainerDataSource(members);
 		tblMembers.setSelectable(true);
+		//tblMembers.setMultiSelect(true);
+		//tblMembers.setMultiSelectMode(MultiSelectMode.DEFAULT);
 		tblMembers.setImmediate(true);
 		tblMembers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblMembers.setVisibleColumns(new Object[] { "mitgliedsnummer",
@@ -364,9 +373,9 @@ public class MemberView extends VerticalLayout implements View {
 			fieldGroup.bind(dfAustrittsdatum, "austrittsdatum");
 			layout.addComponent(dfAustrittsdatum);
 			
-			CheckBox cbAusgetreten = new CheckBox("Ausgetreten");
-			fieldGroup.bind(cbAusgetreten, "ausgetreten");
-			layout.addComponent(cbAusgetreten);
+			CheckBox cbAktiv = new CheckBox("Aktiv");
+			fieldGroup.bind(cbAktiv, "aktiv");
+			layout.addComponent(cbAktiv);
 		}
 
 		Button btnSaveNewMember = new Button("Speichern");
