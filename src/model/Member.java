@@ -13,7 +13,7 @@ public class Member extends AbstractEntity {
 	private String mitgliedsnummer;
 	private Date eintrittsdatum;
 	private Date austrittsdatum;
-	private Boolean ausgetreten = false;
+	private Boolean aktiv = false;
 	private Collection<Group> gruppen = new ArrayList<Group>();
 	private Collection<Subject> sparten = new ArrayList<Subject>();
 
@@ -117,12 +117,12 @@ public class Member extends AbstractEntity {
 		this.austrittsdatum = austrittsdatum;
 	}
 
-	public Boolean getAusgetreten() {
-		return ausgetreten;
+	public Boolean getAktiv() {
+		return aktiv;
 	}
 
-	public void setAusgetreten(Boolean ausgetreten) {
-		this.ausgetreten = ausgetreten;
+	public void setAktiv(Boolean aktiv) {
+		this.aktiv = aktiv;
 	}
 
 }
