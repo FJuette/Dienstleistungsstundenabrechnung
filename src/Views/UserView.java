@@ -112,11 +112,13 @@ public class UserView extends EditableTable<User> implements View {
 
 		TextField txtUserName = new TextField("Benutzername");
 		txtUserName.setWidth("100%");
+		txtUserName.setNullRepresentation("");
 		layout.addComponent(txtUserName);
 		fieldGroup.bind(txtUserName, "benutzername");
 
 		PasswordField txtUserPass = new PasswordField("Passwort");
 		txtUserPass.setWidth("100%");
+		txtUserPass.setNullRepresentation("");
 		layout.addComponent(txtUserPass);
 		fieldGroup.bind(txtUserPass, "passwort");
 
