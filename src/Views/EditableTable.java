@@ -21,7 +21,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 	protected BeanItemContainer<T> beans;
 	
 	protected final Button btnNew = new Button("Neu");
-	private final Button btnChange = new Button("Bearbeiten");
+	protected final Button btnChange = new Button("Bearbeiten");
 	
 	private Handler actionHandler = new Handler() {
 		private final Action REMOVE = new Action("Entfernen");
@@ -66,10 +66,12 @@ public abstract class EditableTable<T> extends VerticalLayout {
 				if("Bearbeiten".equals(btnChange.getCaption())) {
 					table.setEditable(true);
 					btnChange.setCaption("Speichern");
+					btnChange.setStyleName("friendly");
 					ComponentHelper.updateTable(table);
 				} else {
 					table.setEditable(false);
 					btnChange.setCaption("Bearbeiten");
+					btnChange.setStyleName("normal");
 					Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
 					ComponentHelper.updateTable(table);
 				}

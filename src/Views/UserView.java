@@ -1,9 +1,14 @@
 package Views;
 
+import model.Member;
 import model.Role;
 import model.User;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Item;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
@@ -13,176 +18,156 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Notification.Type;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.RoleToRolenameConverter;
 
 @SuppressWarnings("serial")
-public class UserView extends VerticalLayout implements View {
-
-	private final Table tblUsers = new Table();
+public class UserView extends EditableTable<User> implements View {
 	
-	private final Button btnNewUser = new Button("Neuer Benutzer");
-	private final Button btnChange = new Button("Bearbeiten");
-	private BeanItemContainer<User> users = new BeanItemContainer<>(User.class);
+	private FieldGroup fieldGroup;
 	
 	private Handler actionHandler = new Handler() {
 		private final Action REMOVE = new Action("Entfernen");
-		private final Action[] ACTIONS = new Action[] { REMOVE };
+		private final Action CHANGE = new Action("Bearbeiten");
+		private final Action[] ACTIONS = new Action[] { CHANGE, REMOVE };
 
-		@Override
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Entfernen")) {
-				users.removeItem(tblUsers.getValue());
-				ComponentHelper.updateTable(tblUsers);
+				beans.removeItem(table.getValue());
+				ComponentHelper.updateTable(table);
+			} else if (action.getCaption().equals("Bearbeiten")) {
+				if (table.getValue() != null) {
+					openUserWindow(beans.getItem(table.getValue()), "Benutzer bearbeiten");
+				}
 			}
 		}
 
-		@Override
 		public Action[] getActions(final Object target, final Object sender) {
 			return ACTIONS;
 		}
 	};
 	
+	private Handler getActionHandler() {
+		return actionHandler;
+	}
+	
 	public UserView() {
-		initLayout();
+		
+		beans = new BeanItemContainer<>(User.class);
+		beans = ComponentHelper.getDummyUsers();
+		
+		btnChange.setVisible(false);
+
+		btnNew.setCaption("Neuer Benutzer");
+		initLayout("Benutzerverwaltung");
 		initTable();
-	}
-	
-	private void initLayout() {
-		setSpacing(true);
-		setMargin(true);
+		extendTable();
 		
-		Label title = new Label("Benutzerverwaltung");
-		title.addStyleName("h1");
-		addComponent(title);
-				
-		addComponent(tblUsers);
-		
-		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
-		bottomLeftLayout.setSpacing(true);
-		addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponent(btnChange);
-		
-		btnChange.addClickListener(event -> {
-			try {
-				if("Bearbeiten".equals(btnChange.getCaption())) {
-					tblUsers.setEditable(true);
-					btnChange.setCaption("Speichern");
-				} else {
-					tblUsers.setEditable(false);
-					btnChange.setCaption("Bearbeiten");
-					Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
-				}
-				ComponentHelper.updateTable(tblUsers);
-			} catch (Exception e) {
-				Notification.show("Fehler: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
-			}
-		});
-		
-		bottomLeftLayout.addComponent(btnNewUser);
-		btnNewUser.addClickListener(event -> {
-			newUserWindow();
+		btnNew.addClickListener(event -> {
+			openUserWindow(new BeanItem<User>(new User()), "Benutzer anlegen");
 		});
 	}
-	
 
-	private void initTable() {
-		users = ComponentHelper.getDummyUsers();
-		//users.addNestedContainerProperty("rolle.rollenname");
+	@Override
+	protected void extendTable() {
+		beans.addNestedContainerProperty("rolle.rollenname");
 		
-		tblUsers.setContainerDataSource(users);
-		tblUsers.setSelectable(true);
-		tblUsers.setImmediate(true);
-		tblUsers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-		tblUsers.setVisibleColumns( new Object[] {"benutzername", "aktiv", "rolle"} );
-		tblUsers.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
-		tblUsers.setConverter("aktiv", new BooleanToGermanConverter());
-		tblUsers.setConverter("rolle", new RoleToRolenameConverter());
-		tblUsers.addActionHandler(getActionHandler());
-		tblUsers.setWidth("60%");
-		tblUsers.setTableFieldFactory(new DefaultFieldFactory() {
-			@Override
-            public Field createField(Container container, Object itemId,
-                    Object propertyId, Component uiContext) {
-                if ("rolle".equals(propertyId)) {
-                    final ComboBox select = new ComboBox();
-                    select.setImmediate(true);
-                    select.setNullSelectionAllowed(false);
-                    BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
-                    select.setContainerDataSource(roles);
-                    select.setItemCaptionPropertyId("rollenname");
-                    return select;
-                }
-                
-                return super.createField(container, itemId, propertyId, uiContext);
-            }
-		});
+		table.removeAllActionHandlers();
+		table.addActionHandler(getActionHandler());
+		table.setVisibleColumns(new Object[] { "benutzername", "aktiv", "rolle.rollenname" });
+		table.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
+		table.setConverter("aktiv", new BooleanToGermanConverter());
+		table.setConverter("rolle", new RoleToRolenameConverter());
+		table.setWidth("60%");
+	}
+
+	@Override
+	protected void newBeanWindow() {
 		
-		ComponentHelper.updateTable(tblUsers);
 	}
 	
-
-	private void newUserWindow() {
-		Window window = new Window("Anlegen eines neuen Benutzers");
+	private void openUserWindow(Item beanItem, String caption) {
+		Window window = new Window(caption);
 		window.setModal(true);
 		window.setWidth("400");
-		
+
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
 		window.setContent(layout);
 		
+		fieldGroup = new BeanFieldGroup<User>(User.class);
+		fieldGroup.setItemDataSource(beanItem);
+
 		TextField txtUserName = new TextField("Benutzername");
 		txtUserName.setWidth("100%");
 		layout.addComponent(txtUserName);
+		fieldGroup.bind(txtUserName, "benutzername");
 
-		TextField txtUserPass = new TextField("Passwort");
+		PasswordField txtUserPass = new PasswordField("Passwort");
 		txtUserPass.setWidth("100%");
 		layout.addComponent(txtUserPass);
-		
+		fieldGroup.bind(txtUserPass, "passwort");
+
 		CheckBox cbActive = new CheckBox("Aktiv");
 		layout.addComponent(cbActive);
-		
-		ComboBox cbRoles = new ComboBox("Rollen");
+		fieldGroup.bind(cbActive, "aktiv");
+
+		ComboBox cbRoles = new ComboBox("Rolle");
 		BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
 		cbRoles.setContainerDataSource(roles);
 		cbRoles.setItemCaptionPropertyId("rollenname");
-		cbRoles.setNullSelectionAllowed(false);
-		cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
+		//cbRoles.setNullSelectionAllowed(false);
+		//cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
+		if (caption.equals("Benutzer bearbeiten")) {
+			int index = 0;
+			for (int i = 0; i < roles.size(); i++) {
+				if (roles.getIdByIndex(i).getRollenname() == "Benutzer") {
+					index = i;
+				}
+			}
+			cbRoles.setValue(index);
+		}
 		layout.addComponent(cbRoles);
-		
-		Button btnSaveNewGroup = new Button("Speichern");
-		btnSaveNewGroup.setStyleName("friendly");
-		layout.addComponent(btnSaveNewGroup);
-		
-		btnSaveNewGroup.addClickListener(event -> {
-			users.addItem(new User(txtUserName.getValue(), txtUserPass.getValue(), 
-					cbActive.getValue(), (Role)cbRoles.getValue()));
-			ComponentHelper.updateTable(tblUsers);
-			window.close();
+		//fieldGroup.bind(cbRoles, "rolle");
+
+		Button btnSaveUser = new Button("Speichern");
+		btnSaveUser.setStyleName("friendly");
+		layout.addComponent(btnSaveUser);
+
+		btnSaveUser.addClickListener(event -> {
+			try {
+				fieldGroup.commit();
+				if (caption.equals("Anlegen eines neuen Mitglieds")) {
+					beans.addItem(new User(txtUserName.getValue(), txtUserPass
+							.getValue(), cbActive.getValue(), (Role) cbRoles
+							.getValue()));
+				} else {
+					beans.addItem((BeanItem<User>) fieldGroup
+							.getItemDataSource());
+				}
+				ComponentHelper.updateTable(table);
+				window.close();
+			} catch (Exception e) {
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			}
 		});
-		
+
 		getUI().addWindow(window);
-	}
-	
-	private Handler getActionHandler() {
-		return actionHandler;
 	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
 	}
-
 }

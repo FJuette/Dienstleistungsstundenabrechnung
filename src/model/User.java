@@ -9,6 +9,10 @@ public class User extends AbstractEntity {
 	private Boolean aktiv = true;
 	private Role rolle;
 	
+	public User() {
+		
+	}
+	
 	public User(String benutzername, String passwort, Boolean aktiv, Role rolle) {
 		super();
 		this.benutzername = benutzername;
