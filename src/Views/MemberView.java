@@ -94,11 +94,11 @@ public class MemberView extends EditableTable<Member> implements View {
 				}
 			} else if (action.getCaption().equals("Gruppen zuordnen")) {
 				if (table.getValue() != null) {
-					openGroupWindow(beans.getItem(table.getValue()));
+					openMappingWindow(beans.getItem(table.getValue()), "Gruppen", "gruppenname");
 				}
 			} else if (action.getCaption().equals("Sparten zuordnen")) {
 				if (table.getValue() != null) {
-					openSubjectWindow(beans.getItem(table.getValue()));
+					openMappingWindow(beans.getItem(table.getValue()), "Sparten", "spartenname");
 				}
 			} else if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
@@ -416,66 +416,81 @@ public class MemberView extends EditableTable<Member> implements View {
 	}
 
 	private BeanItemContainer<Group> mGroups;
-	private void openGroupWindow(Item beanItem) {
-		Window window = new Window("Gruppen zuordnen");
+	private BeanItemContainer<Subject> mSubjects;
+	
+	private void openMappingWindow(Item beanItem, String caption, String columnName) {
+		Window window = new Window(caption + " zuordnen");
 		window.setModal(true);
 		window.setWidth("500");
 
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
 		window.setContent(layout);
-
+		
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
 
-		BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
-				Group.class);
-		groups = ComponentHelper.getDummyGroups();
+		//
+		BeanItemContainer<Group> groups = ComponentHelper.getDummyGroups();
+		BeanItemContainer<Subject> subjects = ComponentHelper.getDummySubjects();
 
-		ComboBox cbAllGroups = new ComboBox("Alle Gruppen:");
-		cbAllGroups.setContainerDataSource(groups);
-		cbAllGroups.setItemCaptionPropertyId("gruppenname");
-		cbAllGroups.setImmediate(true);
-		cbAllGroups.setWidth("100%");
+		ComboBox cbAll = new ComboBox("Alle " + caption + ":");
+		// Datenquelle abhängig von der Caption auf Gruppen oder Sparten setzen
+		cbAll.setContainerDataSource(caption.equals("Gruppen") ? groups : subjects);
+		
+		cbAll.setItemCaptionPropertyId(columnName);
+		cbAll.setImmediate(true);
+		cbAll.setWidth("100%");
 
-		layout.addComponent(cbAllGroups);
+		layout.addComponent(cbAll);
 
-		Button btnAddGroup = new Button(FontAwesome.PLUS);
-		layout.addComponent(btnAddGroup);
+		Button btnAdd = new Button(FontAwesome.PLUS);
+		layout.addComponent(btnAdd);
 
 		mGroups = new BeanItemContainer<Group>(Group.class);
 		mGroups.addAll(((BeanItem<Member>) beanItem).getBean().getGruppen());
+		mSubjects = new BeanItemContainer<Subject>(Subject.class);
+		mSubjects.addAll(((BeanItem<Member>) beanItem).getBean().getSparten());
 
-		Table tblMemberGroups = new Table("Zugeordnete Gruppen:");
-		tblMemberGroups.setContainerDataSource(mGroups);
-		tblMemberGroups.setVisibleColumns(new Object[] { "gruppenname" });
-		tblMemberGroups.setColumnHeaders("Gruppen");
-		tblMemberGroups.setWidth("100%");
-		tblMemberGroups.setSelectable(true);
+		Table tblMemberElements = new Table("Zugeordnete " + caption + ":");
+		tblMemberElements.setContainerDataSource(caption.equals("Gruppen") ? mGroups : mSubjects);
+		tblMemberElements.setVisibleColumns(new Object[] { columnName });
+		tblMemberElements.setColumnHeaders(caption);
+		tblMemberElements.setWidth("100%");
+		tblMemberElements.setSelectable(true);
 
-		ComponentHelper.updateTable(tblMemberGroups);
-		layout.addComponent(tblMemberGroups);
+		ComponentHelper.updateTable(tblMemberElements);
+		layout.addComponent(tblMemberElements);
 
-		btnAddGroup.addClickListener(event -> {
-			// Compare the Strings because the Object ID is different even on
-			// the same Object types
-				if (cbAllGroups.getValue() != null
-						&& !groupsContainItem(((Group) cbAllGroups.getValue())
-								.getGruppenname())) {
-					mGroups.addItem(cbAllGroups.getValue());
-					ComponentHelper.updateTable(tblMemberGroups);
+		btnAdd.addClickListener(event -> {
+				// Compare the Strings because the Object ID is different even on
+				// the same Object types
+				if (caption.equals("Gruppen")) {
+					if (cbAll.getValue() != null
+							&& !groupsContainItem(((Group) cbAll.getValue())
+									.getGruppenname())) {
+						mGroups.addItem(cbAll.getValue());
+						ComponentHelper.updateTable(tblMemberElements);
+					}
+				} else {
+					if (cbAll.getValue() != null
+							&& !subjectsContainItem(((Subject) cbAll
+									.getValue()).getSpartenname())) {
+						mSubjects.addItem(cbAll.getValue());
+						ComponentHelper.updateTable(tblMemberElements);
+					}
 				}
 			});
 
-		Button btnDeleteGroup = new Button(FontAwesome.MINUS);
-		btnDeleteGroup.addClickListener(event -> {
-			if (tblMemberGroups.getValue() != null) {
-				tblMemberGroups.removeItem(tblMemberGroups.getValue());
-				ComponentHelper.updateTable(tblMemberGroups);
+		Button btnRemove = new Button(FontAwesome.MINUS);
+		btnRemove.addClickListener(event -> {
+			if (tblMemberElements.getValue() != null) {
+				tblMemberElements.removeItem(tblMemberElements.getValue());
+				ComponentHelper.updateTable(tblMemberElements);
 			}
 		});
 
-		layout.addComponent(btnDeleteGroup);
+		layout.addComponent(btnRemove);
 
 		Button btnSaveChanges = new Button("Speichern");
 		btnSaveChanges.setStyleName("friendly");
@@ -484,8 +499,13 @@ public class MemberView extends EditableTable<Member> implements View {
 		btnSaveChanges.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
-				(((BeanItem<Member>) beanItem).getBean()).setGruppen(mGroups
-						.getItemIds());
+				if (caption.equals("Gruppen")) {
+					(((BeanItem<Member>) beanItem).getBean()).setGruppen(mGroups
+							.getItemIds());
+				} else {
+					(((BeanItem<Member>) beanItem).getBean()).setSparten((mSubjects
+							.getItemIds()));
+				}
 				window.close();
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
@@ -495,85 +515,6 @@ public class MemberView extends EditableTable<Member> implements View {
 		getUI().addWindow(window);
 	}
 	
-	private BeanItemContainer<Subject> mSubjects;
-	private void openSubjectWindow(Item beanItem) {
-		Window window = new Window("Sparten zuordnen");
-		window.setModal(true);
-		window.setWidth("500");
-
-		FormLayout layout = new FormLayout();
-		layout.setMargin(true);
-		window.setContent(layout);
-
-		fieldGroup = new BeanFieldGroup<Member>(Member.class);
-		fieldGroup.setItemDataSource(beanItem);
-
-		BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
-				Subject.class);
-		subjects = ComponentHelper.getDummySubjects();
-
-		ComboBox cbAllSubjects = new ComboBox("Alle Sparten:");
-		cbAllSubjects.setContainerDataSource(subjects);
-		cbAllSubjects.setItemCaptionPropertyId("spartenname");
-		cbAllSubjects.setImmediate(true);
-		cbAllSubjects.setWidth("100%");
-
-		layout.addComponent(cbAllSubjects);
-
-		Button btnAddSubject = new Button(FontAwesome.PLUS);
-		layout.addComponent(btnAddSubject);
-
-		mSubjects = new BeanItemContainer<Subject>(Subject.class);
-		mSubjects.addAll(((BeanItem<Member>) beanItem).getBean().getSparten());
-
-		Table tblMemberSubjects = new Table("Zugeordnete Sparten:");
-		tblMemberSubjects.setContainerDataSource(mSubjects);
-		tblMemberSubjects.setVisibleColumns(new Object[] { "spartenname" });
-		tblMemberSubjects.setColumnHeaders("Sparten");
-		tblMemberSubjects.setWidth("100%");
-		tblMemberSubjects.setSelectable(true);
-
-		ComponentHelper.updateTable(tblMemberSubjects);
-		layout.addComponent(tblMemberSubjects);
-
-		btnAddSubject
-				.addClickListener(event -> {
-					if (cbAllSubjects.getValue() != null
-							&& !subjectsContainItem(((Subject) cbAllSubjects
-									.getValue()).getSpartenname())) {
-						mSubjects.addItem(cbAllSubjects.getValue());
-						ComponentHelper.updateTable(tblMemberSubjects);
-					}
-				});
-
-		Button btnDeleteSubject = new Button(FontAwesome.MINUS);
-		btnDeleteSubject.addClickListener(event -> {
-			if (tblMemberSubjects.getValue() != null) {
-				tblMemberSubjects.removeItem(tblMemberSubjects.getValue());
-				ComponentHelper.updateTable(tblMemberSubjects);
-			}
-		});
-
-		layout.addComponent(btnDeleteSubject);
-
-		Button btnSaveChanges = new Button("Speichern");
-		btnSaveChanges.setStyleName("friendly");
-		layout.addComponent(btnSaveChanges);
-
-		btnSaveChanges.addClickListener(event -> {
-			try {
-				fieldGroup.commit();
-				(((BeanItem<Member>) beanItem).getBean()).setSparten((mSubjects
-						.getItemIds()));
-				window.close();
-			} catch (Exception e) {
-				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
-			}
-		});
-
-		getUI().addWindow(window);
-	}
-
 	private boolean groupsContainItem(String search) {
 		for (Group group : mGroups.getItemIds()) {
 			if (group.getGruppenname().equals(search)) {
