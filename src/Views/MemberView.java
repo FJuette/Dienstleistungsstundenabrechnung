@@ -8,22 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
-
-
-
-
-
-
-
 import model.Group;
 import model.Member;
 import model.Subject;
-
-
-
-
-import model.User;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -36,45 +23,31 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.ui.MultiSelectMode;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-
-
-
-
-
-
-
-
-import de.juette.dlsa.BooleanToGermanConverter;
-import de.juette.dlsa.ComponentHelper;import de.juette.dlsa.MyGroupFilter;
-import de.juette.dlsa.RoleToRolenameConverter;
+import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.MyGroupFilter;
 
 @SuppressWarnings("serial")
 public class MemberView extends EditableTable<Member> implements View {
 
 	private FieldGroup fieldGroup;
-	
+
 	private Handler actionHandler = new Handler() {
 		private final Action EDIT = new Action("Bearbeiten");
 		private final Action GROUPS = new Action("Gruppen zuordnen");
@@ -94,17 +67,20 @@ public class MemberView extends EditableTable<Member> implements View {
 				}
 			} else if (action.getCaption().equals("Gruppen zuordnen")) {
 				if (table.getValue() != null) {
-					openMappingWindow(beans.getItem(table.getValue()), "Gruppen", "gruppenname");
+					openMappingWindow(beans.getItem(table.getValue()),
+							"Gruppen", "gruppenname");
 				}
 			} else if (action.getCaption().equals("Sparten zuordnen")) {
 				if (table.getValue() != null) {
-					openMappingWindow(beans.getItem(table.getValue()), "Sparten", "spartenname");
+					openMappingWindow(beans.getItem(table.getValue()),
+							"Sparten", "spartenname");
 				}
 			} else if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
 				ComponentHelper.updateTable(table);
 			} else if (action.getCaption().equals("DLS Buchen")) {
-				Notification.show("Noch nicht implementiert.", Notification.Type.HUMANIZED_MESSAGE);
+				Notification.show("Noch nicht implementiert.",
+						Notification.Type.HUMANIZED_MESSAGE);
 			}
 		}
 
@@ -120,23 +96,23 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	public MemberView() {
 		beans = ComponentHelper.getDummyMembers();
-		
+
 		btnChange.setVisible(false);
 		btnNew.setCaption("Neues Mitglied");
-		
+
 		filterLayout = initFilter();
-		
+
 		initLayout("Mitgliederverwaltung");
 		initTable();
 		extendTable();
-		
+
 		FileUploader reciever = new FileUploader();
 		// Create the upload with a caption and set reciever later
 		Upload upload = new Upload("", reciever);
 		upload.setButtonCaption("Einlesen");
 		upload.addSucceededListener(reciever);
 		addComponent(upload);
-		
+
 		btnNew.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
 					"Anlegen eines neuen Mitglieds");
@@ -146,7 +122,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	private HorizontalLayout initFilter() {
 		ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
 		ComboBox cbFilterSubject = new ComboBox("Filter nach Sparte:");
-		
+
 		HorizontalLayout filterLayout = new HorizontalLayout();
 		filterLayout.setSpacing(true);
 
@@ -166,8 +142,10 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		cbFilterGroup.addValueChangeListener(event -> {
 			beans.removeContainerFilters("gruppen");
-			if (cbFilterGroup.getValue() != null && !cbFilterGroup.getValue().equals("")) {
-				beans.addContainerFilter(new MyGroupFilter("gruppen", (Group)cbFilterGroup.getValue()));
+			if (cbFilterGroup.getValue() != null
+					&& !cbFilterGroup.getValue().equals("")) {
+				beans.addContainerFilter(new MyGroupFilter("gruppen",
+						(Group) cbFilterGroup.getValue()));
 			}
 		});
 
@@ -264,24 +242,19 @@ public class MemberView extends EditableTable<Member> implements View {
 	@Override
 	protected void extendTable() {
 		table.removeAllActionHandlers();
-		
-		//table.setMultiSelect(true);
-		//table.setMultiSelectMode(MultiSelectMode.DEFAULT);
 
-		/* Andere Darstellungsmöglichkeit
-        // override html column with a component, sorting as by the raw html
-        // field
-		table.addGeneratedColumn("html", new ColumnGenerator() {
-            public Component generateCell(Table source, Object itemId,
-                    Object columnId) {
-                String html = ((Member)itemId).getHtmlName();
-                Label label = new Label(html, ContentMode.HTML);
-                label.setSizeUndefined();
-                return label;
-            }
-        });
-		table.setVisibleColumns(new Object[] { "html" });
-		*/
+		// table.setMultiSelect(true);
+		// table.setMultiSelectMode(MultiSelectMode.DEFAULT);
+
+		/*
+		 * Andere Darstellungsmöglichkeit // override html column with a
+		 * component, sorting as by the raw html // field
+		 * table.addGeneratedColumn("html", new ColumnGenerator() { public
+		 * Component generateCell(Table source, Object itemId, Object columnId)
+		 * { String html = ((Member)itemId).getHtmlName(); Label label = new
+		 * Label(html, ContentMode.HTML); label.setSizeUndefined(); return
+		 * label; } }); table.setVisibleColumns(new Object[] { "html" });
+		 */
 		table.setVisibleColumns(new Object[] { "fullName", "mitgliedsnummer" });
 		table.setColumnHeaders("Naame", "Mitgliedsnummer");
 		table.addActionHandler(getActionHandler());
@@ -374,17 +347,18 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		TextField txtVorname = new TextField("Vorname:");
 		fieldGroup.bind(txtVorname, "vorname");
-		
+
 		DateField dfEintrittsdatum = new DateField("Eintrittsdatum");
 		fieldGroup.bind(dfEintrittsdatum, "eintrittsdatum");
 
-		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer, dfEintrittsdatum);
-		
+		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer,
+				dfEintrittsdatum);
+
 		if (caption.equals("Mitarbeiter bearbeiten")) {
 			DateField dfAustrittsdatum = new DateField("Austrittsdatum");
 			fieldGroup.bind(dfAustrittsdatum, "austrittsdatum");
 			layout.addComponent(dfAustrittsdatum);
-			
+
 			CheckBox cbAktiv = new CheckBox("Aktiv");
 			fieldGroup.bind(cbAktiv, "aktiv");
 			layout.addComponent(cbAktiv);
@@ -398,9 +372,9 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					beans.addItem(new Member(txtNachname.getValue(),
-							txtVorname.getValue(), txtMitgliedsnummer
-									.getValue(), dfEintrittsdatum.getValue()));
+					beans.addItem(new Member(txtNachname.getValue(), txtVorname
+							.getValue(), txtMitgliedsnummer.getValue(),
+							dfEintrittsdatum.getValue()));
 				} else {
 					beans.addItem((BeanItem<Member>) fieldGroup
 							.getItemDataSource());
@@ -417,8 +391,9 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Subject> mSubjects;
-	
-	private void openMappingWindow(Item beanItem, String caption, String columnName) {
+
+	private void openMappingWindow(Item beanItem, String caption,
+			String columnName) {
 		Window window = new Window(caption + " zuordnen");
 		window.setModal(true);
 		window.setWidth("500");
@@ -426,18 +401,20 @@ public class MemberView extends EditableTable<Member> implements View {
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
 		window.setContent(layout);
-		
+
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
 
 		//
 		BeanItemContainer<Group> groups = ComponentHelper.getDummyGroups();
-		BeanItemContainer<Subject> subjects = ComponentHelper.getDummySubjects();
+		BeanItemContainer<Subject> subjects = ComponentHelper
+				.getDummySubjects();
 
 		ComboBox cbAll = new ComboBox("Alle " + caption + ":");
 		// Datenquelle abhängig von der Caption auf Gruppen oder Sparten setzen
-		cbAll.setContainerDataSource(caption.equals("Gruppen") ? groups : subjects);
-		
+		cbAll.setContainerDataSource(caption.equals("Gruppen") ? groups
+				: subjects);
+
 		cbAll.setItemCaptionPropertyId(columnName);
 		cbAll.setImmediate(true);
 		cbAll.setWidth("100%");
@@ -453,7 +430,9 @@ public class MemberView extends EditableTable<Member> implements View {
 		mSubjects.addAll(((BeanItem<Member>) beanItem).getBean().getSparten());
 
 		Table tblMemberElements = new Table("Zugeordnete " + caption + ":");
-		tblMemberElements.setContainerDataSource(caption.equals("Gruppen") ? mGroups : mSubjects);
+		tblMemberElements
+				.setContainerDataSource(caption.equals("Gruppen") ? mGroups
+						: mSubjects);
 		tblMemberElements.setVisibleColumns(new Object[] { columnName });
 		tblMemberElements.setColumnHeaders(caption);
 		tblMemberElements.setWidth("100%");
@@ -463,24 +442,24 @@ public class MemberView extends EditableTable<Member> implements View {
 		layout.addComponent(tblMemberElements);
 
 		btnAdd.addClickListener(event -> {
-				// Compare the Strings because the Object ID is different even on
-				// the same Object types
-				if (caption.equals("Gruppen")) {
-					if (cbAll.getValue() != null
-							&& !groupsContainItem(((Group) cbAll.getValue())
-									.getGruppenname())) {
-						mGroups.addItem(cbAll.getValue());
-						ComponentHelper.updateTable(tblMemberElements);
-					}
-				} else {
-					if (cbAll.getValue() != null
-							&& !subjectsContainItem(((Subject) cbAll
-									.getValue()).getSpartenname())) {
-						mSubjects.addItem(cbAll.getValue());
-						ComponentHelper.updateTable(tblMemberElements);
-					}
+			// Compare the Strings because the Object ID is different even on
+			// the same Object types
+			if (caption.equals("Gruppen")) {
+				if (cbAll.getValue() != null
+						&& !groupsContainItem(((Group) cbAll.getValue())
+								.getGruppenname())) {
+					mGroups.addItem(cbAll.getValue());
+					ComponentHelper.updateTable(tblMemberElements);
 				}
-			});
+			} else {
+				if (cbAll.getValue() != null
+						&& !subjectsContainItem(((Subject) cbAll.getValue())
+								.getSpartenname())) {
+					mSubjects.addItem(cbAll.getValue());
+					ComponentHelper.updateTable(tblMemberElements);
+				}
+			}
+		});
 
 		Button btnRemove = new Button(FontAwesome.MINUS);
 		btnRemove.addClickListener(event -> {
@@ -500,11 +479,11 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Gruppen")) {
-					(((BeanItem<Member>) beanItem).getBean()).setGruppen(mGroups
-							.getItemIds());
+					(((BeanItem<Member>) beanItem).getBean())
+							.setGruppen(mGroups.getItemIds());
 				} else {
-					(((BeanItem<Member>) beanItem).getBean()).setSparten((mSubjects
-							.getItemIds()));
+					(((BeanItem<Member>) beanItem).getBean())
+							.setSparten((mSubjects.getItemIds()));
 				}
 				window.close();
 			} catch (Exception e) {
@@ -514,7 +493,7 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		getUI().addWindow(window);
 	}
-	
+
 	private boolean groupsContainItem(String search) {
 		for (Group group : mGroups.getItemIds()) {
 			if (group.getGruppenname().equals(search)) {
@@ -533,7 +512,6 @@ public class MemberView extends EditableTable<Member> implements View {
 		return false;
 	}
 
-
 	@Override
 	public void enter(ViewChangeEvent event) {
 
@@ -542,7 +520,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	@Override
 	protected void newBeanWindow() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
