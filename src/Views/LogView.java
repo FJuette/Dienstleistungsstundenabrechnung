@@ -6,8 +6,6 @@ import model.Cycle;
 import model.Log;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.Action;
-import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileDownloader;
@@ -18,7 +16,6 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 

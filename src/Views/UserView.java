@@ -1,10 +1,8 @@
 package Views;
 
-import model.Member;
 import model.Role;
 import model.User;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -17,16 +15,12 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Notification.Type;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
@@ -34,9 +28,9 @@ import de.juette.dlsa.RoleToRolenameConverter;
 
 @SuppressWarnings("serial")
 public class UserView extends EditableTable<User> implements View {
-	
+
 	private FieldGroup fieldGroup;
-	
+
 	private Handler actionHandler = new Handler() {
 		private final Action REMOVE = new Action("Entfernen");
 		private final Action CHANGE = new Action("Bearbeiten");
@@ -49,7 +43,8 @@ public class UserView extends EditableTable<User> implements View {
 				ComponentHelper.updateTable(table);
 			} else if (action.getCaption().equals("Bearbeiten")) {
 				if (table.getValue() != null) {
-					openUserWindow(beans.getItem(table.getValue()), "Benutzer bearbeiten");
+					openUserWindow(beans.getItem(table.getValue()),
+							"Benutzer bearbeiten");
 				}
 			}
 		}
@@ -58,23 +53,23 @@ public class UserView extends EditableTable<User> implements View {
 			return ACTIONS;
 		}
 	};
-	
+
 	private Handler getActionHandler() {
 		return actionHandler;
 	}
-	
+
 	public UserView() {
-		
+
 		beans = new BeanItemContainer<>(User.class);
 		beans = ComponentHelper.getDummyUsers();
-		
+
 		btnChange.setVisible(false);
 
 		btnNew.setCaption("Neuer Benutzer");
 		initLayout("Benutzerverwaltung");
 		initTable();
 		extendTable();
-		
+
 		btnNew.addClickListener(event -> {
 			openUserWindow(new BeanItem<User>(new User()), "Benutzer anlegen");
 		});
@@ -83,10 +78,11 @@ public class UserView extends EditableTable<User> implements View {
 	@Override
 	protected void extendTable() {
 		beans.addNestedContainerProperty("rolle.rollenname");
-		
+
 		table.removeAllActionHandlers();
 		table.addActionHandler(getActionHandler());
-		table.setVisibleColumns(new Object[] { "benutzername", "aktiv", "rolle.rollenname" });
+		table.setVisibleColumns(new Object[] { "benutzername", "aktiv",
+				"rolle.rollenname" });
 		table.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
 		table.setConverter("aktiv", new BooleanToGermanConverter());
 		table.setConverter("rolle", new RoleToRolenameConverter());
@@ -95,9 +91,9 @@ public class UserView extends EditableTable<User> implements View {
 
 	@Override
 	protected void newBeanWindow() {
-		
+
 	}
-	
+
 	private void openUserWindow(Item beanItem, String caption) {
 		Window window = new Window(caption);
 		window.setModal(true);
@@ -106,7 +102,7 @@ public class UserView extends EditableTable<User> implements View {
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
 		window.setContent(layout);
-		
+
 		fieldGroup = new BeanFieldGroup<User>(User.class);
 		fieldGroup.setItemDataSource(beanItem);
 
@@ -130,8 +126,8 @@ public class UserView extends EditableTable<User> implements View {
 		BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
 		cbRoles.setContainerDataSource(roles);
 		cbRoles.setItemCaptionPropertyId("rollenname");
-		//cbRoles.setNullSelectionAllowed(false);
-		//cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
+		// cbRoles.setNullSelectionAllowed(false);
+		// cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
 		if (caption.equals("Benutzer bearbeiten")) {
 			int index = 0;
 			for (int i = 0; i < roles.size(); i++) {
@@ -142,7 +138,7 @@ public class UserView extends EditableTable<User> implements View {
 			cbRoles.setValue(index);
 		}
 		layout.addComponent(cbRoles);
-		//fieldGroup.bind(cbRoles, "rolle");
+		// fieldGroup.bind(cbRoles, "rolle");
 
 		Button btnSaveUser = new Button("Speichern");
 		btnSaveUser.setStyleName("friendly");
@@ -156,8 +152,7 @@ public class UserView extends EditableTable<User> implements View {
 							.getValue(), cbActive.getValue(), (Role) cbRoles
 							.getValue()));
 				} else {
-					beans.addItem((BeanItem<User>) fieldGroup
-							.getItemDataSource());
+					beans.addItem((User) fieldGroup.getItemDataSource());
 				}
 				ComponentHelper.updateTable(table);
 				window.close();

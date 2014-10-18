@@ -232,7 +232,6 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				br.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -376,8 +375,7 @@ public class MemberView extends EditableTable<Member> implements View {
 							.getValue(), txtMitgliedsnummer.getValue(),
 							dfEintrittsdatum.getValue()));
 				} else {
-					beans.addItem((BeanItem<Member>) fieldGroup
-							.getItemDataSource());
+					beans.addItem((Member)fieldGroup.getItemDataSource());
 				}
 				ComponentHelper.updateTable(table);
 				window.close();
@@ -392,7 +390,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Subject> mSubjects;
 
-	private void openMappingWindow(Item beanItem, String caption,
+	private void openMappingWindow(BeanItem<Member> beanItem, String caption,
 			String columnName) {
 		Window window = new Window(caption + " zuordnen");
 		window.setModal(true);
@@ -519,7 +517,6 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	@Override
 	protected void newBeanWindow() {
-		// TODO Auto-generated method stub
 
 	}
 

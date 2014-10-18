@@ -1,7 +1,6 @@
 package Views;
 
 import model.Activity;
-import model.Group;
 import model.Member;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -9,16 +8,14 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 
+@SuppressWarnings("serial")
 public class ActivityView extends EditableTable<Activity> implements View {
 
 	public ActivityView() {
