@@ -22,6 +22,8 @@ public class SettingsView extends VerticalLayout implements View {
 	private final DateField dfStichtag = new DateField("Stichtag");
 	private final TextField txtCountDls = new TextField("Anzahl der Dienstleistungsstunden pro Jahr");
 	private final TextField txtCostDls = new TextField("Kosten pro Dienstleistungsstunde");
+	private final TextField txtDlsFromYear = new TextField("Alter ab wann Dienstleistungsstunden geleistet werden müssen");
+	private final TextField txtDlsToYear = new TextField("Alter bis Dienstleistungsstunden geleistet werden müssen");
 	private final OptionGroup groupKind = new OptionGroup();
 	private final CheckBox cbAusgleich = new CheckBox("Ausgleichungsbuchungen beim Jahreslauf");
 	private final CheckBox cbUebername = new CheckBox("Übername von DLS beim Jahreswechsel");
@@ -48,6 +50,12 @@ public class SettingsView extends VerticalLayout implements View {
 				
 		txtCostDls.setWidth("25%");
 		form.addComponent(txtCostDls);
+
+		txtDlsFromYear.setWidth("8%");
+		form.addComponent(txtDlsFromYear);
+
+		txtDlsToYear.setWidth("8%");
+		form.addComponent(txtDlsToYear);
 		
 		section = new Label("Buchungsverhalten");
 		section.addStyleName("h2");
