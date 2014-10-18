@@ -52,6 +52,9 @@
 			rev="4.3.6.Final"/>
 		<dependency org="org.hibernate" name="hibernate-validator" 
 			rev="5.1.2.Final"/>
+			
+		<!-- Library for detecting a file encoding -->
+		<dependency org="com.ibm.icu" name="icu4j" rev="53.1"/>
 		
 	</dependencies>
 </ivy-module>

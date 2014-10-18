@@ -2,16 +2,20 @@ package Views;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import model.Group;
 import model.Member;
 import model.Subject;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -216,12 +220,37 @@ public class MemberView extends EditableTable<Member> implements View {
 		// Make a class for handling CSV files
 		// Path as property
 		// Content as Object?
+		String charset = "UTF-8"; //Default chartset
+		byte[] fileContent = null;
+        try {
+        	File f = new File(file);
+			FileInputStream fin = new FileInputStream(f.getPath());
+			fileContent = new byte[(int) f.length()];
+			fin.read(fileContent);
+			fin.close();
+			byte[] data =  fileContent;
+			CharsetDetector detector = new CharsetDetector();
+			detector.setText(data);
+			CharsetMatch cm = detector.detect();
+			
+			if (cm != null) {
+				int confidence = cm.getConfidence();
+				System.out.println("Encoding: " + cm.getName() + " - Confidence: " + confidence + "%");
+				if (confidence > 30) {
+                    charset = cm.getName();
+                }
+			}
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		};
+		
+		
 		BufferedReader br = null;
 		String cvsSplitBy = ";";
 
 		try {
-
-			br = new BufferedReader(new FileReader(file));
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
 			return br.readLine().split(cvsSplitBy);
 
 		} catch (FileNotFoundException e) {
