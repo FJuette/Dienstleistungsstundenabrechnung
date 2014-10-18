@@ -111,7 +111,6 @@ public class BookingView extends VerticalLayout implements View {
 		tblBookings.setContainerDataSource(bookings);
 		tblBookings.setSelectable(true);
 		tblBookings.setImmediate(true);
-		tblBookings.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblBookings.setVisibleColumns(new Object[] { "anzahlDLS",
 				"ableistungsDatum", "bemerkung", "mitglied.mitgliedsnummer" });
 		tblBookings.setColumnHeaders("Anzahl DLS", "Ableistungsdatum",

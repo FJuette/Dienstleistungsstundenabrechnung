@@ -71,7 +71,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
 			put("subject", SubjectView.class);
-			put("acitivies", ActivityView.class);
+			put("activities", ActivityView.class);
 			put("user", UserView.class);
 			put("member", MemberView.class);
 			put("settings", SettingsView.class);
@@ -117,7 +117,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("booking", "Journal");
 				put("user", "Benutzer");
 				put("member", "Mitglieder");
-				put("acitivies", "Aktionen");
+				put("activities", "Aktionen");
 				put("groups", "Gruppen");
 				put("subject", "Sparten");
 				put("settings", "Einstellungen");

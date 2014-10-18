@@ -75,7 +75,6 @@ public class LogView extends VerticalLayout implements View {
 		tblLog.setContainerDataSource(logEntrys);
 		tblLog.setSelectable(true);
 		tblLog.setImmediate(true);
-		tblLog.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		tblLog.setVisibleColumns(new Object[] { "timestamp", "beschreibung",
 				"bearbeiter.fullName" });
 		tblLog.setColumnHeaders("Zeitpunkt", "Beschreibung", "Bearbeiter");
