@@ -185,6 +185,14 @@ public class BookingView extends VerticalLayout implements View {
 		layout.setMargin(true);
 		window.setContent(layout);
 
+		ComboBox cbMembers = new ComboBox("Mitglied");
+		cbMembers.setWidth("100%");
+		cbMembers.setImmediate(true);
+		cbMembers.setContainerDataSource(ComponentHelper.getDummyMembers());
+		cbMembers.setItemCaptionPropertyId("fullName");
+		cbMembers.setFilteringMode(FilteringMode.CONTAINS);
+		layout.addComponent(cbMembers);
+
 		DateField dfDate = new DateField("Ableistungsdatum");
 		dfDate.setWidth("100%");
 		layout.addComponent(dfDate);
@@ -202,33 +210,26 @@ public class BookingView extends VerticalLayout implements View {
 		txtCountDls.setWidth("100%");
 		layout.addComponent(txtCountDls);
 
-		ComboBox cbMembers = new ComboBox("Mitglied");
-		cbMembers.setWidth("100%");
-		cbMembers.setImmediate(true);
-		cbMembers.setContainerDataSource(ComponentHelper.getDummyMembers());
-		cbMembers.setItemCaptionPropertyId("fullName");
-		cbMembers.setFilteringMode(FilteringMode.CONTAINS);
-		layout.addComponent(cbMembers);
-
-		TextArea txtContent = new TextArea("Bemerkung");
-		txtContent.setWidth("100%");
-		layout.addComponent(txtContent);
+		TextArea txtComment = new TextArea("Bemerkung");
+		txtComment.setWidth("100%");
+		layout.addComponent(txtComment);
 
 		Button btnSaveNewBooking = new Button("Speichern");
 		btnSaveNewBooking.setStyleName("friendly");
 		layout.addComponent(btnSaveNewBooking);
 
 		btnSaveNewBooking.addClickListener(event -> {
-			bookings.addItem(new Booking(Integer.parseInt(txtCountDls
-					.getValue()), txtContent.getValue(), dfDate.getValue(),
-					(Member) cbMembers.getValue(), (Activity) cbActivities
-							.getValue(), (Member) cbMembers.getValue()));
+			bookings.addItem(new Booking(Double.parseDouble(txtCountDls
+					.getValue().replace(',', '.')), txtComment.getValue(),
+					dfDate.getValue(), (Member) cbMembers.getValue(),
+					(Activity) cbActivities.getValue(), (Member) cbMembers
+							.getValue()));
 			ComponentHelper.updateTable(tblBookings);
 
 			txtCountDls.setValue("");
-			txtContent.setValue("");
-			cbMembers.setValue(null);
-			txtCountDls.focus();
+			txtComment.setValue("");
+			cbActivities.setValue(null);
+			dfDate.focus();
 		});
 
 		getUI().addWindow(window);

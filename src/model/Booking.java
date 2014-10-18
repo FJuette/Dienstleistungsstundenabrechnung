@@ -3,7 +3,7 @@ package model;
 import java.util.Date;
 
 public class Booking extends AbstractEntity {
-	private int anzahlDLS;
+	private double anzahlDLS;
 	private String bemerkung;
 	private Date ableistungsDatum;
 	
@@ -11,7 +11,7 @@ public class Booking extends AbstractEntity {
 	private Activity aktion;
 	private Member abzeichner;
 	
-	public Booking(int anzahlDLS, String bemerkung, Date ableistungsDatum,
+	public Booking(double anzahlDLS, String bemerkung, Date ableistungsDatum,
 			Member mitglied, Activity aktion, Member abzeichner) {
 		this.anzahlDLS = anzahlDLS;
 		this.bemerkung = bemerkung;
@@ -38,10 +38,10 @@ public class Booking extends AbstractEntity {
 	public void setAbzeichner(Member abzeichner) {
 		this.abzeichner = abzeichner;
 	}
-	public int getAnzahlDLS() {
+	public double getAnzahlDLS() {
 		return anzahlDLS;
 	}
-	public void setAnzahlDLS(int anzahlDLS) {
+	public void setAnzahlDLS(double anzahlDLS) {
 		this.anzahlDLS = anzahlDLS;
 	}
 	public String getBemerkung() {
