@@ -17,7 +17,6 @@ import Views.LogView;
 import Views.LoginView;
 import Views.MainView;
 import Views.MemberView;
-import Views.SearchView;
 import Views.SettingsView;
 import Views.SubjectView;
 import Views.UserView;

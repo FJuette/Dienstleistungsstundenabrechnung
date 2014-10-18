@@ -10,11 +10,20 @@ import java.io.OutputStream;
 
 
 
+
+
+
+
+
+
 import model.Group;
 import model.Member;
 import model.Subject;
 
 
+
+
+import model.User;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -28,14 +37,17 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.MultiSelectMode;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Upload.Receiver;
@@ -48,26 +60,21 @@ import com.vaadin.ui.Window;
 
 
 
-import de.juette.dlsa.ComponentHelper;import de.juette.dlsa.MyGroupFilter;
 
+
+
+
+
+
+import de.juette.dlsa.BooleanToGermanConverter;
+import de.juette.dlsa.ComponentHelper;import de.juette.dlsa.MyGroupFilter;
+import de.juette.dlsa.RoleToRolenameConverter;
 
 @SuppressWarnings("serial")
-public class MemberView extends VerticalLayout implements View {
-
-	private final Table tblMembers = new Table();
+public class MemberView extends EditableTable<Member> implements View {
 
 	private FieldGroup fieldGroup;
-	private BeanItemContainer<Member> members = new BeanItemContainer<Member>(
-			Member.class);
-
-	private BeanItemContainer<Group> mGroups;
-	private BeanItemContainer<Subject> mSubjects;
-
-	private Button btnNewMember = new Button("Neues Mitglied");
-
-	private ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
-	private ComboBox cbFilterSubject = new ComboBox("Filter nach Sparte:");
-
+	
 	private Handler actionHandler = new Handler() {
 		private final Action EDIT = new Action("Bearbeiten");
 		private final Action GROUPS = new Action("Gruppen zuordnen");
@@ -81,21 +88,21 @@ public class MemberView extends VerticalLayout implements View {
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Bearbeiten")) {
-				if (tblMembers.getValue() != null) {
-					openMemberWindow(members.getItem(tblMembers.getValue()),
+				if (table.getValue() != null) {
+					openMemberWindow(beans.getItem(table.getValue()),
 							"Mitarbeiter bearbeiten");
 				}
 			} else if (action.getCaption().equals("Gruppen zuordnen")) {
-				if (tblMembers.getValue() != null) {
-					openGroupWindow(members.getItem(tblMembers.getValue()));
+				if (table.getValue() != null) {
+					openGroupWindow(beans.getItem(table.getValue()));
 				}
 			} else if (action.getCaption().equals("Sparten zuordnen")) {
-				if (tblMembers.getValue() != null) {
-					openSubjectWindow(members.getItem(tblMembers.getValue()));
+				if (table.getValue() != null) {
+					openSubjectWindow(beans.getItem(table.getValue()));
 				}
 			} else if (action.getCaption().equals("Entfernen")) {
-				members.removeItem(tblMembers.getValue());
-				ComponentHelper.updateTable(tblMembers);
+				beans.removeItem(table.getValue());
+				ComponentHelper.updateTable(table);
 			} else if (action.getCaption().equals("DLS Buchen")) {
 				Notification.show("Noch nicht implementiert.", Notification.Type.HUMANIZED_MESSAGE);
 			}
@@ -107,42 +114,39 @@ public class MemberView extends VerticalLayout implements View {
 		}
 	};
 
-	public MemberView() {
-		initLayout();
-		initTable();
+	private Handler getActionHandler() {
+		return actionHandler;
 	}
 
-	private void initLayout() {
-		setSpacing(true);
-		setMargin(true);
-
-		Label title = new Label("Mitgliederverwaltung");
-		title.addStyleName("h1");
-		addComponent(title);
-
-		addComponent(initFilter());
-		addComponent(tblMembers);
-
-		VerticalLayout bottomLeftLayout = new VerticalLayout();
-		bottomLeftLayout.setSpacing(true);
-		addComponent(bottomLeftLayout);
-
+	public MemberView() {
+		beans = ComponentHelper.getDummyMembers();
+		
+		btnChange.setVisible(false);
+		btnNew.setCaption("Neues Mitglied");
+		
+		filterLayout = initFilter();
+		
+		initLayout("Mitgliederverwaltung");
+		initTable();
+		extendTable();
+		
 		FileUploader reciever = new FileUploader();
 		// Create the upload with a caption and set reciever later
 		Upload upload = new Upload("", reciever);
 		upload.setButtonCaption("Einlesen");
 		upload.addSucceededListener(reciever);
-
-		bottomLeftLayout.addComponents(btnNewMember, upload);
-
-		btnNewMember.addClickListener(event -> {
+		addComponent(upload);
+		
+		btnNew.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
 					"Anlegen eines neuen Mitglieds");
 		});
-
 	}
 
 	private HorizontalLayout initFilter() {
+		ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
+		ComboBox cbFilterSubject = new ComboBox("Filter nach Sparte:");
+		
 		HorizontalLayout filterLayout = new HorizontalLayout();
 		filterLayout.setSpacing(true);
 
@@ -161,9 +165,9 @@ public class MemberView extends VerticalLayout implements View {
 		filterLayout.addComponent(cbFilterSubject);
 
 		cbFilterGroup.addValueChangeListener(event -> {
-			members.removeContainerFilters("gruppen");
+			beans.removeContainerFilters("gruppen");
 			if (cbFilterGroup.getValue() != null && !cbFilterGroup.getValue().equals("")) {
-				members.addContainerFilter(new MyGroupFilter("gruppen", (Group)cbFilterGroup.getValue()));
+				beans.addContainerFilter(new MyGroupFilter("gruppen", (Group)cbFilterGroup.getValue()));
 			}
 		});
 
@@ -179,10 +183,10 @@ public class MemberView extends VerticalLayout implements View {
 	}
 
 	private void filterTable(Object columnId, String value) {
-		members.removeAllContainerFilters();
-		members.addContainerFilter(columnId, value, true, false);
+		beans.removeAllContainerFilters();
+		beans.addContainerFilter(columnId, value, true, false);
 
-		ComponentHelper.updateTable(tblMembers);
+		ComponentHelper.updateTable(table);
 	}
 
 	class FileUploader implements Receiver, SucceededListener {
@@ -257,28 +261,36 @@ public class MemberView extends VerticalLayout implements View {
 		return null;
 	}
 
-	private void initTable() {
-		members = ComponentHelper.getDummyMembers();
+	@Override
+	protected void extendTable() {
+		table.removeAllActionHandlers();
+		
+		//table.setMultiSelect(true);
+		//table.setMultiSelectMode(MultiSelectMode.DEFAULT);
 
-		tblMembers.setContainerDataSource(members);
-		tblMembers.setSelectable(true);
-		//tblMembers.setMultiSelect(true);
-		//tblMembers.setMultiSelectMode(MultiSelectMode.DEFAULT);
-		tblMembers.setImmediate(true);
-		tblMembers.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-		tblMembers.setVisibleColumns(new Object[] { "mitgliedsnummer",
-				"fullName" });
-		tblMembers.setColumnHeaders("Mitgliedsnummer", "Name");
-		tblMembers.setWidth("60%");
-		tblMembers.addActionHandler(getActionHandler());
-		tblMembers.addItemClickListener(event -> {
+		/* Andere Darstellungsmöglichkeit
+        // override html column with a component, sorting as by the raw html
+        // field
+		table.addGeneratedColumn("html", new ColumnGenerator() {
+            public Component generateCell(Table source, Object itemId,
+                    Object columnId) {
+                String html = ((Member)itemId).getHtmlName();
+                Label label = new Label(html, ContentMode.HTML);
+                label.setSizeUndefined();
+                return label;
+            }
+        });
+		table.setVisibleColumns(new Object[] { "html" });
+		*/
+		table.setVisibleColumns(new Object[] { "fullName", "mitgliedsnummer" });
+		table.setColumnHeaders("Naame", "Mitgliedsnummer");
+		table.addActionHandler(getActionHandler());
+		table.setWidth("40%");
+		table.addItemClickListener(event -> {
 			if (event.isDoubleClick()) {
 				openMemberWindow(event.getItem(), "Mitarbeiter bearbeiten");
 			}
 		});
-
-		ComponentHelper.updateTable(tblMembers);
-
 	}
 
 	protected void ImportWindow(String[] csvCols, String[] database) {
@@ -386,14 +398,14 @@ public class MemberView extends VerticalLayout implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					members.addItem(new Member(txtNachname.getValue(),
+					beans.addItem(new Member(txtNachname.getValue(),
 							txtVorname.getValue(), txtMitgliedsnummer
 									.getValue(), dfEintrittsdatum.getValue()));
 				} else {
-					members.addItem((BeanItem<Member>) fieldGroup
+					beans.addItem((BeanItem<Member>) fieldGroup
 							.getItemDataSource());
 				}
-				ComponentHelper.updateTable(tblMembers);
+				ComponentHelper.updateTable(table);
 				window.close();
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
@@ -403,6 +415,7 @@ public class MemberView extends VerticalLayout implements View {
 		getUI().addWindow(window);
 	}
 
+	private BeanItemContainer<Group> mGroups;
 	private void openGroupWindow(Item beanItem) {
 		Window window = new Window("Gruppen zuordnen");
 		window.setModal(true);
@@ -481,7 +494,8 @@ public class MemberView extends VerticalLayout implements View {
 
 		getUI().addWindow(window);
 	}
-
+	
+	private BeanItemContainer<Subject> mSubjects;
 	private void openSubjectWindow(Item beanItem) {
 		Window window = new Window("Sparten zuordnen");
 		window.setModal(true);
@@ -578,13 +592,16 @@ public class MemberView extends VerticalLayout implements View {
 		return false;
 	}
 
-	private Handler getActionHandler() {
-		return actionHandler;
-	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
 
+	}
+
+	@Override
+	protected void newBeanWindow() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

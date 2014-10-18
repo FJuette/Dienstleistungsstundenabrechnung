@@ -60,6 +60,10 @@ public class Member extends AbstractEntity {
 	public String getFullName() {
 		return vorname + " " + nachname;
 	}
+	
+	public String getHtmlName() {
+		return "<p style='font-size:0.9em'><strong>" + vorname + " " + nachname + "</strong></p><p style='font-size:0.8em'>" + mitgliedsnummer + "</p>";
+	}
 
 	public String getNachname() {
 		return nachname;

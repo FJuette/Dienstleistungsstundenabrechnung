@@ -16,6 +16,7 @@ import de.juette.dlsa.ComponentHelper;
 public abstract class EditableTable<T> extends VerticalLayout {
 	
 	protected abstract void extendTable();
+	protected HorizontalLayout filterLayout;
 	
 	protected final Table table = new Table();
 	protected BeanItemContainer<T> beans;
@@ -52,7 +53,12 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		
 		Label title = new Label(caption);
 		title.addStyleName("h1");
+		
 		addComponent(title);
+		
+		if (filterLayout != null) {
+			addComponent(filterLayout);
+		}
 		
 		addComponent(table);
 		
@@ -90,7 +96,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		table.setContainerDataSource(beans);
 		table.setSelectable(true);
 		table.setImmediate(true);
-		table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
+		//table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		table.setWidth("40%");
 		table.addActionHandler(getActionHandler());
 		
