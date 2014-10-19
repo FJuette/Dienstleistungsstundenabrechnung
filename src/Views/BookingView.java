@@ -65,6 +65,10 @@ public class BookingView extends VerticalLayout implements View {
 	private final HorizontalLayout filterLayout = new HorizontalLayout();
 	private final Button btnNewBookings = new Button("Neue Buchung(en)");
 	private final Button btnYear = new Button("Jahreslauf durchführen");
+	private final Button btnThisYear = new Button("Vorläufiger Jahreslauf 2014");
+	private final Button btnYearBefore = new Button("Vorläufiger Jahreslauf 2013");
+	
+	//
 
 	private BeanItemContainer<Booking> bookings = new BeanItemContainer<>(
 			Booking.class);
@@ -94,9 +98,18 @@ public class BookingView extends VerticalLayout implements View {
 		addComponent(lblFilter);
 		addComponent(filterLayout);
 		addComponent(tblBookings);
-		addComponent(btnYear);
 
 		btnYear.setStyleName("primary");
+		btnYearBefore.setStyleName("primary");
+		btnThisYear.setStyleName("primary");
+		
+		HorizontalLayout btnsYear = new HorizontalLayout();
+		btnsYear.setSpacing(true);
+		btnsYear.addComponent(btnYearBefore);
+		btnsYear.addComponent(btnThisYear);
+		btnsYear.addComponent(btnYear);
+		addComponent(btnsYear);
+		
 		btnYear.addClickListener(event -> {
 			YearWindow();
 		});
