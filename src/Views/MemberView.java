@@ -45,6 +45,7 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 
 @SuppressWarnings("serial")
@@ -110,17 +111,28 @@ public class MemberView extends EditableTable<Member> implements View {
 		initTable();
 		extendTable();
 
-		FileUploader reciever = new FileUploader();
+		FileHandler reciever = new FileHandler();
 		// Create the upload with a caption and set reciever later
 		Upload upload = new Upload("", reciever);
 		upload.setButtonCaption("Einlesen");
-		upload.addSucceededListener(reciever);
+		upload.addSucceededListener(new SucceededListener() {
+			@Override
+			public void uploadSucceeded(SucceededEvent event) {
+				Notification.show("Hier fehlt noch der Code...", Type.ERROR_MESSAGE);
+			}
+		});
+		
 		addComponent(upload);
-
+		
 		btnNew.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
 					"Anlegen eines neuen Mitglieds");
 		});
+	}
+	
+	public void uploadSucceeded(SucceededEvent event) {
+		Notification.show("Datei erfolgreich hochgeladen",
+				Notification.Type.TRAY_NOTIFICATION);
 	}
 
 	private HorizontalLayout initFilter() {
@@ -170,103 +182,7 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		ComponentHelper.updateTable(table);
 	}
-
-	class FileUploader implements Receiver, SucceededListener {
-
-		public File file;
-
-		@Override
-		public OutputStream receiveUpload(String filename, String mimeType) {
-			// Create upload stream
-			FileOutputStream fos = null; // Stream to write to
-			try {
-				// Open the file for writing
-				System.out.println(VaadinService.getCurrent()
-						.getBaseDirectory().getAbsolutePath()
-						+ "/WEB-INF/Files/" + filename);
-				file = new File(VaadinService.getCurrent().getBaseDirectory()
-						.getAbsolutePath()
-						+ "/WEB-INF/Files/" + filename);
-				fos = new FileOutputStream(file);
-			} catch (final FileNotFoundException ex) {
-				new Notification("Datei nicht gefunden:<br/>", ex.getMessage(),
-						Notification.Type.ERROR_MESSAGE);
-				return null;
-			} catch (final Exception ex) {
-				new Notification("Fehler:<br/>", ex.getMessage(),
-						Notification.Type.ERROR_MESSAGE);
-				return null;
-			}
-			return fos;
-		}
-
-		public void uploadSucceeded(SucceededEvent e) {
-			/*
-			 * Für jede Spalte links aus der Klasse/DB eine Combobox mit jeweils
-			 * allen Feldern Rechte Combobox mit allen Spalten aus der CSV
-			 */
-			Notification.show(file.getName(),
-					Notification.Type.TRAY_NOTIFICATION);
-			ImportWindow(getColumnNames(VaadinService.getCurrent()
-					.getBaseDirectory().getAbsolutePath()
-					+ "/WEB-INF/Files/" + file.getName()), new String[] {
-					"Nachname", "Vorname", "Mitgliedsnummer", "Eintrittsdatum",
-					"Austrittsdatum", "Aktiv" });
-		}
-	}
-
-	// http://www.mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
-	private String[] getColumnNames(String file) {
-		// Make a class for handling CSV files
-		// Path as property
-		// Content as Object?
-		String charset = "UTF-8"; //Default chartset
-		byte[] fileContent = null;
-        try {
-        	File f = new File(file);
-			FileInputStream fin = new FileInputStream(f.getPath());
-			fileContent = new byte[(int) f.length()];
-			fin.read(fileContent);
-			fin.close();
-			byte[] data =  fileContent;
-			CharsetDetector detector = new CharsetDetector();
-			detector.setText(data);
-			CharsetMatch cm = detector.detect();
-			
-			if (cm != null) {
-				int confidence = cm.getConfidence();
-				System.out.println("Encoding: " + cm.getName() + " - Confidence: " + confidence + "%");
-				if (confidence > 30) {
-                    charset = cm.getName();
-                }
-			}
-			
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		};
-		
-		
-		BufferedReader br = null;
-		String cvsSplitBy = ";";
-
-		try {
-			br = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
-			return br.readLine().split(cvsSplitBy);
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
-	}
-
+	
 	@Override
 	protected void extendTable() {
 		table.removeAllActionHandlers();
