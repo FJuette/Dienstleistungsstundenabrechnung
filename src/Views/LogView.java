@@ -79,6 +79,8 @@ public class LogView extends VerticalLayout implements View {
 				"bearbeiter.fullName" });
 		tblLog.setColumnHeaders("Zeitpunkt", "Beschreibung", "Bearbeiter");
 		tblLog.setWidth("100%");
+		tblLog.setSortContainerPropertyId("timestamp");
+		tblLog.setSortAscending(false);
 
 		ComponentHelper.updateTable(tblLog);
 	}
