@@ -94,7 +94,6 @@ public class ComponentHelper {
 					new SimpleDateFormat("dd.MM.yyyy").parse("14.12.19987"),
 					jGroups, jSubjects));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return members;
@@ -128,7 +127,6 @@ public class ComponentHelper {
 					getDummyMembers().getIdByIndex(2), getDummyActivities()
 							.getIdByIndex(2), getDummyMembers().getIdByIndex(1)));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return bookings;
@@ -168,7 +166,6 @@ public class ComponentHelper {
 							"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
 							getDummyMembers().getIdByIndex(0)));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return logEntrys;
@@ -185,7 +182,6 @@ public class ComponentHelper {
 					"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
 					"Jahreslauf vom 31.03.2013"));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return cycles;
