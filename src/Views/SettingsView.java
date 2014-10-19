@@ -1,12 +1,19 @@
 package Views;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -20,34 +27,41 @@ import com.vaadin.ui.VerticalLayout;
 public class SettingsView extends VerticalLayout implements View {
 
 	private final DateField dfStichtag = new DateField("Stichtag");
-	private final TextField txtCountDls = new TextField("Anzahl der Dienstleistungsstunden pro Jahr");
-	private final TextField txtCostDls = new TextField("Kosten pro Dienstleistungsstunde");
-	private final TextField txtDlsFromYear = new TextField("Alter ab wann Dienstleistungsstunden geleistet werden müssen");
-	private final TextField txtDlsToYear = new TextField("Alter bis Dienstleistungsstunden geleistet werden müssen");
+	private final TextField txtCountDls = new TextField(
+			"Anzahl der Dienstleistungsstunden pro Jahr");
+	private final TextField txtCostDls = new TextField(
+			"Kosten pro Dienstleistungsstunde");
+	private final TextField txtDlsFromYear = new TextField(
+			"Alter ab wann Dienstleistungsstunden geleistet werden müssen");
+	private final TextField txtDlsToYear = new TextField(
+			"Alter bis Dienstleistungsstunden geleistet werden müssen");
 	private final OptionGroup groupKind = new OptionGroup();
-	private final CheckBox cbAusgleich = new CheckBox("Ausgleichungsbuchungen beim Jahreslauf");
-	private final CheckBox cbUebername = new CheckBox("Übername von DLS beim Jahreswechsel");
+	private final CheckBox cbAusgleich = new CheckBox(
+			"Ausgleichungsbuchungen beim Jahreslauf");
+	private final CheckBox cbUebername = new CheckBox(
+			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
-	
+	private VerticalLayout mappinglayout;
+
 	public SettingsView() {
 		setSpacing(true);
 		setMargin(true);
-		
+
 		Label title = new Label("Grundeinstellungen");
 		title.addStyleName("h1");
 		addComponent(title);
-		
+
 		final FormLayout form = new FormLayout();
 		form.setMargin(false);
 		form.setWidth("800px");
 		addComponent(form);
-		
+
 		Label section = new Label("Berechnungsgrundlagen");
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
 		form.addComponent(dfStichtag);
-				
+
 		txtCostDls.setWidth("25%");
 		form.addComponent(txtCostDls);
 
@@ -56,12 +70,12 @@ public class SettingsView extends VerticalLayout implements View {
 
 		txtDlsToYear.setWidth("8%");
 		form.addComponent(txtDlsToYear);
-		
+
 		section = new Label("Buchungsverhalten");
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
-		
+
 		HorizontalLayout wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
@@ -72,38 +86,101 @@ public class SettingsView extends VerticalLayout implements View {
 		groupKind.addStyleName("horizontal");
 		wrap.addComponent(groupKind);
 		form.addComponent(wrap);
-		
+
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		wrap.setCaption("Ausgleichsbuchungen");
 		wrap.addComponent(cbAusgleich);
 		form.addComponent(wrap);
-		
+
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		wrap.setCaption("Übernahme von DLS");
 		wrap.addComponent(cbUebername);
 		form.addComponent(wrap);
-		
+
+		section = new Label("Spaltenzuordnung");
+		section.addStyleName("h2");
+		section.addStyleName("colored");
+		form.addComponent(section);
+
+		mappinglayout = getColumnMappingLayout(new String[] { "Nachname",
+				"Vorname", "Mitgliedsnummer", "Eintrittsdatum",
+				"Austrittsdatum", "Aktiv" });
+		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
+		form.addComponent(mappinglayout);
+
+		mappinglayout
+				.forEach(c -> {
+					((HorizontalLayout) c).forEach(p -> {
+						// Demo of setting the Values
+						System.out.println(p.getClass().getTypeName());
+						if ("com.vaadin.ui.ComboBox".equals(p.getClass()
+								.getTypeName())) {
+							BeanItemContainer<String> csv = new BeanItemContainer<String>(
+									String.class);
+							csv.addItem("Test");
+							((ComboBox) p).setContainerDataSource(csv);
+						}
+					});
+				});
+
 		form.addComponent(btnSave);
-		
+
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			Notification.show("Speichern erfolgreich.", Notification.Type.TRAY_NOTIFICATION);
+			Notification.show("Speichern erfolgreich.",
+					Notification.Type.TRAY_NOTIFICATION);
 		});
-		
+
 		form.setReadOnly(false);
-		
+
 		addDummyData();
 	}
-	
+
+	private VerticalLayout getColumnMappingLayout(String[] database) {
+		VerticalLayout layout = new VerticalLayout();
+		BeanItemContainer<String> db = new BeanItemContainer<String>(
+				String.class);
+		for (String col : database) {
+			db.addItem(col);
+		}
+
+		HorizontalLayout headLayout = new HorizontalLayout();
+		layout.addComponent(headLayout);
+
+		Label lblDbHead = new Label("Datenbankfelder");
+		lblDbHead.setStyleName("h4");
+		lblDbHead.setWidth("200");
+		headLayout.addComponent(lblDbHead);
+
+		Label lblCsvHead = new Label("CSV-Spalten");
+		lblCsvHead.setStyleName("h4");
+		lblCsvHead.setWidth("300");
+		headLayout.addComponent(lblCsvHead);
+
+		for (String col : database) {
+			HorizontalLayout boxesLayout = new HorizontalLayout();
+			layout.addComponent(boxesLayout);
+
+			Label lblDb = new Label(col);
+			lblDb.setWidth("200");
+			boxesLayout.addComponent(lblDb);
+
+			ComboBox cbCsv = new ComboBox();
+			cbCsv.setWidth("300");
+			boxesLayout.addComponent(cbCsv);
+		}
+		return layout;
+	}
+
 	@Override
 	public void enter(ViewChangeEvent event) {
-		
+
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	private void addDummyData() {
 		dfStichtag.setValue(new Date(114, 11, 31));
