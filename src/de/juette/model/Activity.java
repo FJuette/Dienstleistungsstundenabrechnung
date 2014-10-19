@@ -1,6 +1,7 @@
 package de.juette.model;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Activity extends AbstractEntity {
@@ -8,8 +9,8 @@ public class Activity extends AbstractEntity {
 	private String beschreibung;
 	private float umfangDLS;
 	
+	@ManyToOne
 	private Member ansprechpartner;
-	private Member autorisierungVorstand;
 	
 	public Activity(String jahr, String beschreibung, float umfangDLS,
 			Member ansprechpartner, Member autorisierungVorstand) {
@@ -17,7 +18,6 @@ public class Activity extends AbstractEntity {
 		this.beschreibung = beschreibung;
 		this.umfangDLS = umfangDLS;
 		this.ansprechpartner = ansprechpartner;
-		this.autorisierungVorstand = autorisierungVorstand;
 	}
 	public String getJahr() {
 		return jahr;
@@ -43,12 +43,4 @@ public class Activity extends AbstractEntity {
 	public void setAnsprechpartner(Member ansprechpartner) {
 		this.ansprechpartner = ansprechpartner;
 	}
-	public Member getAutorisierungVorstand() {
-		return autorisierungVorstand;
-	}
-	public void setAutorisierungVorstand(Member autorisierungVorstand) {
-		this.autorisierungVorstand = autorisierungVorstand;
-	}
-	
-	
 }

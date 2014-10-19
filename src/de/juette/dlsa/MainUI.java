@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
@@ -16,14 +17,17 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionDestroyEvent;
+import com.vaadin.server.SessionDestroyListener;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
@@ -40,15 +44,11 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ValoTheme;
 
-import de.juette.model.Activity;
-import de.juette.model.Group;
-import de.juette.model.User;
+import de.juette.model.HibernateUtil;
 import de.juette.views.ActivityView;
 import de.juette.views.BookingView;
 import de.juette.views.GroupsView;
-import de.juette.views.HelpView;
 import de.juette.views.LogView;
-import de.juette.views.LoginView;
 import de.juette.views.MainView;
 import de.juette.views.MemberView;
 import de.juette.views.SettingsView;
@@ -62,7 +62,24 @@ public class MainUI extends UI implements ViewChangeListener {
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = MainUI.class)
-	public static class Servlet extends VaadinServlet {
+	public static class Servlet extends VaadinServlet implements SessionInitListener, SessionDestroyListener {
+
+		@Override
+		protected void servletInitialized() throws ServletException {
+			super.servletInitialized();
+			getService().addSessionInitListener(this);
+			getService().addSessionDestroyListener(this);
+		}
+		
+		@Override
+		public void sessionDestroy(SessionDestroyEvent event) {
+			HibernateUtil.closeSession();
+		}
+
+		@Override
+		public void sessionInit(SessionInitEvent event) throws ServiceException {
+			HibernateUtil.getSessionFactory();
+		}
 	}
 
 	private Navigator navigator;
