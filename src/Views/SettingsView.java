@@ -16,7 +16,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Upload.SucceededEvent;
+import com.vaadin.ui.Upload.SucceededListener;
+
+import de.juette.dlsa.FileHandler;
 
 @SuppressWarnings("serial")
 public class SettingsView extends VerticalLayout implements View {
@@ -37,6 +42,7 @@ public class SettingsView extends VerticalLayout implements View {
 			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
 	private VerticalLayout mappinglayout;
+	private BeanItemContainer<String> csv = new BeanItemContainer<String>(String.class);
 
 	public SettingsView() {
 		setSpacing(true);
@@ -100,29 +106,42 @@ public class SettingsView extends VerticalLayout implements View {
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
+		
+		FileHandler reciever = new FileHandler();
+		// Create the upload with a caption and set reciever later
+		Upload upload = new Upload("Spaltenüberschriften aus der Mitgliederliste einlesen:", reciever);
+		upload.setButtonCaption("Einlesen");
+		upload.addSucceededListener(new SucceededListener() {
+			@Override
+			public void uploadSucceeded(SucceededEvent event) {
+				for (String item : reciever.getColumnNames()) {
+					csv.addBean(item);
+				}
+				reciever.getFile().delete();
+				//Notification.show("Hier fehlt noch der Code..." + reciever.getFile().getAbsolutePath(), Type.ERROR_MESSAGE);
+			}
+		});
+		
+		form.addComponent(upload);
 
 		mappinglayout = getColumnMappingLayout(new String[] { "Nachname",
 				"Vorname", "Mitgliedsnummer", "Eintrittsdatum",
 				"Austrittsdatum", "Aktiv" });
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-		form.addComponent(mappinglayout);
+		addComponent(mappinglayout);
 
 		mappinglayout
 				.forEach(c -> {
 					((HorizontalLayout) c).forEach(p -> {
 						// Demo of setting the Values
-						System.out.println(p.getClass().getTypeName());
 						if ("com.vaadin.ui.ComboBox".equals(p.getClass()
 								.getTypeName())) {
-							BeanItemContainer<String> csv = new BeanItemContainer<String>(
-									String.class);
-							csv.addItem("Test");
-							((ComboBox) p).setContainerDataSource(csv);
+							System.out.println(p.getClass().getTypeName());
 						}
 					});
 				});
 
-		form.addComponent(btnSave);
+		addComponent(btnSave);
 
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
@@ -137,6 +156,7 @@ public class SettingsView extends VerticalLayout implements View {
 
 	private VerticalLayout getColumnMappingLayout(String[] database) {
 		VerticalLayout layout = new VerticalLayout();
+		layout.setSpacing(true);
 		BeanItemContainer<String> db = new BeanItemContainer<String>(
 				String.class);
 		for (String col : database) {
@@ -146,12 +166,12 @@ public class SettingsView extends VerticalLayout implements View {
 		HorizontalLayout headLayout = new HorizontalLayout();
 		layout.addComponent(headLayout);
 
-		Label lblDbHead = new Label("Datenbankfelder");
+		Label lblDbHead = new Label("Datenbankfeld");
 		lblDbHead.setStyleName("h4");
 		lblDbHead.setWidth("200");
 		headLayout.addComponent(lblDbHead);
 
-		Label lblCsvHead = new Label("CSV-Spalten");
+		Label lblCsvHead = new Label("Spalte aus der Migliederliste");
 		lblCsvHead.setStyleName("h4");
 		lblCsvHead.setWidth("300");
 		headLayout.addComponent(lblCsvHead);
@@ -166,6 +186,7 @@ public class SettingsView extends VerticalLayout implements View {
 
 			ComboBox cbCsv = new ComboBox();
 			cbCsv.setWidth("300");
+			cbCsv.setContainerDataSource(csv);
 			boxesLayout.addComponent(cbCsv);
 		}
 		return layout;
