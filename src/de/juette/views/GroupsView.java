@@ -1,6 +1,4 @@
-package Views;
-
-import model.Group;
+package de.juette.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
@@ -13,6 +11,7 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
+import de.juette.model.Group;
 
 @SuppressWarnings("serial")
 public class GroupsView extends EditableTable<Group> implements View {

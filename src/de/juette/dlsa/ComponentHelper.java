@@ -6,21 +6,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javafx.scene.shape.Cylinder;
-import model.Activity;
-import model.Booking;
-import model.Cycle;
-import model.Group;
-import model.Log;
-import model.Member;
-import model.Role;
-import model.Subject;
-import model.User;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
+
+import de.juette.model.Activity;
+import de.juette.model.Booking;
+import de.juette.model.Cycle;
+import de.juette.model.Group;
+import de.juette.model.Log;
+import de.juette.model.Member;
+import de.juette.model.Role;
+import de.juette.model.Subject;
+import de.juette.model.User;
 
 public class ComponentHelper {
 

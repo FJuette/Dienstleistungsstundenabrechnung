@@ -1,4 +1,4 @@
-package Views;
+package de.juette.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;

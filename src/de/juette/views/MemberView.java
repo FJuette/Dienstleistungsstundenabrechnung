@@ -1,8 +1,4 @@
-package Views;
-
-import model.Group;
-import model.Member;
-import model.Subject;
+package de.juette.views;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -33,6 +29,9 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
+import de.juette.model.Group;
+import de.juette.model.Member;
+import de.juette.model.Subject;
 
 @SuppressWarnings("serial")
 public class MemberView extends EditableTable<Member> implements View {

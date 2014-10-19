@@ -1,4 +1,4 @@
-package model;
+package de.juette.model;
 
 import javax.persistence.Entity;
 

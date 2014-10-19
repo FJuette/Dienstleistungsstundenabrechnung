@@ -1,11 +1,7 @@
-package Views;
+package de.juette.views;
 
 import java.io.File;
 import java.util.Date;
-
-import model.Activity;
-import model.Booking;
-import model.Member;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
@@ -33,6 +29,9 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.DateToShortGermanStringConverter;
+import de.juette.model.Activity;
+import de.juette.model.Booking;
+import de.juette.model.Member;
 
 @SuppressWarnings("serial")
 public class BookingView extends VerticalLayout implements View {

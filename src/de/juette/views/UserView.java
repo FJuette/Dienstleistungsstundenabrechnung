@@ -1,7 +1,4 @@
-package Views;
-
-import model.Role;
-import model.User;
+package de.juette.views;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -25,6 +22,8 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.RoleToRolenameConverter;
+import de.juette.model.Role;
+import de.juette.model.User;
 
 @SuppressWarnings("serial")
 public class UserView extends EditableTable<User> implements View {

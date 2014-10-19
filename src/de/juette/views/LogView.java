@@ -1,9 +1,6 @@
-package Views;
+package de.juette.views;
 
 import java.io.File;
-
-import model.Cycle;
-import model.Log;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
@@ -20,6 +17,8 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.ComponentHelper;
+import de.juette.model.Cycle;
+import de.juette.model.Log;
 
 @SuppressWarnings("serial")
 public class LogView extends VerticalLayout implements View {

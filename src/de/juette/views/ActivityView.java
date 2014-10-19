@@ -1,7 +1,4 @@
-package Views;
-
-import model.Activity;
-import model.Member;
+package de.juette.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
@@ -14,6 +11,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
+import de.juette.model.Activity;
+import de.juette.model.Member;
 
 @SuppressWarnings("serial")
 public class ActivityView extends EditableTable<Activity> implements View {

@@ -2,9 +2,9 @@ package de.juette.dlsa;
 
 import java.util.Locale;
 
-import model.Role;
-
 import com.vaadin.data.util.converter.Converter;
+
+import de.juette.model.Role;
 
 @SuppressWarnings("serial")
 public class RoleToRolenameConverter implements Converter<String, Role> {

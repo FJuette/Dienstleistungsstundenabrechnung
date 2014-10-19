@@ -3,11 +3,11 @@ package de.juette.dlsa;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import model.Group;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+
+import de.juette.model.Group;
 
 @SuppressWarnings("serial")
 public class MyGroupFilter implements Container.Filter {

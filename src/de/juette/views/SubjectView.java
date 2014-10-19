@@ -1,6 +1,4 @@
-package Views;
-
-import model.Subject;
+package de.juette.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
@@ -11,6 +9,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
+import de.juette.model.Subject;
 
 @SuppressWarnings("serial")
 public class SubjectView extends EditableTable<Subject> implements View {

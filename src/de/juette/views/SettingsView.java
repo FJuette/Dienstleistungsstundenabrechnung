@@ -1,4 +1,4 @@
-package Views;
+package de.juette.views;
 
 import java.util.Date;
 

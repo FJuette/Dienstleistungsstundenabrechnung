@@ -6,21 +6,6 @@ import java.util.Map.Entry;
 
 import javax.servlet.annotation.WebServlet;
 
-import model.Activity;
-import model.Group;
-import model.User;
-import Views.ActivityView;
-import Views.BookingView;
-import Views.GroupsView;
-import Views.HelpView;
-import Views.LogView;
-import Views.LoginView;
-import Views.MainView;
-import Views.MemberView;
-import Views.SettingsView;
-import Views.SubjectView;
-import Views.UserView;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -54,6 +39,21 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ValoTheme;
+
+import de.juette.model.Activity;
+import de.juette.model.Group;
+import de.juette.model.User;
+import de.juette.views.ActivityView;
+import de.juette.views.BookingView;
+import de.juette.views.GroupsView;
+import de.juette.views.HelpView;
+import de.juette.views.LogView;
+import de.juette.views.LoginView;
+import de.juette.views.MainView;
+import de.juette.views.MemberView;
+import de.juette.views.SettingsView;
+import de.juette.views.SubjectView;
+import de.juette.views.UserView;
 
 @SuppressWarnings("serial")
 @Theme("dlsaTheme")
