@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Mitglied")
 public class Member extends AbstractEntity {
 	private String nachname;
 	private String vorname;
@@ -14,7 +18,11 @@ public class Member extends AbstractEntity {
 	private Date eintrittsdatum;
 	private Date austrittsdatum;
 	private Boolean aktiv = false;
+	
+	@ManyToMany (cascade=CascadeType.ALL)
 	private Collection<Group> gruppen = new ArrayList<Group>();
+	
+	@ManyToMany (cascade=CascadeType.ALL)
 	private Collection<Subject> sparten = new ArrayList<Subject>();
 
 	public Member() {
@@ -56,6 +64,8 @@ public class Member extends AbstractEntity {
 		this.gruppen = gruppen;
 		this.sparten = sparten;
 	}
+	
+	
 
 	public String getFullName() {
 		return vorname + " " + nachname;

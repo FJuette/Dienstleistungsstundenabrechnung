@@ -1,8 +1,10 @@
 package de.juette.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Spaltenzuordnung")
 public class ColumnMapping extends AbstractEntity {
 	private String dbColumnn;
 	private String csvColumn;

@@ -122,11 +122,11 @@ public class ComponentHelper {
 			bookings.addItem(new Booking(2, "Erste Buchung",
 					new SimpleDateFormat("dd.MM.yyyy").parse("01.10.2014"),
 					getDummyMembers().getIdByIndex(3), getDummyActivities()
-							.getIdByIndex(1), getDummyMembers().getIdByIndex(2)));
+							.getIdByIndex(1)));
 			bookings.addItem(new Booking(3, "Zweite Buchung",
 					new SimpleDateFormat("dd.MM.yyyy").parse("11.01.2014"),
 					getDummyMembers().getIdByIndex(2), getDummyActivities()
-							.getIdByIndex(2), getDummyMembers().getIdByIndex(1)));
+							.getIdByIndex(2)));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

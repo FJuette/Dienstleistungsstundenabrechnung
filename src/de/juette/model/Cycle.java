@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Jahreslauf")
 public class Cycle extends AbstractEntity {
 	private File datei;
 	private Date timestamp;

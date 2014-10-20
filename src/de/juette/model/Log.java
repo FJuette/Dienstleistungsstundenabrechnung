@@ -3,11 +3,16 @@ package de.juette.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Historie")
 public class Log extends AbstractEntity {
 	private Date timestamp;
 	private String beschreibung;
+	
+	@ManyToOne
 	private Member bearbeiter;
 	public Date getTimestamp() {
 		return timestamp;

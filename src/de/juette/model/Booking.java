@@ -2,23 +2,30 @@ package de.juette.model;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table (name="Buchung")
 public class Booking extends AbstractEntity {
 	private double anzahlDLS;
 	private String bemerkung;
 	private Date ableistungsDatum;
 	
+	@ManyToOne
 	private Member mitglied;
+	
+	@ManyToOne
 	private Activity aktion;
-	private Member abzeichner;
 	
 	public Booking(double anzahlDLS, String bemerkung, Date ableistungsDatum,
-			Member mitglied, Activity aktion, Member abzeichner) {
+			Member mitglied, Activity aktion) {
 		this.anzahlDLS = anzahlDLS;
 		this.bemerkung = bemerkung;
 		this.ableistungsDatum = ableistungsDatum;
 		this.mitglied = mitglied;
 		this.aktion = aktion;
-		this.abzeichner = abzeichner;
 	}
 	public Member getMitglied() {
 		return mitglied;
@@ -31,12 +38,6 @@ public class Booking extends AbstractEntity {
 	}
 	public void setAktion(Activity aktion) {
 		this.aktion = aktion;
-	}
-	public Member getAbzeichner() {
-		return abzeichner;
-	}
-	public void setAbzeichner(Member abzeichner) {
-		this.abzeichner = abzeichner;
 	}
 	public double getAnzahlDLS() {
 		return anzahlDLS;

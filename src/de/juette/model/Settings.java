@@ -1,8 +1,10 @@
 package de.juette.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Einstellungen")
 public class Settings extends AbstractEntity {
 	private String stichtag;
 	private String costDls;

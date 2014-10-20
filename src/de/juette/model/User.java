@@ -1,12 +1,17 @@
 package de.juette.model;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="UserDetails")
 public class User extends AbstractEntity {
 	private String benutzername;
 	private String passwort;
 	private Boolean aktiv = true;
+	
+	@ManyToOne
 	private Role rolle;
 	
 	public User() {

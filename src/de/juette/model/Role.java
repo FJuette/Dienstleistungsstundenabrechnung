@@ -1,8 +1,10 @@
 package de.juette.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table (name="Rolle")
 public class Role extends AbstractEntity {
 	private String rollenname;
 

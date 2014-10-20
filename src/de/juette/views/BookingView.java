@@ -48,8 +48,7 @@ public class BookingView extends VerticalLayout implements View {
 						-((Booking) tblBookings.getValue()).getAnzahlDLS(),
 						"Stornierung", new Date(), ((Booking) tblBookings
 								.getValue()).getMitglied(),
-						((Booking) tblBookings.getValue()).getAktion(),
-						((Booking) tblBookings.getValue()).getAbzeichner()));
+						((Booking) tblBookings.getValue()).getAktion()));
 				ComponentHelper.updateTable(tblBookings);
 			}
 		}
@@ -234,8 +233,7 @@ public class BookingView extends VerticalLayout implements View {
 			bookings.addItem(new Booking(Double.parseDouble(txtCountDls
 					.getValue().replace(',', '.')), txtComment.getValue(),
 					dfDate.getValue(), (Member) cbMembers.getValue(),
-					(Activity) cbActivities.getValue(), (Member) cbMembers
-							.getValue()));
+					(Activity) cbActivities.getValue()));
 			ComponentHelper.updateTable(tblBookings);
 
 			txtCountDls.setValue("");
