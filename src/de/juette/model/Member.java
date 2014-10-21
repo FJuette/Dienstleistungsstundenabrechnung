@@ -65,8 +65,6 @@ public class Member extends AbstractEntity {
 		this.sparten = sparten;
 	}
 	
-	
-
 	public String getFullName() {
 		return vorname + " " + nachname;
 	}

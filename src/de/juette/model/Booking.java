@@ -19,6 +19,10 @@ public class Booking extends AbstractEntity {
 	@ManyToOne
 	private Activity aktion;
 	
+	public Booking() {
+		
+	}
+	
 	public Booking(double anzahlDLS, String bemerkung, Date ableistungsDatum,
 			Member mitglied, Activity aktion) {
 		this.anzahlDLS = anzahlDLS;

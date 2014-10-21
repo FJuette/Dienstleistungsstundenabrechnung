@@ -25,5 +25,6 @@ public class ColumnMapping extends AbstractEntity {
 		this.csvColumn = csvColumn;
 	}
 	public ColumnMapping() {
+		
 	}
 }

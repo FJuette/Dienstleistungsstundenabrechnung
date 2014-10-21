@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.scene.shape.Cylinder;
 
@@ -17,6 +18,7 @@ import de.juette.model.Activity;
 import de.juette.model.Booking;
 import de.juette.model.Cycle;
 import de.juette.model.Group;
+import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Role;
@@ -51,6 +53,14 @@ public class ComponentHelper {
 		return subjects;
 	}
 
+	public static void createDummySubjects() {
+		ArrayList<Subject> entrys = new ArrayList<Subject>(Arrays.asList(
+				new Subject("Freizeitsportler"), new Subject(
+						"Gelegenheitssportler"), new Subject("Rutinesportler"),
+				new Subject("Leistungssportler")));
+		HibernateUtil.saveAll(entrys);
+	}
+
 	public static BeanItemContainer<Group> getDummyGroups() {
 		BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 				Group.class);
@@ -59,6 +69,13 @@ public class ComponentHelper {
 		groups.addItem(new Group("Mitglied", false));
 		groups.addItem(new Group("Aufsicht", false));
 		return groups;
+	}
+
+	public static void createDummyGroups() {
+		ArrayList<Group> entrys = new ArrayList<Group>(Arrays.asList(new Group(
+				"Trainer", true), new Group("Vorstand", true), new Group(
+				"Mitglied", false), new Group("Aufsicht", false)));
+		HibernateUtil.saveAll(entrys);
 	}
 
 	public static BeanItemContainer<Member> getDummyMembers() {
@@ -98,6 +115,47 @@ public class ComponentHelper {
 			e.printStackTrace();
 		}
 		return members;
+	}
+
+	public static void createDummyMember() {
+		ArrayList<Group> sGroups = (ArrayList<Group>) HibernateUtil
+				.getAllAsList(Group.class);
+		ArrayList<Subject> sSubjects = (ArrayList<Subject>) HibernateUtil
+				.getAllAsList(Subject.class);
+
+		sGroups.remove(1);
+		sGroups.remove(2);
+		sSubjects.remove(0);
+		sSubjects.remove(1);
+
+		ArrayList<Group> jGroups = (ArrayList<Group>) HibernateUtil
+				.getAllAsList(Group.class);
+		ArrayList<Subject> jSubjects = (ArrayList<Subject>) HibernateUtil
+				.getAllAsList(Subject.class);
+
+		jGroups.remove(0);
+		jGroups.remove(2);
+		jSubjects.remove(1);
+		jSubjects.remove(2);
+
+		try {
+			ArrayList<Member> entrys = new ArrayList<Member>(Arrays.asList(
+					new Member("Sander", "Thorsten", "123456",
+							new SimpleDateFormat("dd.MM.yyyy")
+									.parse("11.01.2014"), sGroups, sSubjects),
+					new Member("Juette", "Fabian", "987654",
+							new SimpleDateFormat("dd.MM.yyyy")
+									.parse("01.01.2014"), jGroups, jSubjects),
+					new Member("Tester", "Tom", "565645", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("25.03.2000"), sGroups,
+							sSubjects),
+					new Member("Juppie", "Jörn", "848484",
+							new SimpleDateFormat("dd.MM.yyyy")
+									.parse("14.12.19987"), jGroups, jSubjects)));
+			HibernateUtil.saveAll(entrys);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static BeanItemContainer<Activity> getDummyActivities() {

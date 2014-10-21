@@ -13,6 +13,10 @@ public class Cycle extends AbstractEntity {
 	private Date timestamp;
 	private String anzeigename;
 	
+	public Cycle() {
+		
+	}
+	
 	public Cycle(File datei, Date timestamp, String dateiname) {
 		this.datei = datei;
 		this.timestamp = timestamp;

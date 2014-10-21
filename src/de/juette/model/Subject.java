@@ -14,17 +14,21 @@ public class Subject extends AbstractEntity {
 	
 	@ManyToMany (mappedBy="sparten")
 	private Collection<Member> member = new ArrayList<Member>();
+
+	public Subject() {
+		
+	}
+	
+	public Subject(String spartenname) {
+		super();
+		this.spartenname = spartenname;
+	}
 	
 	public String getSpartenname() {
 		return spartenname;
 	}
 
 	public void setSpartenname(String spartenname) {
-		this.spartenname = spartenname;
-	}
-
-	public Subject(String spartenname) {
-		super();
 		this.spartenname = spartenname;
 	}
 

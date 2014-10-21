@@ -15,6 +15,7 @@ public class Settings extends AbstractEntity {
 	private Boolean dlsTransfer = true;
 	
 	public Settings() {
+		
 	}
 	
 	public Settings(String stichtag, String costDls, int ageFrom, int ageTo,

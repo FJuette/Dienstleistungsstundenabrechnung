@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import java.util.Collection;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -30,6 +32,7 @@ import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.model.Group;
+import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 import de.juette.model.Subject;
 
@@ -37,6 +40,10 @@ import de.juette.model.Subject;
 public class MemberView extends EditableTable<Member> implements View {
 
 	private FieldGroup fieldGroup;
+	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
+			Group.class);
+	private BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
+			Subject.class);
 
 	private Handler actionHandler = new Handler() {
 		private final Action EDIT = new Action("Bearbeiten");
@@ -84,8 +91,11 @@ public class MemberView extends EditableTable<Member> implements View {
 		return actionHandler;
 	}
 
+	@SuppressWarnings("unchecked")
 	public MemberView() {
-		beans = ComponentHelper.getDummyMembers();
+		beans = new BeanItemContainer<Member>(Member.class);
+		beans.addAll((Collection<? extends Member>) HibernateUtil
+				.getAllAsList(Member.class));
 
 		btnChange.setVisible(false);
 		btnNew.setCaption("Neues Mitglied");
@@ -103,18 +113,24 @@ public class MemberView extends EditableTable<Member> implements View {
 		upload.addSucceededListener(new SucceededListener() {
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
-				Notification.show("Hier fehlt noch der Code...", Type.ERROR_MESSAGE);
+				Notification.show("Hier fehlt noch der Code...",
+						Type.ERROR_MESSAGE);
 			}
 		});
-		
+
 		addComponent(upload);
-		
+
 		btnNew.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
 					"Anlegen eines neuen Mitglieds");
 		});
+
+		groups.addAll((Collection<? extends Group>) HibernateUtil
+				.getAllAsList(Group.class));
+		subjects.addAll((Collection<? extends Subject>) HibernateUtil
+				.getAllAsList(Subject.class));
 	}
-	
+
 	public void uploadSucceeded(SucceededEvent event) {
 		Notification.show("Datei erfolgreich hochgeladen",
 				Notification.Type.TRAY_NOTIFICATION);
@@ -130,13 +146,12 @@ public class MemberView extends EditableTable<Member> implements View {
 		TextField txtFilterName = new TextField("Filter nach Name:");
 		filterLayout.addComponent(txtFilterName);
 
-		cbFilterGroup.setContainerDataSource(ComponentHelper.getDummyGroups());
+		cbFilterGroup.setContainerDataSource(groups);
 		cbFilterGroup.setItemCaptionPropertyId("gruppenname");
 		cbFilterGroup.setImmediate(true);
 		filterLayout.addComponent(cbFilterGroup);
 
-		cbFilterSubject.setContainerDataSource(ComponentHelper
-				.getDummySubjects());
+		cbFilterSubject.setContainerDataSource(subjects);
 		cbFilterSubject.setItemCaptionPropertyId("spartenname");
 		cbFilterSubject.setImmediate(true);
 		filterLayout.addComponent(cbFilterSubject);
@@ -167,7 +182,7 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		ComponentHelper.updateTable(table);
 	}
-	
+
 	@Override
 	protected void extendTable() {
 		table.removeAllActionHandlers();
@@ -304,14 +319,14 @@ public class MemberView extends EditableTable<Member> implements View {
 					beans.addItem(new Member(txtNachname.getValue(), txtVorname
 							.getValue(), txtMitgliedsnummer.getValue(),
 							dfEintrittsdatum.getValue()));
-				} else {
-					beans.addItem((Member)fieldGroup.getItemDataSource());
 				}
 				ComponentHelper.updateTable(table);
 				window.close();
 			} catch (Exception e) {
+				e.printStackTrace();
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
+			HibernateUtil.saveAll(beans.getItemIds());
 		});
 
 		getUI().addWindow(window);
@@ -332,11 +347,6 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
-
-		//
-		BeanItemContainer<Group> groups = ComponentHelper.getDummyGroups();
-		BeanItemContainer<Subject> subjects = ComponentHelper
-				.getDummySubjects();
 
 		ComboBox cbAll = new ComboBox("Alle " + caption + ":");
 		// Datenquelle abhängig von der Caption auf Gruppen oder Sparten setzen
@@ -407,17 +417,16 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Gruppen")) {
-					(((BeanItem<Member>) beanItem).getBean())
-							.setGruppen(mGroups.getItemIds());
+					(beanItem.getBean()).setGruppen(mGroups.getItemIds());
 				} else {
-					(((BeanItem<Member>) beanItem).getBean())
-							.setSparten((mSubjects.getItemIds()));
+					(beanItem.getBean()).setSparten((mSubjects.getItemIds()));
 				}
 				window.close();
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 		});
+		HibernateUtil.save(beanItem.getBean());
 
 		getUI().addWindow(window);
 	}

@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import java.util.Collection;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -12,13 +14,14 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Group;
+import de.juette.model.HibernateUtil;
 
 @SuppressWarnings("serial")
 public class GroupsView extends EditableTable<Group> implements View {
 	
 	public GroupsView() {
 		beans = new BeanItemContainer<>(Group.class);
-		beans = ComponentHelper.getDummyGroups();
+		beans.addAll((Collection<? extends Group>) HibernateUtil.getAllAsList(Group.class));
 		
 		btnNew.setCaption("Neue Gruppe");
 		initLayout("Gruppenverwaltung");

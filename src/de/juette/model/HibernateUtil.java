@@ -149,6 +149,18 @@ public class HibernateUtil
 		return list;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static List<? extends AbstractEntity> getAllAsList(Class<? extends AbstractEntity> dataClass) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<? extends AbstractEntity> list = session.createQuery("from " + dataClass.getSimpleName()).list();
+
+		tx.commit();
+
+		return list;
+	}
+	
 	/**
 	 * Delete item by id.
 	 * 

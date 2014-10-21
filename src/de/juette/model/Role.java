@@ -7,6 +7,10 @@ import javax.persistence.Table;
 @Table (name="Rolle")
 public class Role extends AbstractEntity {
 	private String rollenname;
+	
+	public Role() {
+		
+	}
 
 	public Role(String rollenname) {
 		super();

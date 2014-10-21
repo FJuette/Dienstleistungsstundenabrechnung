@@ -14,6 +14,17 @@ public class Log extends AbstractEntity {
 	
 	@ManyToOne
 	private Member bearbeiter;
+	
+	public Log() {
+		
+	}
+	
+	public Log(Date timestamp, String beschreibung, Member bearbeiter) {
+		this.timestamp = timestamp;
+		this.beschreibung = beschreibung;
+		this.bearbeiter = bearbeiter;
+	}
+	
 	public Date getTimestamp() {
 		return timestamp;
 	}
@@ -30,11 +41,6 @@ public class Log extends AbstractEntity {
 		return bearbeiter;
 	}
 	public void setBearbeiter(Member bearbeiter) {
-		this.bearbeiter = bearbeiter;
-	}
-	public Log(Date timestamp, String beschreibung, Member bearbeiter) {
-		this.timestamp = timestamp;
-		this.beschreibung = beschreibung;
 		this.bearbeiter = bearbeiter;
 	}
 }

@@ -16,6 +16,10 @@ public class Group extends AbstractEntity {
 	@ManyToMany (mappedBy="gruppen")
 	private Collection<Member> member = new ArrayList<Member>();
 	
+	public Group() {
+		
+	}
+	
 	public Group(String gruppenname, Boolean befreit) {
 		super();
 		this.gruppenname = gruppenname;

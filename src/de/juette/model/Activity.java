@@ -14,6 +14,10 @@ public class Activity extends AbstractEntity {
 	@ManyToOne
 	private Member ansprechpartner;
 	
+	public Activity() {
+		
+	}
+	
 	public Activity(String jahr, String beschreibung, float umfangDLS,
 			Member ansprechpartner, Member autorisierungVorstand) {
 		this.jahr = jahr;
