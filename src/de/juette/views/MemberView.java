@@ -31,6 +31,7 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
+import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -163,11 +164,17 @@ public class MemberView extends EditableTable<Member> implements View {
 				beans.addContainerFilter(new MyGroupFilter("gruppen",
 						(Group) cbFilterGroup.getValue()));
 			}
+			ComponentHelper.updateTable(table);
 		});
 
 		cbFilterSubject.addValueChangeListener(event -> {
-			Notification.show("Noch nicht implementiert",
-					Notification.Type.HUMANIZED_MESSAGE);
+			beans.removeContainerFilters("sparten");
+			if (cbFilterSubject.getValue() != null
+					&& !cbFilterSubject.getValue().equals("")) {
+				beans.addContainerFilter(new MySubjectFilter("sparten",
+						(Subject) cbFilterSubject.getValue()));
+			}
+			ComponentHelper.updateTable(table);
 		});
 
 		txtFilterName.addTextChangeListener(event -> {
@@ -177,7 +184,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	}
 
 	private void filterTable(Object columnId, String value) {
-		beans.removeAllContainerFilters();
+		beans.removeContainerFilters(columnId);
 		beans.addContainerFilter(columnId, value, true, false);
 
 		ComponentHelper.updateTable(table);

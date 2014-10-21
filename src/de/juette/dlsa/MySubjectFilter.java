@@ -8,19 +8,19 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 
-import de.juette.model.Group;
+import de.juette.model.Subject;
 
 @SuppressWarnings("serial")
-public class MyGroupFilter implements Container.Filter {
+public class MySubjectFilter implements Container.Filter {
 
 	protected String propertyId;
-	protected Group group;
-
-	public MyGroupFilter(String propertyId, Group group) {
+	protected Subject subject;
+	
+	public MySubjectFilter(String propertyId, Subject subject) {
 		this.propertyId = propertyId;
-		this.group = group;
+		this.subject = subject;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean passesFilter(Object itemId, Item item)
@@ -30,7 +30,7 @@ public class MyGroupFilter implements Container.Filter {
 		// Should always check validity
 		if (p == null || !p.getType().equals(Collection.class))
 			return false;
-		else if (p.getValue().contains(group)) {
+		else if (p.getValue().contains(subject)) {
 			return true;
 		} else {
 			return false;
