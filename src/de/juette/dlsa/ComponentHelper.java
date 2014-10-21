@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.scene.shape.Cylinder;
-
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Component;
@@ -117,6 +115,7 @@ public class ComponentHelper {
 		return members;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void createDummyMember() {
 		ArrayList<Group> sGroups = (ArrayList<Group>) HibernateUtil
 				.getAllAsList(Group.class);
@@ -162,15 +161,25 @@ public class ComponentHelper {
 		BeanItemContainer<Activity> activities = new BeanItemContainer<>(
 				Activity.class);
 		activities.addItem(new Activity("2014", "Erste Aktion", 5,
-				getDummyMembers().getIdByIndex(1), getDummyMembers()
-						.getIdByIndex(2)));
+				getDummyMembers().getIdByIndex(1)));
 		activities.addItem(new Activity("2014", "Zweite Aktion", (float) 3.5,
-				getDummyMembers().getIdByIndex(2), getDummyMembers()
-						.getIdByIndex(3)));
+				getDummyMembers().getIdByIndex(2)));
 		activities.addItem(new Activity("2014", "Dritte Aktion", (float) 2.5,
-				getDummyMembers().getIdByIndex(3), getDummyMembers()
-						.getIdByIndex(1)));
+				getDummyMembers().getIdByIndex(3)));
 		return activities;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void createDummyActivities() {
+		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
+				.getAllAsList(Member.class);
+
+		ArrayList<Activity> entrys = new ArrayList<Activity>(
+				Arrays.asList(new Activity("2014", "Erste Aktion", (float) 5,
+						members.get(1)), new Activity("2014", "Zweite Aktion",
+						(float) 3.5, members.get(2)), new Activity("2014",
+						"Dritte Aktion", (float) 2.5, members.get(3))));
+		HibernateUtil.saveAll(entrys);
 	}
 
 	public static BeanItemContainer<Booking> getDummyBookings() {

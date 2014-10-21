@@ -54,6 +54,7 @@ public class SubjectView extends EditableTable<Subject> implements View {
 		btnSaveNewSubject.addClickListener(event -> {
 			beans.addItem(new Subject(txtNewSubject.getValue()));
 			ComponentHelper.updateTable(table);
+			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();
 		});
 		

@@ -19,7 +19,7 @@ public class Activity extends AbstractEntity {
 	}
 	
 	public Activity(String jahr, String beschreibung, float umfangDLS,
-			Member ansprechpartner, Member autorisierungVorstand) {
+			Member ansprechpartner) {
 		this.jahr = jahr;
 		this.beschreibung = beschreibung;
 		this.umfangDLS = umfangDLS;

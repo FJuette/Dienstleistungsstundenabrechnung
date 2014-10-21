@@ -80,10 +80,11 @@ public class MainUI extends UI implements ViewChangeListener {
 		public void sessionInit(SessionInitEvent event) throws ServiceException {
 			HibernateUtil.getSessionFactory();
 			
-			if (false) {
+			if (true) {
 				ComponentHelper.createDummySubjects();
 				ComponentHelper.createDummyGroups();
 				ComponentHelper.createDummyMember();
+				ComponentHelper.createDummyActivities();
 			}
 		}
 	}

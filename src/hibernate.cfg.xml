@@ -18,7 +18,7 @@
         <property name="show_sql">true</property>
         
         <!-- create (Always create the DB new), update (Only if newer) -->
-        <property name="hbm2ddl.auto">update</property>
+        <property name="hbm2ddl.auto">create</property>
         
         <mapping class="de.juette.model.Activity"></mapping>
         <mapping class="de.juette.model.Booking"></mapping>

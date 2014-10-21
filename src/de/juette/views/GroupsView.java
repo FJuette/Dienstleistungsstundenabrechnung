@@ -61,6 +61,7 @@ public class GroupsView extends EditableTable<Group> implements View {
 		btnSaveNewGroup.addClickListener(event -> {
 			beans.addItem(new Group(txtNewGroup.getValue(), cbNewGroup.getValue()));
 			ComponentHelper.updateTable(table);
+			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();
 		});
 		
