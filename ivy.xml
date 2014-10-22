@@ -41,6 +41,7 @@
 		<dependency org="com.vaadin" name="vaadin-client-compiler"
 			rev="&vaadin.version;" conf="widgetset-compile->default" />
 			
+			
 		<!-- Jar for the  Postgresql database -->
 		<dependency org="postgresql" name="postgresql" 
 			rev="9.1-901.jdbc4" />
@@ -55,6 +56,16 @@
 			
 		<!-- Library for detecting a file encoding -->
 		<dependency org="com.ibm.icu" name="icu4j" rev="53.1"/>
+		
+		<!-- Shiro Lib Dependencys -->
+		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.6.4"/>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.4"/>
+		<dependency org="commons-beanutils" name="commons-beanutils" rev="1.8.3"/>
+		<dependency org="log4j" name="log4j" rev="1.2.16"/>
+		<!-- Shiro Lib for the authentication and authorization -->
+		<dependency org="org.apache.shiro" name="shiro-core" rev="1.2.2"/>
+		<dependency org="org.apache.shiro" name="shiro-web" rev="1.2.2"/>
 		
 	</dependencies>
 </ivy-module>
