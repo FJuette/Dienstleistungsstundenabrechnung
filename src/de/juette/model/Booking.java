@@ -12,6 +12,7 @@ public class Booking extends AbstractEntity {
 	private double anzahlDLS;
 	private String bemerkung;
 	private Date ableistungsDatum;
+	private Boolean storniert = false;
 	
 	@ManyToOne
 	private Member mitglied;
@@ -60,6 +61,14 @@ public class Booking extends AbstractEntity {
 	}
 	public void setAbleistungsDatum(Date ableistungsDatum) {
 		this.ableistungsDatum = ableistungsDatum;
+	}
+
+	public Boolean getStorniert() {
+		return storniert;
+	}
+
+	public void setStorniert(Boolean storniert) {
+		this.storniert = storniert;
 	}
 	
 	

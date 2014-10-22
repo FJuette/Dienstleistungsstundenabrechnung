@@ -200,6 +200,30 @@ public class ComponentHelper {
 		return bookings;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static void createDummyBookings() {
+		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
+				.getAllAsList(Member.class);
+
+		ArrayList<Activity> activities = (ArrayList<Activity>) HibernateUtil
+				.getAllAsList(Activity.class);
+
+		ArrayList<Booking> entrys;
+		try {
+			entrys = new ArrayList<Booking>(Arrays.asList(
+					new Booking(2, "Erste Buchung", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("01.10.2014"), members.get(3),
+							activities.get(1)),
+					new Booking(3, "Zweite Buchung", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("11.01.2014"), members.get(2),
+							activities.get(2))));
+
+			HibernateUtil.saveAll(entrys);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static BeanItemContainer<User> getDummyUsers() {
 		BeanItemContainer<User> users = new BeanItemContainer<User>(User.class);
 		users.addItem(new User("Administrator", "geheim", true, getDummyRoles()

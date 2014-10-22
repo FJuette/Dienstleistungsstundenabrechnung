@@ -1,8 +1,11 @@
 package de.juette.views;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
@@ -21,6 +24,8 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -29,8 +34,10 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.DateToShortGermanStringConverter;
+import de.juette.model.AbstractEntity;
 import de.juette.model.Activity;
 import de.juette.model.Booking;
+import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 @SuppressWarnings("serial")
@@ -44,12 +51,30 @@ public class BookingView extends VerticalLayout implements View {
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Stornieren")) {
-				bookings.addItem(new Booking(
-						-((Booking) tblBookings.getValue()).getAnzahlDLS(),
-						"Stornierung", new Date(), ((Booking) tblBookings
-								.getValue()).getMitglied(),
-						((Booking) tblBookings.getValue()).getAktion()));
-				ComponentHelper.updateTable(tblBookings);
+				if (!((Booking) tblBookings.getValue()).getStorniert()) {
+					Booking b = new Booking();
+					b.setAbleistungsDatum(new Date());
+					b.setAktion(((Booking) tblBookings.getValue()).getAktion());
+					b.setAnzahlDLS(-((Booking) tblBookings.getValue())
+							.getAnzahlDLS());
+					b.setBemerkung("Stornierung von "
+							+ ((Booking) tblBookings.getValue()).getBemerkung());
+					b.setMitglied(((Booking) tblBookings.getValue())
+							.getMitglied());
+
+					((Booking) tblBookings.getValue()).setStorniert(true);
+
+					bookings.addItem(b);
+					ComponentHelper.updateTable(tblBookings);
+					HibernateUtil
+							.saveAll((List<? extends AbstractEntity>) bookings
+									.getItemIds());
+				} else {
+					Notification
+							.show("Das Stornieren der Buchung ist leider nicht möglich, "
+									+ "da diese bereits Storniert wurde.", Type.ERROR_MESSAGE);
+				}
+
 			}
 		}
 
@@ -64,8 +89,9 @@ public class BookingView extends VerticalLayout implements View {
 	private final Button btnNewBookings = new Button("Neue Buchung(en)");
 	private final Button btnYear = new Button("Jahreslauf durchführen");
 	private final Button btnThisYear = new Button("Vorläufiger Jahreslauf 2014");
-	private final Button btnYearBefore = new Button("Vorläufiger Jahreslauf 2013");
-	
+	private final Button btnYearBefore = new Button(
+			"Vorläufiger Jahreslauf 2013");
+
 	//
 
 	private BeanItemContainer<Booking> bookings = new BeanItemContainer<>(
@@ -100,22 +126,24 @@ public class BookingView extends VerticalLayout implements View {
 		btnYear.setStyleName("primary");
 		btnYearBefore.setStyleName("primary");
 		btnThisYear.setStyleName("primary");
-		
+
 		HorizontalLayout btnsYear = new HorizontalLayout();
 		btnsYear.setSpacing(true);
 		btnsYear.addComponent(btnYearBefore);
 		btnsYear.addComponent(btnThisYear);
 		btnsYear.addComponent(btnYear);
 		addComponent(btnsYear);
-		
+
 		btnYear.addClickListener(event -> {
 			YearWindow();
 		});
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private void initTable() {
-		bookings = ComponentHelper.getDummyBookings();
+		bookings.addAll((Collection<? extends Booking>) HibernateUtil
+				.getAllAsList(Booking.class));
 		// Add the nested Property to the available columns
 		bookings.addNestedContainerProperty("mitglied.mitgliedsnummer");
 
@@ -187,6 +215,7 @@ public class BookingView extends VerticalLayout implements View {
 		ComponentHelper.updateTable(tblBookings);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void newBookingsWindow() {
 		Window window = new Window("Anlegen einer neuen Buchung");
 		window.setModal(true);
@@ -196,10 +225,15 @@ public class BookingView extends VerticalLayout implements View {
 		layout.setMargin(true);
 		window.setContent(layout);
 
+		BeanItemContainer<Member> members = new BeanItemContainer<Member>(
+				Member.class);
+		members.addAll((Collection<? extends Member>) HibernateUtil
+				.getAllAsList(Member.class));
+
 		ComboBox cbMembers = new ComboBox("Mitglied");
 		cbMembers.setWidth("100%");
 		cbMembers.setImmediate(true);
-		cbMembers.setContainerDataSource(ComponentHelper.getDummyMembers());
+		cbMembers.setContainerDataSource(members);
 		cbMembers.setItemCaptionPropertyId("fullName");
 		cbMembers.setFilteringMode(FilteringMode.CONTAINS);
 		layout.addComponent(cbMembers);
@@ -208,11 +242,15 @@ public class BookingView extends VerticalLayout implements View {
 		dfDate.setWidth("100%");
 		layout.addComponent(dfDate);
 
+		BeanItemContainer<Activity> activities = new BeanItemContainer<Activity>(
+				Activity.class);
+		activities.addAll((Collection<? extends Activity>) HibernateUtil
+				.getAllAsList(Activity.class));
+
 		ComboBox cbActivities = new ComboBox("Aktion");
 		cbActivities.setWidth("100%");
 		cbActivities.setImmediate(true);
-		cbActivities.setContainerDataSource(ComponentHelper
-				.getDummyActivities());
+		cbActivities.setContainerDataSource(activities);
 		cbActivities.setItemCaptionPropertyId("beschreibung");
 		cbActivities.setFilteringMode(FilteringMode.CONTAINS);
 		layout.addComponent(cbActivities);
@@ -235,7 +273,7 @@ public class BookingView extends VerticalLayout implements View {
 					dfDate.getValue(), (Member) cbMembers.getValue(),
 					(Activity) cbActivities.getValue()));
 			ComponentHelper.updateTable(tblBookings);
-
+			HibernateUtil.saveAll((List<? extends AbstractEntity>) bookings);
 			txtCountDls.setValue("");
 			txtComment.setValue("");
 			cbActivities.setValue(null);
