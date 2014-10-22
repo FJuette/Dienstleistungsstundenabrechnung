@@ -1,10 +1,13 @@
 package de.juette.dlsa;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.apache.shiro.crypto.hash.Sha256Hash;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinService;
@@ -224,6 +227,19 @@ public class ComponentHelper {
 		}
 	}
 
+	public static BeanItemContainer<Role> getDummyRoles() {
+		BeanItemContainer<Role> roles = new BeanItemContainer<Role>(Role.class);
+		roles.addItem(new Role("Admin"));
+		roles.addItem(new Role("Benutzer"));
+		return roles;
+	}
+
+	public static void createDummyRoles() {
+		ArrayList<Role> entrys = new ArrayList<Role>(Arrays.asList(new Role(
+				"Administrator"), new Role("Benutzer"), new Role("Gast")));
+		HibernateUtil.saveAll(entrys);
+	}
+
 	public static BeanItemContainer<User> getDummyUsers() {
 		BeanItemContainer<User> users = new BeanItemContainer<User>(User.class);
 		users.addItem(new User("Administrator", "geheim", true, getDummyRoles()
@@ -235,11 +251,16 @@ public class ComponentHelper {
 		return users;
 	}
 
-	public static BeanItemContainer<Role> getDummyRoles() {
-		BeanItemContainer<Role> roles = new BeanItemContainer<Role>(Role.class);
-		roles.addItem(new Role("Admin"));
-		roles.addItem(new Role("Benutzer"));
-		return roles;
+	@SuppressWarnings("unchecked")
+	public static void createDummyUsers() {
+		ArrayList<Role> roles = (ArrayList<Role>) HibernateUtil
+				.getAllAsList(Role.class);
+
+		ArrayList<User> entrys = new ArrayList<User>(Arrays.asList(
+				new User("admin", new Sha256Hash("admin").toString(), true,
+						roles.get(0)), new User("Benutzer 1", new Sha256Hash(
+						"geheime").toString(), true, roles.get(1))));
+		HibernateUtil.saveAll(entrys);
 	}
 
 	public static BeanItemContainer<Log> getDummyLog() {
@@ -263,19 +284,67 @@ public class ComponentHelper {
 		return logEntrys;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static void createDummyLogs() {
+		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
+				.getAllAsList(Member.class);
+
+		ArrayList<Log> entrys;
+		try {
+			entrys = new ArrayList<Log>(
+					Arrays.asList(
+							new Log(
+									new SimpleDateFormat("dd.MM.yyyy hh:mm")
+											.parse("13.03.2014 10:23"),
+									"Benutzer Juette bearbeitet, veränderte(s) Feld(er): Nachname",
+									members.get(1)),
+							new Log(
+									new SimpleDateFormat("dd.MM.yyyy hh:mm")
+											.parse("14.03.2014 17:53"),
+									"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
+									members.get(0))));
+
+			HibernateUtil.saveAll(entrys);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static BeanItemContainer<Cycle> getDummyCycles() {
 		BeanItemContainer<Cycle> cycles = new BeanItemContainer<Cycle>(
 				Cycle.class);
 		File file = new File(VaadinService.getCurrent().getBaseDirectory()
 				.getAbsolutePath()
 				+ "/WEB-INF/Files/ExampleResult.csv");
-		try {
-			cycles.addItem(new Cycle(file, new SimpleDateFormat(
-					"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
-					"Jahreslauf vom 31.03.2013"));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 		return cycles;
 	}
+	
+	public static void createDummyCycles() {
+		File file = new File(VaadinService.getCurrent().getBaseDirectory()
+				.getAbsolutePath()
+				+ "/WEB-INF/Files/ExampleResult.csv");
+		byte[] bFile = new byte[(int) file.length()];
+		try {
+		     FileInputStream fileInputStream = new FileInputStream(file);
+		     //convert file into array of bytes
+		     fileInputStream.read(bFile);
+		     fileInputStream.close();
+	        } catch (Exception e) {
+		     e.printStackTrace();
+        }
+		
+		ArrayList<Cycle> entrys;
+		try {
+			entrys = new ArrayList<Cycle>(Arrays.asList(
+					new Cycle(bFile, new SimpleDateFormat(
+							"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
+							"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")
+					));
+			HibernateUtil.saveAll(entrys);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }

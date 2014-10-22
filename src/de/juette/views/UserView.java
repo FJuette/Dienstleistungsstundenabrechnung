@@ -1,5 +1,9 @@
 package de.juette.views;
 
+import java.util.Collection;
+
+import org.apache.shiro.crypto.hash.Sha256Hash;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -22,6 +26,8 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.RoleToRolenameConverter;
+import de.juette.model.AbstractEntity;
+import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.User;
 
@@ -35,10 +41,15 @@ public class UserView extends EditableTable<User> implements View {
 		private final Action CHANGE = new Action("Bearbeiten");
 		private final Action[] ACTIONS = new Action[] { CHANGE, REMOVE };
 
+		@SuppressWarnings("unchecked")
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
+				HibernateUtil.removeItem(
+						(Class<? extends AbstractEntity>) table.getValue()
+								.getClass(),
+						((AbstractEntity) table.getValue()).getId().toString());
 				ComponentHelper.updateTable(table);
 			} else if (action.getCaption().equals("Bearbeiten")) {
 				if (table.getValue() != null) {
@@ -57,10 +68,11 @@ public class UserView extends EditableTable<User> implements View {
 		return actionHandler;
 	}
 
+	@SuppressWarnings("unchecked")
 	public UserView() {
 
 		beans = new BeanItemContainer<>(User.class);
-		beans = ComponentHelper.getDummyUsers();
+		beans.addAll((Collection<? extends User>) HibernateUtil.getAllAsList(User.class));
 
 		btnChange.setVisible(false);
 
@@ -93,6 +105,7 @@ public class UserView extends EditableTable<User> implements View {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private void openUserWindow(Item beanItem, String caption) {
 		Window window = new Window(caption);
 		window.setModal(true);
@@ -122,7 +135,8 @@ public class UserView extends EditableTable<User> implements View {
 		fieldGroup.bind(cbActive, "aktiv");
 
 		ComboBox cbRoles = new ComboBox("Rolle");
-		BeanItemContainer<Role> roles = ComponentHelper.getDummyRoles();
+		BeanItemContainer<Role> roles = new BeanItemContainer<Role>(Role.class);
+		roles.addAll((Collection<? extends Role>) HibernateUtil.getAllAsList(Role.class));
 		cbRoles.setContainerDataSource(roles);
 		cbRoles.setItemCaptionPropertyId("rollenname");
 		// cbRoles.setNullSelectionAllowed(false);
@@ -146,14 +160,13 @@ public class UserView extends EditableTable<User> implements View {
 		btnSaveUser.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
-				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					beans.addItem(new User(txtUserName.getValue(), txtUserPass
-							.getValue(), cbActive.getValue(), (Role) cbRoles
+				if (caption.equals("Benutzer anlegen")) {
+					beans.addItem(new User(txtUserName.getValue(), new Sha256Hash(txtUserPass
+							.getValue()).toString(), cbActive.getValue(), (Role) cbRoles
 							.getValue()));
-				} else {
-					beans.addItem((User) fieldGroup.getItemDataSource());
 				}
 				ComponentHelper.updateTable(table);
+				HibernateUtil.saveAll(beans.getItemIds());
 				window.close();
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);

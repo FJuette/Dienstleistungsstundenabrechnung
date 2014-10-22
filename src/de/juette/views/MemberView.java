@@ -32,6 +32,7 @@ import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
+import de.juette.model.AbstractEntity;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -55,6 +56,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		private final Action[] ACTIONS = new Action[] { EDIT, GROUPS, SUBJECS,
 				MASS_CHANGE, REMOVE };
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
@@ -75,6 +77,10 @@ public class MemberView extends EditableTable<Member> implements View {
 				}
 			} else if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
+				HibernateUtil.removeItem(
+						(Class<? extends AbstractEntity>) table.getValue()
+								.getClass(),
+						((AbstractEntity) table.getValue()).getId().toString());
 				ComponentHelper.updateTable(table);
 			} else if (action.getCaption().equals("DLS Buchen")) {
 				Notification.show("Noch nicht implementiert.",

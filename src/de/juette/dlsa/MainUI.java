@@ -86,6 +86,10 @@ public class MainUI extends UI implements ViewChangeListener {
 				ComponentHelper.createDummyMember();
 				ComponentHelper.createDummyActivities();
 				ComponentHelper.createDummyBookings();
+				ComponentHelper.createDummyRoles();
+				ComponentHelper.createDummyUsers();
+				ComponentHelper.createDummyLogs();
+				ComponentHelper.createDummyCycles();
 			}
 		}
 	}

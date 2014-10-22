@@ -19,6 +19,7 @@ import de.juette.model.HibernateUtil;
 @SuppressWarnings("serial")
 public class GroupsView extends EditableTable<Group> implements View {
 	
+	@SuppressWarnings("unchecked")
 	public GroupsView() {
 		beans = new BeanItemContainer<>(Group.class);
 		beans.addAll((Collection<? extends Group>) HibernateUtil.getAllAsList(Group.class));
