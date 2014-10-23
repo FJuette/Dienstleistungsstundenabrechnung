@@ -124,7 +124,11 @@ public class UserView extends EditableTable<User> implements View {
 		layout.addComponent(txtUserName);
 		fieldGroup.bind(txtUserName, "benutzername");
 
+		
 		PasswordField txtUserPass = new PasswordField("Passwort");
+		txtUserPass.addBlurListener(event -> {
+			txtUserPass.setValue(new Sha256Hash(txtUserPass.getValue()).toString());
+		});
 		txtUserPass.setWidth("100%");
 		txtUserPass.setNullRepresentation("");
 		layout.addComponent(txtUserPass);
@@ -139,16 +143,11 @@ public class UserView extends EditableTable<User> implements View {
 		roles.addAll((Collection<? extends Role>) HibernateUtil.getAllAsList(Role.class));
 		cbRoles.setContainerDataSource(roles);
 		cbRoles.setItemCaptionPropertyId("rollenname");
+		fieldGroup.bind(cbRoles, "rolle");
 		// cbRoles.setNullSelectionAllowed(false);
 		// cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
 		if (caption.equals("Benutzer bearbeiten")) {
-			int index = 0;
-			for (int i = 0; i < roles.size(); i++) {
-				if (roles.getIdByIndex(i).getRollenname() == "Benutzer") {
-					index = i;
-				}
-			}
-			cbRoles.setValue(index);
+			//cbRoles.setValue(((User)beanItem.).getRolle());
 		}
 		layout.addComponent(cbRoles);
 		// fieldGroup.bind(cbRoles, "rolle");

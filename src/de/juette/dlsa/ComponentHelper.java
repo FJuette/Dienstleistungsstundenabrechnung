@@ -23,6 +23,7 @@ import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Role;
+import de.juette.model.Settings;
 import de.juette.model.Subject;
 import de.juette.model.User;
 
@@ -318,33 +319,39 @@ public class ComponentHelper {
 				+ "/WEB-INF/Files/ExampleResult.csv");
 		return cycles;
 	}
-	
+
 	public static void createDummyCycles() {
 		File file = new File(VaadinService.getCurrent().getBaseDirectory()
 				.getAbsolutePath()
 				+ "/WEB-INF/Files/ExampleResult.csv");
 		byte[] bFile = new byte[(int) file.length()];
 		try {
-		     FileInputStream fileInputStream = new FileInputStream(file);
-		     //convert file into array of bytes
-		     fileInputStream.read(bFile);
-		     fileInputStream.close();
-	        } catch (Exception e) {
-		     e.printStackTrace();
-        }
-		
+			FileInputStream fileInputStream = new FileInputStream(file);
+			// convert file into array of bytes
+			fileInputStream.read(bFile);
+			fileInputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		ArrayList<Cycle> entrys;
 		try {
-			entrys = new ArrayList<Cycle>(Arrays.asList(
-					new Cycle(bFile, new SimpleDateFormat(
-							"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
-							"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")
-					));
+			entrys = new ArrayList<Cycle>(Arrays.asList(new Cycle(bFile,
+					new SimpleDateFormat("dd.MM.yyyy hh:mm")
+							.parse("13.03.2014 10:23"),
+					"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")));
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
+	public static void createDummySettings() {
+		ArrayList<Settings> entrys = new ArrayList<Settings>(
+				Arrays.asList(new Settings("31.12", 5, (double) 10, 18, 67,
+						"Anteilig bis zum Stichtag", true, false)));
+		HibernateUtil.saveAll(entrys);
+	}
+
 }

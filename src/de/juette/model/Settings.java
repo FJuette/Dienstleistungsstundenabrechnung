@@ -7,10 +7,11 @@ import javax.persistence.Table;
 @Table (name="Einstellungen")
 public class Settings extends AbstractEntity {
 	private String stichtag;
-	private String costDls;
-	private int ageFrom;
-	private int ageTo;
-	private int bookingMethod; // Index of the selected value
+	private Integer countDls;
+	private Double costDls;
+	private Integer ageFrom;
+	private Integer ageTo;
+	private String bookingMethod;
 	private Boolean clearing = true;
 	private Boolean dlsTransfer = true;
 	
@@ -18,13 +19,18 @@ public class Settings extends AbstractEntity {
 		
 	}
 	
-	public Settings(String stichtag, String costDls, int ageFrom, int ageTo,
-			int bookingMethod) {
+	public Settings(String stichtag, Integer countDls, Double costDls,
+			Integer ageFrom, Integer ageTo, String bookingMethod,
+			Boolean clearing, Boolean dlsTransfer) {
+		super();
 		this.stichtag = stichtag;
+		this.countDls = countDls;
 		this.costDls = costDls;
 		this.ageFrom = ageFrom;
 		this.ageTo = ageTo;
 		this.bookingMethod = bookingMethod;
+		this.clearing = clearing;
+		this.dlsTransfer = dlsTransfer;
 	}
 	public String getStichtag() {
 		return stichtag;
@@ -32,28 +38,28 @@ public class Settings extends AbstractEntity {
 	public void setStichtag(String stichtag) {
 		this.stichtag = stichtag;
 	}
-	public String getCostDls() {
+	public double getCostDls() {
 		return costDls;
 	}
-	public void setCostDls(String costDls) {
+	public void setCostDls(Double costDls) {
 		this.costDls = costDls;
 	}
-	public int getAgeFrom() {
+	public Integer getAgeFrom() {
 		return ageFrom;
 	}
-	public void setAgeFrom(int ageFrom) {
+	public void setAgeFrom(Integer ageFrom) {
 		this.ageFrom = ageFrom;
 	}
-	public int getAgeTo() {
+	public Integer getAgeTo() {
 		return ageTo;
 	}
-	public void setAgeTo(int ageTo) {
+	public void setAgeTo(Integer ageTo) {
 		this.ageTo = ageTo;
 	}
-	public int getBookingMethod() {
+	public String getBookingMethod() {
 		return bookingMethod;
 	}
-	public void setBookingMethod(int bookingMethod) {
+	public void setBookingMethod(String bookingMethod) {
 		this.bookingMethod = bookingMethod;
 	}
 	public Boolean getClearing() {
@@ -67,6 +73,14 @@ public class Settings extends AbstractEntity {
 	}
 	public void setDlsTransfer(Boolean dlsTransfer) {
 		this.dlsTransfer = dlsTransfer;
+	}
+
+	public Integer getCountDls() {
+		return countDls;
+	}
+
+	public void setCountDls(Integer countDls) {
+		this.countDls = countDls;
 	}
 	
 	

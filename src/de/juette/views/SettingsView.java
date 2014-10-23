@@ -1,7 +1,11 @@
 package de.juette.views;
 
-import java.util.Date;
+import java.util.List;
 
+import com.ibm.icu.text.SimpleDateFormat;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -17,16 +21,19 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
+import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.FileHandler;
+import de.juette.model.HibernateUtil;
+import de.juette.model.Member;
+import de.juette.model.Settings;
 
 @SuppressWarnings("serial")
 public class SettingsView extends VerticalLayout implements View {
 
-	private final DateField dfStichtag = new DateField("Stichtag");
+	private final TextField dfStichtag = new TextField("Stichtag");
 	private final TextField txtCountDls = new TextField(
 			"Anzahl der Dienstleistungsstunden pro Jahr");
 	private final TextField txtCostDls = new TextField(
@@ -45,6 +52,17 @@ public class SettingsView extends VerticalLayout implements View {
 	private BeanItemContainer<String> csv = new BeanItemContainer<String>(String.class);
 
 	public SettingsView() {
+		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
+		@SuppressWarnings("unchecked")
+		List<Settings> settings = (List<Settings>) HibernateUtil.getAllAsList(Settings.class);
+		for (Settings s : settings) {
+			beanItem = new BeanItem<Settings>(s);
+			break;
+		}
+		
+		FieldGroup fieldGroup = new BeanFieldGroup<Settings>(Settings.class);
+		fieldGroup.setItemDataSource(beanItem);
+		
 		setSpacing(true);
 		setMargin(true);
 
@@ -62,15 +80,23 @@ public class SettingsView extends VerticalLayout implements View {
 		section.addStyleName("colored");
 		form.addComponent(section);
 		form.addComponent(dfStichtag);
+		fieldGroup.bind(dfStichtag, "stichtag");
 
-		txtCostDls.setWidth("25%");
+		txtCostDls.setWidth("15%");
 		form.addComponent(txtCostDls);
+		fieldGroup.bind(txtCostDls, "costDls");
 
-		txtDlsFromYear.setWidth("8%");
+		txtCountDls.setWidth("12%");
+		form.addComponent(txtCountDls);
+		fieldGroup.bind(txtCountDls, "countDls");
+
+		txtDlsFromYear.setWidth("12%");
 		form.addComponent(txtDlsFromYear);
+		fieldGroup.bind(txtDlsFromYear, "ageFrom");
 
-		txtDlsToYear.setWidth("8%");
+		txtDlsToYear.setWidth("12%");
 		form.addComponent(txtDlsToYear);
+		fieldGroup.bind(txtDlsToYear, "ageTo");
 
 		section = new Label("Buchungsverhalten");
 		section.addStyleName("h2");
@@ -83,10 +109,10 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.setCaption("Berechnung beim Jahreslauf");
 		groupKind.addItem("Volles Jahr zum Stichtag");
 		groupKind.addItem("Anteilig bis zum Stichtag");
-		groupKind.addItem("Nur volle Monate im Verein");
 		groupKind.addStyleName("horizontal");
 		wrap.addComponent(groupKind);
 		form.addComponent(wrap);
+		fieldGroup.bind(groupKind, "bookingMethod");
 
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
@@ -94,6 +120,7 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.setCaption("Ausgleichsbuchungen");
 		wrap.addComponent(cbAusgleich);
 		form.addComponent(wrap);
+		fieldGroup.bind(cbAusgleich, "clearing");
 
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
@@ -101,6 +128,7 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.setCaption("Übernahme von DLS");
 		wrap.addComponent(cbUebername);
 		form.addComponent(wrap);
+		fieldGroup.bind(cbUebername, "dlsTransfer");
 
 		section = new Label("Spaltenzuordnung");
 		section.addStyleName("h2");
@@ -151,7 +179,6 @@ public class SettingsView extends VerticalLayout implements View {
 
 		form.setReadOnly(false);
 
-		addDummyData();
 	}
 
 	private VerticalLayout getColumnMappingLayout(String[] database) {
@@ -196,13 +223,24 @@ public class SettingsView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 
 	}
-
-	@SuppressWarnings("deprecation")
-	private void addDummyData() {
-		dfStichtag.setValue(new Date(114, 11, 31));
-		txtCountDls.setValue("5");
-		txtCostDls.setValue("10 €");
-		groupKind.select("Volles Jahr zum Stichtag");
-		cbUebername.setValue(true);
-	}
+	/*
+	private void setData() {
+		@SuppressWarnings("unchecked")
+		List<Settings> settings = (List<Settings>) HibernateUtil.getAllAsList(Settings.class);
+		settings.forEach(s -> {
+			try {
+				dfStichtag.setValue(s.getStichtag());
+				txtCountDls.setValue(s.getCountDls().toString());
+				txtCostDls.setValue(Double.toString(s.getCostDls()));
+				txtDlsFromYear.setValue(s.getAgeFrom().toString());
+				txtDlsToYear.setValue(s.getAgeTo().toString());
+				groupKind.select(s.getBookingMethod());
+				cbUebername.setValue(s.getDlsTransfer());
+				cbAusgleich.setValue(s.getClearing());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+	} */
 }
