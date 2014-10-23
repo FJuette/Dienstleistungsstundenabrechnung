@@ -34,7 +34,7 @@ import com.vaadin.ui.Window;
 import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.model.AbstractEntity;
-import de.juette.model.Activity;
+import de.juette.model.Campaign;
 import de.juette.model.Booking;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -43,25 +43,25 @@ import de.juette.model.Member;
 public class BookingView extends VerticalLayout implements View {
 
 	private Handler actionHandler = new Handler() {
-		private final Action STORBNO = new Action("Stornieren");
-		private final Action[] ACTIONS = new Action[] { STORBNO };
+		private final Action STORNO = new Action("Stornieren");
+		private final Action[] ACTIONS = new Action[] { STORNO };
 
 		@Override
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Stornieren")) {
-				if (!((Booking) tblBookings.getValue()).getStorniert()) {
+				if (!((Booking) tblBookings.getValue()).getCanceled()) {
 					Booking b = new Booking();
-					b.setAbleistungsDatum(new Date());
-					b.setAktion(((Booking) tblBookings.getValue()).getAktion());
-					b.setAnzahlDLS(-((Booking) tblBookings.getValue())
-							.getAnzahlDLS());
-					b.setBemerkung("Stornierung von "
-							+ ((Booking) tblBookings.getValue()).getBemerkung());
-					b.setMitglied(((Booking) tblBookings.getValue())
-							.getMitglied());
+					b.setDoneDate(new Date());
+					b.setActivity(((Booking) tblBookings.getValue()).getActivity());
+					b.setCountDls(-((Booking) tblBookings.getValue())
+							.getCountDls());
+					b.setComment("Stornierung von "
+							+ ((Booking) tblBookings.getValue()).getComment());
+					b.setMember(((Booking) tblBookings.getValue())
+							.getMember());
 
-					((Booking) tblBookings.getValue()).setStorniert(true);
+					((Booking) tblBookings.getValue()).setCanceled(true);
 
 					bookings.addItem(b);
 					ComponentHelper.updateTable(tblBookings);
@@ -144,22 +144,22 @@ public class BookingView extends VerticalLayout implements View {
 		bookings.addAll((Collection<? extends Booking>) HibernateUtil
 				.getAllAsList(Booking.class));
 		// Add the nested Property to the available columns
-		bookings.addNestedContainerProperty("mitglied.mitgliedsnummer");
+		bookings.addNestedContainerProperty("member.mitgliedsnummer");
 
 		tblBookings.setContainerDataSource(bookings);
 		tblBookings.setSelectable(true);
 		tblBookings.setImmediate(true);
-		tblBookings.setVisibleColumns(new Object[] { "anzahlDLS",
-				"ableistungsDatum", "bemerkung", "mitglied.mitgliedsnummer" });
+		tblBookings.setVisibleColumns(new Object[] { "countDls",
+				"doneDate", "comment", "member.mitgliedsnummer" });
 		tblBookings.setColumnHeaders("Anzahl DLS", "Ableistungsdatum",
 				"Bemerkung", "Mitgliedsnummer");
-		tblBookings.setConverter("ableistungsDatum",
+		tblBookings.setConverter("doneDate",
 				new DateToShortGermanStringConverter());
 		tblBookings.setWidth("100%");
 		tblBookings.addActionHandler(getActionHandler());
-		tblBookings.setColumnExpandRatio("anzahlDLS", (float) 0.1);
-		tblBookings.setColumnExpandRatio("ableistungsDatum", (float) 0.2);
-		tblBookings.setColumnExpandRatio("bemerkung", (float) 0.5);
+		tblBookings.setColumnExpandRatio("countDls", (float) 0.1);
+		tblBookings.setColumnExpandRatio("doneDate", (float) 0.2);
+		tblBookings.setColumnExpandRatio("comment", (float) 0.5);
 		tblBookings.setColumnExpandRatio("mitglied.mitgliedsnummer",
 				(float) 0.2);
 
@@ -175,9 +175,9 @@ public class BookingView extends VerticalLayout implements View {
 		txtFilterDls.setNullRepresentation("");
 		txtFilterDls.addTextChangeListener(event -> {
 			if (!event.getText().equals("")) {
-				filterTable("anzahlDLS", event.getText());
+				filterTable("countDls", event.getText());
 			} else {
-				bookings.removeContainerFilters("anzahlDLS");
+				bookings.removeContainerFilters("countDls");
 			}
 
 		});
@@ -186,10 +186,10 @@ public class BookingView extends VerticalLayout implements View {
 		dfFilterDate
 				.addValueChangeListener(event -> {
 					if (((DateField) event.getProperty()).getValue() != null) {
-						filterTable("ableistungsDatum", ((DateField) event
+						filterTable("doneDate", ((DateField) event
 								.getProperty()).getValue().toString());
 					} else {
-						bookings.removeContainerFilters("ableistungsDatum");
+						bookings.removeContainerFilters("doneDate");
 					}
 
 				});
@@ -198,9 +198,9 @@ public class BookingView extends VerticalLayout implements View {
 		txtFilterNote.setConverter(String.class);
 		txtFilterNote.addTextChangeListener(event -> {
 			if (!event.getText().equals("")) {
-				filterTable("bemerkung", event.getText());
+				filterTable("comment", event.getText());
 			} else {
-				bookings.removeContainerFilters("bemerkung");
+				bookings.removeContainerFilters("comment");
 			}
 
 		});
@@ -208,9 +208,7 @@ public class BookingView extends VerticalLayout implements View {
 	}
 
 	private void filterTable(Object columnId, String value) {
-		// bookings.removeAllContainerFilters();
 		bookings.addContainerFilter(columnId, value, true, false);
-
 		ComponentHelper.updateTable(tblBookings);
 	}
 
@@ -241,16 +239,16 @@ public class BookingView extends VerticalLayout implements View {
 		dfDate.setWidth("100%");
 		layout.addComponent(dfDate);
 
-		BeanItemContainer<Activity> activities = new BeanItemContainer<Activity>(
-				Activity.class);
-		activities.addAll((Collection<? extends Activity>) HibernateUtil
-				.getAllAsList(Activity.class));
+		BeanItemContainer<Campaign> activities = new BeanItemContainer<Campaign>(
+				Campaign.class);
+		activities.addAll((Collection<? extends Campaign>) HibernateUtil
+				.getAllAsList(Campaign.class));
 
 		ComboBox cbActivities = new ComboBox("Aktion");
 		cbActivities.setWidth("100%");
 		cbActivities.setImmediate(true);
 		cbActivities.setContainerDataSource(activities);
-		cbActivities.setItemCaptionPropertyId("beschreibung");
+		cbActivities.setItemCaptionPropertyId("description");
 		cbActivities.setFilteringMode(FilteringMode.CONTAINS);
 		layout.addComponent(cbActivities);
 
@@ -270,7 +268,7 @@ public class BookingView extends VerticalLayout implements View {
 			bookings.addItem(new Booking(Double.parseDouble(txtCountDls
 					.getValue().replace(',', '.')), txtComment.getValue(),
 					dfDate.getValue(), (Member) cbMembers.getValue(),
-					(Activity) cbActivities.getValue()));
+					(Campaign) cbActivities.getValue()));
 			ComponentHelper.updateTable(tblBookings);
 			HibernateUtil.saveAll((List<? extends AbstractEntity>) bookings);
 			txtCountDls.setValue("");

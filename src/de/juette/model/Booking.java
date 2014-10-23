@@ -2,74 +2,88 @@ package de.juette.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="Buchung")
+@Table(name = "Buchungen")
 public class Booking extends AbstractEntity {
-	private double anzahlDLS;
-	private String bemerkung;
-	private Date ableistungsDatum;
-	private Boolean storniert = false;
-	
+	@Column(name = "anzahlDls")
+	private double countDls;
+	@Column(name = "bemerkung")
+	private String comment;
+	@Column(name = "ableistungsDatum")
+	private Date doneDate;
+	@Column(name = "storniert")
+	private Boolean canceled = false;
+
 	@ManyToOne
-	private Member mitglied;
-	
+	private Member member;
+
 	@ManyToOne
-	private Activity aktion;
-	
+	private Campaign activity;
+
 	public Booking() {
-		
-	}
-	
-	public Booking(double anzahlDLS, String bemerkung, Date ableistungsDatum,
-			Member mitglied, Activity aktion) {
-		this.anzahlDLS = anzahlDLS;
-		this.bemerkung = bemerkung;
-		this.ableistungsDatum = ableistungsDatum;
-		this.mitglied = mitglied;
-		this.aktion = aktion;
-	}
-	public Member getMitglied() {
-		return mitglied;
-	}
-	public void setMitglied(Member mitglied) {
-		this.mitglied = mitglied;
-	}
-	public Activity getAktion() {
-		return aktion;
-	}
-	public void setAktion(Activity aktion) {
-		this.aktion = aktion;
-	}
-	public double getAnzahlDLS() {
-		return anzahlDLS;
-	}
-	public void setAnzahlDLS(double anzahlDLS) {
-		this.anzahlDLS = anzahlDLS;
-	}
-	public String getBemerkung() {
-		return bemerkung;
-	}
-	public void setBemerkung(String bemerkung) {
-		this.bemerkung = bemerkung;
-	}
-	public Date getAbleistungsDatum() {
-		return ableistungsDatum;
-	}
-	public void setAbleistungsDatum(Date ableistungsDatum) {
-		this.ableistungsDatum = ableistungsDatum;
+
 	}
 
-	public Boolean getStorniert() {
-		return storniert;
+	public Booking(double countDls, String comment, Date doneDate,
+			Member member, Campaign activity) {
+		super();
+		this.countDls = countDls;
+		this.comment = comment;
+		this.doneDate = doneDate;
+		this.member = member;
+		this.activity = activity;
 	}
 
-	public void setStorniert(Boolean storniert) {
-		this.storniert = storniert;
+	public double getCountDls() {
+		return countDls;
 	}
-	
-	
+
+	public void setCountDls(double countDls) {
+		this.countDls = countDls;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public Date getDoneDate() {
+		return doneDate;
+	}
+
+	public void setDoneDate(Date doneDate) {
+		this.doneDate = doneDate;
+	}
+
+	public Boolean getCanceled() {
+		return canceled;
+	}
+
+	public void setCanceled(Boolean canceled) {
+		this.canceled = canceled;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public Campaign getActivity() {
+		return activity;
+	}
+
+	public void setActivity(Campaign activity) {
+		this.activity = activity;
+	}
 }
