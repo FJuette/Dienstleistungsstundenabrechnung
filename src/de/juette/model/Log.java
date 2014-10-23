@@ -2,45 +2,53 @@ package de.juette.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="Historie")
+@Table(name = "Historie")
 public class Log extends AbstractEntity {
 	private Date timestamp;
-	private String beschreibung;
-	
+	@Column(name = "beschreibung")
+	private String description;
+
 	@ManyToOne
-	private Member bearbeiter;
-	
+	private Member editor;
+
 	public Log() {
-		
+
 	}
-	
-	public Log(Date timestamp, String beschreibung, Member bearbeiter) {
+
+	public Log(Date timestamp, String description, Member editor) {
 		this.timestamp = timestamp;
-		this.beschreibung = beschreibung;
-		this.bearbeiter = bearbeiter;
+		this.description = description;
+		this.editor = editor;
 	}
-	
+
 	public Date getTimestamp() {
 		return timestamp;
 	}
+
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
-	public String getBeschreibung() {
-		return beschreibung;
+
+	public String getDescription() {
+		return description;
 	}
-	public void setBeschreibung(String beschreibung) {
-		this.beschreibung = beschreibung;
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	public Member getBearbeiter() {
-		return bearbeiter;
+
+	public Member getEditor() {
+		return editor;
 	}
-	public void setBearbeiter(Member bearbeiter) {
-		this.bearbeiter = bearbeiter;
+
+	public void setEditor(Member editor) {
+		this.editor = editor;
 	}
+
 }

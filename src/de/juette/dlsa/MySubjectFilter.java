@@ -8,15 +8,15 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 
-import de.juette.model.Subject;
+import de.juette.model.Category;
 
 @SuppressWarnings("serial")
 public class MySubjectFilter implements Container.Filter {
 
 	protected String propertyId;
-	protected Subject subject;
+	protected Category subject;
 	
-	public MySubjectFilter(String propertyId, Subject subject) {
+	public MySubjectFilter(String propertyId, Category subject) {
 		this.propertyId = propertyId;
 		this.subject = subject;
 	}

@@ -45,14 +45,14 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ValoTheme;
 
 import de.juette.model.HibernateUtil;
-import de.juette.views.ActivityView;
+import de.juette.views.CampaignView;
 import de.juette.views.BookingView;
+import de.juette.views.ErrorView;
 import de.juette.views.GroupsView;
 import de.juette.views.LogView;
-import de.juette.views.MainView;
 import de.juette.views.MemberView;
 import de.juette.views.SettingsView;
-import de.juette.views.SubjectView;
+import de.juette.views.CategoryView;
 import de.juette.views.UserView;
 
 @SuppressWarnings("serial")
@@ -80,6 +80,7 @@ public class MainUI extends UI implements ViewChangeListener {
 		public void sessionInit(SessionInitEvent event) throws ServiceException {
 			HibernateUtil.getSessionFactory();
 			
+			// Creates Example data, for fresh Database and to show and test the functionality
 			if (true) {
 				DataHandler.createDummySubjects();
 				DataHandler.createDummyGroups();
@@ -100,14 +101,12 @@ public class MainUI extends UI implements ViewChangeListener {
 		{
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
-			put("subject", SubjectView.class);
-			put("activities", ActivityView.class);
+			put("category", CategoryView.class);
+			put("campain", CampaignView.class);
 			put("user", UserView.class);
 			put("member", MemberView.class);
 			put("settings", SettingsView.class);
 			put("log", LogView.class);
-			//put("search", SearchView.class);
-			//put("help", HelpView.class);
 		}
 	};
 
@@ -138,7 +137,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			LoginWindow();
 		}
 
-		navigator.setErrorView(MainView.class);
+		navigator.setErrorView(ErrorView.class);
 	}
 
 	CssLayout buildMenu() {
@@ -147,13 +146,11 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("booking", "Journal");
 				put("user", "Benutzer");
 				put("member", "Mitglieder");
-				put("activities", "Aktionen");
+				put("campain", "Aktionen");
 				put("groups", "Gruppen");
-				put("subject", "Sparten");
+				put("category", "Sparten");
 				put("settings", "Einstellungen");
-				//put("search", "Suche");
 				put("log", "Historie");
-				//put("help", "Hilfe");
 			}
 		};
 

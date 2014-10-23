@@ -36,7 +36,7 @@ import de.juette.model.AbstractEntity;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
-import de.juette.model.Subject;
+import de.juette.model.Category;
 
 @SuppressWarnings("serial")
 public class MemberView extends EditableTable<Member> implements View {
@@ -44,8 +44,8 @@ public class MemberView extends EditableTable<Member> implements View {
 	private FieldGroup fieldGroup;
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
-	private BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
-			Subject.class);
+	private BeanItemContainer<Category> categories = new BeanItemContainer<Category>(
+			Category.class);
 
 	private Handler actionHandler = new Handler() {
 		private final Action EDIT = new Action("Bearbeiten");
@@ -68,12 +68,12 @@ public class MemberView extends EditableTable<Member> implements View {
 			} else if (action.getCaption().equals("Gruppen zuordnen")) {
 				if (table.getValue() != null) {
 					openMappingWindow(beans.getItem(table.getValue()),
-							"Gruppen", "gruppenname");
+							"Gruppen", "groupName");
 				}
 			} else if (action.getCaption().equals("Sparten zuordnen")) {
 				if (table.getValue() != null) {
 					openMappingWindow(beans.getItem(table.getValue()),
-							"Sparten", "spartenname");
+							"Sparten", "categoryName");
 				}
 			} else if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
@@ -128,14 +128,14 @@ public class MemberView extends EditableTable<Member> implements View {
 		addComponent(upload);
 
 		btnNew.addClickListener(event -> {
-			openMemberWindow(new BeanItem<Member>(new Member("", "", "")),
+			openMemberWindow(new BeanItem<Member>(new Member()),
 					"Anlegen eines neuen Mitglieds");
 		});
 
 		groups.addAll((Collection<? extends Group>) HibernateUtil
 				.getAllAsList(Group.class));
-		subjects.addAll((Collection<? extends Subject>) HibernateUtil
-				.getAllAsList(Subject.class));
+		categories.addAll((Collection<? extends Category>) HibernateUtil
+				.getAllAsList(Category.class));
 	}
 
 	public void uploadSucceeded(SucceededEvent event) {
@@ -154,37 +154,37 @@ public class MemberView extends EditableTable<Member> implements View {
 		filterLayout.addComponent(txtFilterName);
 
 		cbFilterGroup.setContainerDataSource(groups);
-		cbFilterGroup.setItemCaptionPropertyId("gruppenname");
+		cbFilterGroup.setItemCaptionPropertyId("groupName");
 		cbFilterGroup.setImmediate(true);
 		filterLayout.addComponent(cbFilterGroup);
 
-		cbFilterSubject.setContainerDataSource(subjects);
-		cbFilterSubject.setItemCaptionPropertyId("spartenname");
+		cbFilterSubject.setContainerDataSource(categories);
+		cbFilterSubject.setItemCaptionPropertyId("categoryName");
 		cbFilterSubject.setImmediate(true);
 		filterLayout.addComponent(cbFilterSubject);
 
 		cbFilterGroup.addValueChangeListener(event -> {
-			beans.removeContainerFilters("gruppen");
+			beans.removeContainerFilters("groups");
 			if (cbFilterGroup.getValue() != null
 					&& !cbFilterGroup.getValue().equals("")) {
-				beans.addContainerFilter(new MyGroupFilter("gruppen",
+				beans.addContainerFilter(new MyGroupFilter("groups",
 						(Group) cbFilterGroup.getValue()));
 			}
 			ComponentHelper.updateTable(table);
 		});
 
 		cbFilterSubject.addValueChangeListener(event -> {
-			beans.removeContainerFilters("sparten");
+			beans.removeContainerFilters("categories");
 			if (cbFilterSubject.getValue() != null
 					&& !cbFilterSubject.getValue().equals("")) {
-				beans.addContainerFilter(new MySubjectFilter("sparten",
-						(Subject) cbFilterSubject.getValue()));
+				beans.addContainerFilter(new MySubjectFilter("categories",
+						(Category) cbFilterSubject.getValue()));
 			}
 			ComponentHelper.updateTable(table);
 		});
 
 		txtFilterName.addTextChangeListener(event -> {
-			filterTable("nachname", event.getText());
+			filterTable("surname", event.getText());
 		});
 		return filterLayout;
 	}
@@ -212,8 +212,8 @@ public class MemberView extends EditableTable<Member> implements View {
 		 * Label(html, ContentMode.HTML); label.setSizeUndefined(); return
 		 * label; } }); table.setVisibleColumns(new Object[] { "html" });
 		 */
-		table.setVisibleColumns(new Object[] { "fullName", "mitgliedsnummer" });
-		table.setColumnHeaders("Naame", "Mitgliedsnummer");
+		table.setVisibleColumns(new Object[] { "fullName", "memberId" });
+		table.setColumnHeaders("Name", "Mitgliedsnummer");
 		table.addActionHandler(getActionHandler());
 		table.setWidth("40%");
 		table.addItemClickListener(event -> {
@@ -296,29 +296,32 @@ public class MemberView extends EditableTable<Member> implements View {
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
 
-		TextField txtMitgliedsnummer = new TextField("Mitgliedsnummer:");
-		fieldGroup.bind(txtMitgliedsnummer, "mitgliedsnummer");
+		TextField txtMemberId = new TextField("Mitgliedsnummer:");
+		txtMemberId.setNullRepresentation("");
+		fieldGroup.bind(txtMemberId, "memberId");
 
-		TextField txtNachname = new TextField("Nachname:");
-		fieldGroup.bind(txtNachname, "nachname");
+		TextField txtSurname = new TextField("Nachname:");
+		txtSurname.setNullRepresentation("");
+		fieldGroup.bind(txtSurname, "surname");
 
-		TextField txtVorname = new TextField("Vorname:");
-		fieldGroup.bind(txtVorname, "vorname");
+		TextField txtForname = new TextField("Vorname:");
+		txtForname.setNullRepresentation("");
+		fieldGroup.bind(txtForname, "forename");
 
-		DateField dfEintrittsdatum = new DateField("Eintrittsdatum");
-		fieldGroup.bind(dfEintrittsdatum, "eintrittsdatum");
+		DateField dfEntryDate = new DateField("Eintrittsdatum");
+		fieldGroup.bind(dfEntryDate, "entryDate");
 
-		layout.addComponents(txtVorname, txtNachname, txtMitgliedsnummer,
-				dfEintrittsdatum);
+		layout.addComponents(txtForname, txtSurname, txtMemberId,
+				dfEntryDate);
 
 		if (caption.equals("Mitarbeiter bearbeiten")) {
-			DateField dfAustrittsdatum = new DateField("Austrittsdatum");
-			fieldGroup.bind(dfAustrittsdatum, "austrittsdatum");
-			layout.addComponent(dfAustrittsdatum);
+			DateField dfLeavingDate = new DateField("Austrittsdatum");
+			fieldGroup.bind(dfLeavingDate, "leavingDate");
+			layout.addComponent(dfLeavingDate);
 
-			CheckBox cbAktiv = new CheckBox("Aktiv");
-			fieldGroup.bind(cbAktiv, "aktiv");
-			layout.addComponent(cbAktiv);
+			CheckBox cbActive = new CheckBox("Aktiv");
+			fieldGroup.bind(cbActive, "active");
+			layout.addComponent(cbActive);
 		}
 
 		Button btnSaveNewMember = new Button("Speichern");
@@ -329,9 +332,9 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					beans.addItem(new Member(txtNachname.getValue(), txtVorname
-							.getValue(), txtMitgliedsnummer.getValue(),
-							dfEintrittsdatum.getValue()));
+					beans.addItem(new Member(txtSurname.getValue(), txtForname
+							.getValue(), txtMemberId.getValue(),
+							dfEntryDate.getValue()));
 				}
 				ComponentHelper.updateTable(table);
 				window.close();
@@ -346,7 +349,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	}
 
 	private BeanItemContainer<Group> mGroups;
-	private BeanItemContainer<Subject> mSubjects;
+	private BeanItemContainer<Category> mCategories;
 
 	private void openMappingWindow(BeanItem<Member> beanItem, String caption,
 			String columnName) {
@@ -364,7 +367,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		ComboBox cbAll = new ComboBox("Alle " + caption + ":");
 		// Datenquelle abhängig von der Caption auf Gruppen oder Sparten setzen
 		cbAll.setContainerDataSource(caption.equals("Gruppen") ? groups
-				: subjects);
+				: categories);
 
 		cbAll.setItemCaptionPropertyId(columnName);
 		cbAll.setImmediate(true);
@@ -376,14 +379,14 @@ public class MemberView extends EditableTable<Member> implements View {
 		layout.addComponent(btnAdd);
 
 		mGroups = new BeanItemContainer<Group>(Group.class);
-		mGroups.addAll(((BeanItem<Member>) beanItem).getBean().getGruppen());
-		mSubjects = new BeanItemContainer<Subject>(Subject.class);
-		mSubjects.addAll(((BeanItem<Member>) beanItem).getBean().getSparten());
+		mGroups.addAll(((BeanItem<Member>) beanItem).getBean().getGroups());
+		mCategories = new BeanItemContainer<Category>(Category.class);
+		mCategories.addAll(((BeanItem<Member>) beanItem).getBean().getCategories());
 
 		Table tblMemberElements = new Table("Zugeordnete " + caption + ":");
 		tblMemberElements
 				.setContainerDataSource(caption.equals("Gruppen") ? mGroups
-						: mSubjects);
+						: mCategories);
 		tblMemberElements.setVisibleColumns(new Object[] { columnName });
 		tblMemberElements.setColumnHeaders(caption);
 		tblMemberElements.setWidth("100%");
@@ -396,17 +399,13 @@ public class MemberView extends EditableTable<Member> implements View {
 			// Compare the Strings because the Object ID is different even on
 			// the same Object types
 			if (caption.equals("Gruppen")) {
-				if (cbAll.getValue() != null
-						&& !groupsContainItem(((Group) cbAll.getValue())
-								.getGruppenname())) {
+				if (cbAll.getValue() != null && !mGroups.containsId(cbAll.getValue())) {
 					mGroups.addItem(cbAll.getValue());
 					ComponentHelper.updateTable(tblMemberElements);
 				}
 			} else {
-				if (cbAll.getValue() != null
-						&& !subjectsContainItem(((Subject) cbAll.getValue())
-								.getSpartenname())) {
-					mSubjects.addItem(cbAll.getValue());
+				if (cbAll.getValue() != null && !mCategories.containsId(cbAll.getValue())) {
+					mCategories.addItem(cbAll.getValue());
 					ComponentHelper.updateTable(tblMemberElements);
 				}
 			}
@@ -430,9 +429,9 @@ public class MemberView extends EditableTable<Member> implements View {
 			try {
 				fieldGroup.commit();
 				if (caption.equals("Gruppen")) {
-					(beanItem.getBean()).setGruppen(mGroups.getItemIds());
+					(beanItem.getBean()).setGroups(mGroups.getItemIds());
 				} else {
-					(beanItem.getBean()).setSparten((mSubjects.getItemIds()));
+					(beanItem.getBean()).setCategories((mCategories.getItemIds()));
 				}
 				window.close();
 			} catch (Exception e) {
@@ -444,24 +443,6 @@ public class MemberView extends EditableTable<Member> implements View {
 		getUI().addWindow(window);
 	}
 
-	private boolean groupsContainItem(String search) {
-		for (Group group : mGroups.getItemIds()) {
-			if (group.getGruppenname().equals(search)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean subjectsContainItem(String search) {
-		for (Subject subject : mSubjects.getItemIds()) {
-			if (subject.getSpartenname().equals(search)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	@Override
 	public void enter(ViewChangeEvent event) {
 
@@ -471,5 +452,4 @@ public class MemberView extends EditableTable<Member> implements View {
 	protected void newBeanWindow() {
 
 	}
-
 }

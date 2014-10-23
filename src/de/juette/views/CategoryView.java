@@ -12,14 +12,15 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Subject;
+import de.juette.model.Category;
 
 @SuppressWarnings("serial")
-public class SubjectView extends EditableTable<Subject> implements View {
+public class CategoryView extends EditableTable<Category> implements View {
 
-	public SubjectView() {
-		beans = new BeanItemContainer<>(Subject.class);
-		beans.addAll((Collection<? extends Subject>) HibernateUtil.getAllAsList(Subject.class));
+	@SuppressWarnings("unchecked")
+	public CategoryView() {
+		beans = new BeanItemContainer<>(Category.class);
+		beans.addAll((Collection<? extends Category>) HibernateUtil.getAllAsList(Category.class));
 		
 		btnNew.setCaption("Neue Sparte");
 		initLayout("Spartenverwaltung");
@@ -29,7 +30,7 @@ public class SubjectView extends EditableTable<Subject> implements View {
 
 	@Override
 	protected void extendTable() {
-		table.setVisibleColumns( new Object[] {"spartenname"} );
+		table.setVisibleColumns( new Object[] {"categoryName"} );
 		table.setColumnHeaders("Sparte");
 	}
 
@@ -43,16 +44,16 @@ public class SubjectView extends EditableTable<Subject> implements View {
 		layout.setMargin(true);
 		window.setContent(layout);
 		
-		TextField txtNewSubject = new TextField("Name");
-		txtNewSubject.setWidth("100%");
-		layout.addComponent(txtNewSubject);
+		TextField txtNewCategory = new TextField("Name");
+		txtNewCategory.setWidth("100%");
+		layout.addComponent(txtNewCategory);
 				
 		Button btnSaveNewSubject = new Button("Speichern");
 		btnSaveNewSubject.setStyleName("friendly");
 		layout.addComponent(btnSaveNewSubject);
 		
 		btnSaveNewSubject.addClickListener(event -> {
-			beans.addItem(new Subject(txtNewSubject.getValue()));
+			beans.addItem(new Category(txtNewCategory.getValue()));
 			ComponentHelper.updateTable(table);
 			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();

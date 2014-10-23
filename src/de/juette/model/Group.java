@@ -3,45 +3,53 @@ package de.juette.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="Gruppe")
+@Table(name = "Gruppen")
 public class Group extends AbstractEntity {
-	private String gruppenname;
-	private Boolean befreit = false;
-	
-	@ManyToMany (mappedBy="gruppen")
+	@Column(name = "gruppenname")
+	private String groupName;
+	@Column(name = "befreit")
+	private Boolean liberated = false;
+
+	@ManyToMany(mappedBy = "groups")
 	private Collection<Member> member = new ArrayList<Member>();
-	
+
 	public Group() {
-		
+
 	}
-	
-	public Group(String gruppenname, Boolean befreit) {
-		super();
-		this.gruppenname = gruppenname;
-		this.befreit = befreit;
+
+	public Group(String groupName, Boolean liberated) {
+		this.groupName = groupName;
+		this.liberated = liberated;
 	}
-	public String getGruppenname() {
-		return gruppenname;
+
+	public String getGroupName() {
+		return groupName;
 	}
-	public void setGruppenname(String gruppenname) {
-		this.gruppenname = gruppenname;
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}
-	public Boolean getBefreit() {
-		return befreit;
+
+	public Boolean getLiberated() {
+		return liberated;
 	}
-	public void setBefreit(Boolean befreit) {
-		this.befreit = befreit;
+
+	public void setLiberated(Boolean liberated) {
+		this.liberated = liberated;
 	}
+
 	public Collection<Member> getMember() {
 		return member;
 	}
+
 	public void setMember(Collection<Member> member) {
 		this.member = member;
 	}
-	
+
 }

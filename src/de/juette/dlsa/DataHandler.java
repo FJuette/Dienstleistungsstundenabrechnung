@@ -14,33 +14,33 @@ import com.vaadin.server.VaadinService;
 
 import de.juette.model.Campaign;
 import de.juette.model.Booking;
-import de.juette.model.Cycle;
+import de.juette.model.CourseOfYear;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Role;
 import de.juette.model.Settings;
-import de.juette.model.Subject;
+import de.juette.model.Category;
 import de.juette.model.User;
 
 public class DataHandler {
 
-	public static BeanItemContainer<Subject> getDummySubjects() {
-		BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
-				Subject.class);
-		subjects.addItem(new Subject("Freizeitsportler"));
-		subjects.addItem(new Subject("Gelegenheitssportler"));
-		subjects.addItem(new Subject("Rutinesportler"));
-		subjects.addItem(new Subject("Leistungssportler"));
+	public static BeanItemContainer<Category> getDummySubjects() {
+		BeanItemContainer<Category> subjects = new BeanItemContainer<Category>(
+				Category.class);
+		subjects.addItem(new Category("Freizeitsportler"));
+		subjects.addItem(new Category("Gelegenheitssportler"));
+		subjects.addItem(new Category("Rutinesportler"));
+		subjects.addItem(new Category("Leistungssportler"));
 		return subjects;
 	}
 
 	public static void createDummySubjects() {
-		ArrayList<Subject> entrys = new ArrayList<Subject>(Arrays.asList(
-				new Subject("Freizeitsportler"), new Subject(
-						"Gelegenheitssportler"), new Subject("Rutinesportler"),
-				new Subject("Leistungssportler")));
+		ArrayList<Category> entrys = new ArrayList<Category>(Arrays.asList(
+				new Category("Freizeitsportler"), new Category(
+						"Gelegenheitssportler"), new Category("Rutinesportler"),
+				new Category("Leistungssportler")));
 		HibernateUtil.saveAll(entrys);
 	}
 
@@ -69,7 +69,7 @@ public class DataHandler {
 		sGroups.add(getDummyGroups().getIdByIndex(0));
 		sGroups.add(getDummyGroups().getIdByIndex(1));
 
-		ArrayList<Subject> sSubjects = new ArrayList<Subject>();
+		ArrayList<Category> sSubjects = new ArrayList<Category>();
 		sSubjects.add(getDummySubjects().getIdByIndex(2));
 		sSubjects.add(getDummySubjects().getIdByIndex(3));
 
@@ -77,7 +77,7 @@ public class DataHandler {
 		jGroups.add(getDummyGroups().getIdByIndex(2));
 		jGroups.add(getDummyGroups().getIdByIndex(3));
 
-		ArrayList<Subject> jSubjects = new ArrayList<Subject>();
+		ArrayList<Category> jSubjects = new ArrayList<Category>();
 		jSubjects.add(getDummySubjects().getIdByIndex(0));
 		jSubjects.add(getDummySubjects().getIdByIndex(1));
 
@@ -104,8 +104,8 @@ public class DataHandler {
 	public static void createDummyMember() {
 		ArrayList<Group> sGroups = (ArrayList<Group>) HibernateUtil
 				.getAllAsList(Group.class);
-		ArrayList<Subject> sSubjects = (ArrayList<Subject>) HibernateUtil
-				.getAllAsList(Subject.class);
+		ArrayList<Category> sSubjects = (ArrayList<Category>) HibernateUtil
+				.getAllAsList(Category.class);
 
 		sGroups.remove(1);
 		sGroups.remove(2);
@@ -114,8 +114,8 @@ public class DataHandler {
 
 		ArrayList<Group> jGroups = (ArrayList<Group>) HibernateUtil
 				.getAllAsList(Group.class);
-		ArrayList<Subject> jSubjects = (ArrayList<Subject>) HibernateUtil
-				.getAllAsList(Subject.class);
+		ArrayList<Category> jSubjects = (ArrayList<Category>) HibernateUtil
+				.getAllAsList(Category.class);
 
 		jGroups.remove(0);
 		jGroups.remove(2);
@@ -291,9 +291,9 @@ public class DataHandler {
 		}
 	}
 
-	public static BeanItemContainer<Cycle> getDummyCycles() {
-		BeanItemContainer<Cycle> cycles = new BeanItemContainer<Cycle>(
-				Cycle.class);
+	public static BeanItemContainer<CourseOfYear> getDummyCycles() {
+		BeanItemContainer<CourseOfYear> cycles = new BeanItemContainer<CourseOfYear>(
+				CourseOfYear.class);
 		File file = new File(VaadinService.getCurrent().getBaseDirectory()
 				.getAbsolutePath()
 				+ "/WEB-INF/Files/ExampleResult.csv");
@@ -314,9 +314,9 @@ public class DataHandler {
 			e.printStackTrace();
 		}
 
-		ArrayList<Cycle> entrys;
+		ArrayList<CourseOfYear> entrys;
 		try {
-			entrys = new ArrayList<Cycle>(Arrays.asList(new Cycle(bFile,
+			entrys = new ArrayList<CourseOfYear>(Arrays.asList(new CourseOfYear(bFile,
 					new SimpleDateFormat("dd.MM.yyyy hh:mm")
 							.parse("13.03.2014 10:23"),
 					"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")));

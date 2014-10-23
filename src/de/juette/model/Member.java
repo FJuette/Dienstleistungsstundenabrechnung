@@ -5,136 +5,128 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="Mitglied")
+@Table(name = "Mitglieder")
 public class Member extends AbstractEntity {
-	private String nachname;
-	private String vorname;
-	private String mitgliedsnummer;
-	private Date eintrittsdatum;
-	private Date austrittsdatum;
-	private Boolean aktiv = false;
-	
-	@ManyToMany (cascade=CascadeType.ALL)
-	private Collection<Group> gruppen = new ArrayList<Group>();
-	
-	@ManyToMany (cascade=CascadeType.ALL)
-	private Collection<Subject> sparten = new ArrayList<Subject>();
+	@Column(name = "nachname")
+	private String surname;
+	@Column(name = "vorname")
+	private String forename;
+	@Column(name = "mitgliedsnummer")
+	private String memberId;
+	@Column(name = "eintrittsdatum")
+	private Date entryDate;
+	@Column(name = "austrittsdatum")
+	private Date leavingDate;
+	@Column(name = "aktiv")
+	private Boolean active = false;
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	private Collection<Group> groups = new ArrayList<Group>();
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	private Collection<Category> categories = new ArrayList<Category>();
 
 	public Member() {
 
 	}
 
-	public Member(String nachname, String vorname, String mitgliedsnummer,
-			Date eintrittsdatum, Collection<Group> gruppen,
-			Collection<Subject> sparten) {
-		this.nachname = nachname;
-		this.vorname = vorname;
-		this.mitgliedsnummer = mitgliedsnummer;
-		this.eintrittsdatum = eintrittsdatum;
-		this.gruppen = gruppen;
-		this.sparten = sparten;
+	public Member(String surname, String forename, String memberId,
+			Date entryDate) {
+		this.surname = surname;
+		this.forename = forename;
+		this.memberId = memberId;
+		this.entryDate = entryDate;
 	}
 
-	public Member(String nachname, String vorname, String mitgliedsnummer) {
-		super();
-		this.nachname = nachname;
-		this.vorname = vorname;
-		this.mitgliedsnummer = mitgliedsnummer;
+	public Member(String surname, String forename, String memberId,
+			Date entryDate, Collection<Group> groups,
+			Collection<Category> categories) {
+		this.surname = surname;
+		this.forename = forename;
+		this.memberId = memberId;
+		this.entryDate = entryDate;
+		this.groups = groups;
+		this.categories = categories;
 	}
 
-	public Member(String nachname, String vorname, String mitgliedsnummer, Date eintrittsdatum) {
-		super();
-		this.nachname = nachname;
-		this.vorname = vorname;
-		this.mitgliedsnummer = mitgliedsnummer;
-		this.eintrittsdatum = eintrittsdatum;
-	}
-
-	public Member(String nachname, String vorname, String mitgliedsnummer,
-			Collection<Group> gruppen, Collection<Subject> sparten) {
-		super();
-		this.nachname = nachname;
-		this.vorname = vorname;
-		this.mitgliedsnummer = mitgliedsnummer;
-		this.gruppen = gruppen;
-		this.sparten = sparten;
-	}
-	
 	public String getFullName() {
-		return vorname + " " + nachname;
+		return forename + " " + surname;
 	}
-	
+
 	public String getHtmlName() {
-		return "<p style='font-size:0.9em'><strong>" + vorname + " " + nachname + "</strong></p><p style='font-size:0.8em'>" + mitgliedsnummer + "</p>";
+		return "<p style='font-size:0.9em'><strong>" + forename + " " + surname
+				+ "</strong></p><p style='font-size:0.8em'>" + memberId
+				+ "</p>";
 	}
 
-	public String getNachname() {
-		return nachname;
+	public String getSurname() {
+		return surname;
 	}
 
-	public void setNachname(String nachname) {
-		this.nachname = nachname;
+	public void setSurname(String surname) {
+		this.surname = surname;
 	}
 
-	public String getVorname() {
-		return vorname;
+	public String getForename() {
+		return forename;
 	}
 
-	public void setVorname(String vorname) {
-		this.vorname = vorname;
+	public void setForename(String forename) {
+		this.forename = forename;
 	}
 
-	public String getMitgliedsnummer() {
-		return mitgliedsnummer;
+	public String getMemberId() {
+		return memberId;
 	}
 
-	public void setMitgliedsnummer(String mitgliedsnummer) {
-		this.mitgliedsnummer = mitgliedsnummer;
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
 	}
 
-	public Collection<Group> getGruppen() {
-		return gruppen;
+	public Date getEntryDate() {
+		return entryDate;
 	}
 
-	public void setGruppen(Collection<Group> gruppen) {
-		this.gruppen = gruppen;
+	public void setEntryDate(Date entryDate) {
+		this.entryDate = entryDate;
 	}
 
-	public Collection<Subject> getSparten() {
-		return sparten;
+	public Date getLeavingDate() {
+		return leavingDate;
 	}
 
-	public void setSparten(Collection<Subject> sparten) {
-		this.sparten = sparten;
+	public void setLeavingDate(Date leavingDate) {
+		this.leavingDate = leavingDate;
 	}
 
-	public Date getEintrittsdatum() {
-		return eintrittsdatum;
+	public Boolean getActive() {
+		return active;
 	}
 
-	public void setEintrittsdatum(Date eintrittsdatum) {
-		this.eintrittsdatum = eintrittsdatum;
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
-	public Date getAustrittsdatum() {
-		return austrittsdatum;
+	public Collection<Group> getGroups() {
+		return groups;
 	}
 
-	public void setAustrittsdatum(Date austrittsdatum) {
-		this.austrittsdatum = austrittsdatum;
+	public void setGroups(Collection<Group> groups) {
+		this.groups = groups;
 	}
 
-	public Boolean getAktiv() {
-		return aktiv;
+	public Collection<Category> getCategories() {
+		return categories;
 	}
 
-	public void setAktiv(Boolean aktiv) {
-		this.aktiv = aktiv;
+	public void setCategories(Collection<Category> categories) {
+		this.categories = categories;
 	}
 
 }

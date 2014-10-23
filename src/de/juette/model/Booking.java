@@ -23,20 +23,20 @@ public class Booking extends AbstractEntity {
 	private Member member;
 
 	@ManyToOne
-	private Campaign activity;
+	private Campaign campaign;
 
 	public Booking() {
 
 	}
 
 	public Booking(double countDls, String comment, Date doneDate,
-			Member member, Campaign activity) {
+			Member member, Campaign campaign) {
 		super();
 		this.countDls = countDls;
 		this.comment = comment;
 		this.doneDate = doneDate;
 		this.member = member;
-		this.activity = activity;
+		this.campaign = campaign;
 	}
 
 	public double getCountDls() {
@@ -79,11 +79,11 @@ public class Booking extends AbstractEntity {
 		this.member = member;
 	}
 
-	public Campaign getActivity() {
-		return activity;
+	public Campaign getCampaign() {
+		return campaign;
 	}
 
-	public void setActivity(Campaign activity) {
-		this.activity = activity;
+	public void setCampaign(Campaign campaign) {
+		this.campaign = campaign;
 	}
 }

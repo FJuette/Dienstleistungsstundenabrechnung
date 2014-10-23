@@ -18,10 +18,10 @@ import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 @SuppressWarnings("serial")
-public class ActivityView extends EditableTable<Campaign> implements View {
+public class CampaignView extends EditableTable<Campaign> implements View {
 
 	@SuppressWarnings("unchecked")
-	public ActivityView() {
+	public CampaignView() {
 		beans = new BeanItemContainer<>(Campaign.class);
 		beans.addAll((Collection<? extends Campaign>) HibernateUtil.getAllAsList(Campaign.class));
 

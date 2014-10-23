@@ -32,9 +32,9 @@ public class GroupsView extends EditableTable<Group> implements View {
 	
 	@Override
 	protected void extendTable() {
-		table.setVisibleColumns( new Object[] {"gruppenname", "befreit"} );
+		table.setVisibleColumns( new Object[] {"groupName", "liberated"} );
 		table.setColumnHeaders("Gruppe", "DLS Befreit");
-		table.setConverter("befreit", new BooleanToGermanConverter());
+		table.setConverter("liberated", new BooleanToGermanConverter());
 	}
 
 

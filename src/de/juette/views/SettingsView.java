@@ -2,7 +2,6 @@ package de.juette.views;
 
 import java.util.List;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -13,7 +12,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -27,13 +25,12 @@ import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.FileHandler;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Member;
 import de.juette.model.Settings;
 
 @SuppressWarnings("serial")
 public class SettingsView extends VerticalLayout implements View {
 
-	private final TextField dfStichtag = new TextField("Stichtag");
+	private final TextField txtDueDate = new TextField("Stichtag");
 	private final TextField txtCountDls = new TextField(
 			"Anzahl der Dienstleistungsstunden pro Jahr");
 	private final TextField txtCostDls = new TextField(
@@ -43,26 +40,28 @@ public class SettingsView extends VerticalLayout implements View {
 	private final TextField txtDlsToYear = new TextField(
 			"Alter bis Dienstleistungsstunden geleistet werden müssen");
 	private final OptionGroup groupKind = new OptionGroup();
-	private final CheckBox cbAusgleich = new CheckBox(
+	private final CheckBox cbClearing = new CheckBox(
 			"Ausgleichungsbuchungen beim Jahreslauf");
-	private final CheckBox cbUebername = new CheckBox(
+	private final CheckBox cbTransfer = new CheckBox(
 			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
 	private VerticalLayout mappinglayout;
-	private BeanItemContainer<String> csv = new BeanItemContainer<String>(String.class);
+	private BeanItemContainer<String> csv = new BeanItemContainer<String>(
+			String.class);
 
 	public SettingsView() {
 		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
 		@SuppressWarnings("unchecked")
-		List<Settings> settings = (List<Settings>) HibernateUtil.getAllAsList(Settings.class);
+		List<Settings> settings = (List<Settings>) HibernateUtil
+				.getAllAsList(Settings.class);
 		for (Settings s : settings) {
 			beanItem = new BeanItem<Settings>(s);
 			break;
 		}
-		
+
 		FieldGroup fieldGroup = new BeanFieldGroup<Settings>(Settings.class);
 		fieldGroup.setItemDataSource(beanItem);
-		
+
 		setSpacing(true);
 		setMargin(true);
 
@@ -79,8 +78,8 @@ public class SettingsView extends VerticalLayout implements View {
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
-		form.addComponent(dfStichtag);
-		fieldGroup.bind(dfStichtag, "stichtag");
+		form.addComponent(txtDueDate);
+		fieldGroup.bind(txtDueDate, "dueDate");
 
 		txtCostDls.setWidth("15%");
 		form.addComponent(txtCostDls);
@@ -118,26 +117,28 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		wrap.setCaption("Ausgleichsbuchungen");
-		wrap.addComponent(cbAusgleich);
+		wrap.addComponent(cbClearing);
 		form.addComponent(wrap);
-		fieldGroup.bind(cbAusgleich, "clearing");
+		fieldGroup.bind(cbClearing, "clearing");
 
 		wrap = new HorizontalLayout();
 		wrap.setSpacing(true);
 		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		wrap.setCaption("Übernahme von DLS");
-		wrap.addComponent(cbUebername);
+		wrap.addComponent(cbTransfer);
 		form.addComponent(wrap);
-		fieldGroup.bind(cbUebername, "dlsTransfer");
+		fieldGroup.bind(cbTransfer, "dlsTransfer");
 
 		section = new Label("Spaltenzuordnung");
 		section.addStyleName("h2");
 		section.addStyleName("colored");
 		form.addComponent(section);
-		
+
 		FileHandler reciever = new FileHandler();
 		// Create the upload with a caption and set reciever later
-		Upload upload = new Upload("Spaltenüberschriften aus der Mitgliederliste einlesen:", reciever);
+		Upload upload = new Upload(
+				"Spaltenüberschriften aus der Mitgliederliste einlesen:",
+				reciever);
 		upload.setButtonCaption("Einlesen");
 		upload.addSucceededListener(new SucceededListener() {
 			@Override
@@ -146,10 +147,11 @@ public class SettingsView extends VerticalLayout implements View {
 					csv.addBean(item);
 				}
 				reciever.getFile().delete();
-				//Notification.show("Hier fehlt noch der Code..." + reciever.getFile().getAbsolutePath(), Type.ERROR_MESSAGE);
+				// Notification.show("Hier fehlt noch der Code..." +
+				// reciever.getFile().getAbsolutePath(), Type.ERROR_MESSAGE);
 			}
 		});
-		
+
 		form.addComponent(upload);
 
 		mappinglayout = getColumnMappingLayout(new String[] { "Nachname",
@@ -158,16 +160,15 @@ public class SettingsView extends VerticalLayout implements View {
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		addComponent(mappinglayout);
 
-		mappinglayout
-				.forEach(c -> {
-					((HorizontalLayout) c).forEach(p -> {
-						// Demo of setting the Values
-						if ("com.vaadin.ui.ComboBox".equals(p.getClass()
-								.getTypeName())) {
-							System.out.println(p.getClass().getTypeName());
-						}
-					});
+		mappinglayout.forEach(c -> {
+			((HorizontalLayout) c).forEach(p -> {
+				// Demo of setting the Values
+					if ("com.vaadin.ui.ComboBox".equals(p.getClass()
+							.getTypeName())) {
+						System.out.println(p.getClass().getTypeName());
+					}
 				});
+		});
 
 		addComponent(btnSave);
 
@@ -223,24 +224,4 @@ public class SettingsView extends VerticalLayout implements View {
 	public void enter(ViewChangeEvent event) {
 
 	}
-	/*
-	private void setData() {
-		@SuppressWarnings("unchecked")
-		List<Settings> settings = (List<Settings>) HibernateUtil.getAllAsList(Settings.class);
-		settings.forEach(s -> {
-			try {
-				dfStichtag.setValue(s.getStichtag());
-				txtCountDls.setValue(s.getCountDls().toString());
-				txtCostDls.setValue(Double.toString(s.getCostDls()));
-				txtDlsFromYear.setValue(s.getAgeFrom().toString());
-				txtDlsToYear.setValue(s.getAgeTo().toString());
-				groupKind.select(s.getBookingMethod());
-				cbUebername.setValue(s.getDlsTransfer());
-				cbAusgleich.setValue(s.getClearing());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
-	} */
 }

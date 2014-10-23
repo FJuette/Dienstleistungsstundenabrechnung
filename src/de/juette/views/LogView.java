@@ -19,7 +19,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.ComponentHelper;
-import de.juette.model.Cycle;
+import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 
@@ -29,10 +29,10 @@ public class LogView extends VerticalLayout implements View {
 	private final Table tblLog = new Table();
 	private BeanItemContainer<Log> logEntrys = new BeanItemContainer<>(
 			Log.class);
-	private final ComboBox oldCycles = new ComboBox(
+	private final ComboBox oldCourses = new ComboBox(
 			"Auswertungen der vergangenen Jahresläufe");
-	private BeanItemContainer<Cycle> cycles = new BeanItemContainer<>(
-			Cycle.class);
+	private BeanItemContainer<CourseOfYear> courses = new BeanItemContainer<>(
+			CourseOfYear.class);
 
 	public LogView() {
 		initLayout();
@@ -48,24 +48,24 @@ public class LogView extends VerticalLayout implements View {
 		title.addStyleName("h1");
 		addComponent(title);
 
-		cycles.addAll((Collection<? extends Cycle>) HibernateUtil.getAllAsList(Cycle.class));
+		courses.addAll((Collection<? extends CourseOfYear>) HibernateUtil.getAllAsList(CourseOfYear.class));
 
-		oldCycles.setContainerDataSource(cycles);
-		oldCycles.setItemCaptionPropertyId("anzeigename");
-		addComponent(oldCycles);
+		oldCourses.setContainerDataSource(courses);
+		oldCourses.setItemCaptionPropertyId("displayName");
+		addComponent(oldCourses);
 		
 		Button saveFile = new Button("Download");
 		saveFile.setIcon(FontAwesome.DOWNLOAD);
 		saveFile.setStyleName("friendly");
 		addComponent(saveFile);
 
-		oldCycles.addValueChangeListener(event -> {
-			if (oldCycles.getValue() != null) {
+		oldCourses.addValueChangeListener(event -> {
+			if (oldCourses.getValue() != null) {
 				String basepath = VaadinService.getCurrent().getBaseDirectory()
 						.getAbsolutePath();
-				Cycle cycle = (Cycle)oldCycles.getValue();
-				byte[] bFile = cycle.getDatei();
-				String filepath = basepath + "/WEB-INF/Files/" + cycle.getDateiname();
+				CourseOfYear coy = (CourseOfYear)oldCourses.getValue();
+				byte[] bFile = coy.getFile();
+				String filepath = basepath + "/WEB-INF/Files/" + coy.getFilename();
 				 
 		        try{
 		            FileOutputStream fos = new FileOutputStream(filepath); 
@@ -86,13 +86,13 @@ public class LogView extends VerticalLayout implements View {
 	@SuppressWarnings("unchecked")
 	private void initTable() {
 		logEntrys.addAll((Collection<? extends Log>) HibernateUtil.getAllAsList(Log.class));
-		logEntrys.addNestedContainerProperty("bearbeiter.fullName");
+		logEntrys.addNestedContainerProperty("editor.fullName");
 
 		tblLog.setContainerDataSource(logEntrys);
 		tblLog.setSelectable(true);
 		tblLog.setImmediate(true);
-		tblLog.setVisibleColumns(new Object[] { "timestamp", "beschreibung",
-				"bearbeiter.fullName" });
+		tblLog.setVisibleColumns(new Object[] { "timestamp", "description",
+				"editor.fullName" });
 		tblLog.setColumnHeaders("Zeitpunkt", "Beschreibung", "Bearbeiter");
 		tblLog.setWidth("100%");
 		tblLog.setSortContainerPropertyId("timestamp");
