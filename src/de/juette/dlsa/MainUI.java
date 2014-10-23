@@ -81,16 +81,16 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.getSessionFactory();
 			
 			if (true) {
-				DataHelper.createDummySubjects();
-				DataHelper.createDummyGroups();
-				DataHelper.createDummyMember();
-				DataHelper.createDummyActivities();
-				DataHelper.createDummyBookings();
-				DataHelper.createDummyRoles();
-				DataHelper.createDummyUsers();
-				DataHelper.createDummyLogs();
-				DataHelper.createDummyCycles();
-				DataHelper.createDummySettings();
+				DataHandler.createDummySubjects();
+				DataHandler.createDummyGroups();
+				DataHandler.createDummyMember();
+				DataHandler.createDummyActivities();
+				DataHandler.createDummyBookings();
+				DataHandler.createDummyRoles();
+				DataHandler.createDummyUsers();
+				DataHandler.createDummyLogs();
+				DataHandler.createDummyCycles();
+				DataHandler.createDummySettings();
 			}
 		}
 	}

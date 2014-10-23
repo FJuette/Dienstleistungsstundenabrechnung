@@ -24,7 +24,7 @@ import de.juette.model.Settings;
 import de.juette.model.Subject;
 import de.juette.model.User;
 
-public class DataHelper {
+public class DataHandler {
 
 	public static BeanItemContainer<Subject> getDummySubjects() {
 		BeanItemContainer<Subject> subjects = new BeanItemContainer<Subject>(
