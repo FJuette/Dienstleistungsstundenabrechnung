@@ -10,9 +10,8 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.ComponentHelper;
-import de.juette.model.HibernateUtil;
 import de.juette.model.Category;
+import de.juette.model.HibernateUtil;
 
 @SuppressWarnings("serial")
 public class CategoryView extends EditableTable<Category> implements View {
@@ -54,7 +53,7 @@ public class CategoryView extends EditableTable<Category> implements View {
 		
 		btnSaveNewSubject.addClickListener(event -> {
 			beans.addItem(new Category(txtNewCategory.getValue()));
-			ComponentHelper.updateTable(table);
+			updateTable();
 			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();
 		});

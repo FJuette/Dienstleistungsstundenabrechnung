@@ -28,15 +28,14 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.ComponentHelper;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.AbstractEntity;
+import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
-import de.juette.model.Category;
 
 @SuppressWarnings("serial")
 public class MemberView extends EditableTable<Member> implements View {
@@ -81,7 +80,7 @@ public class MemberView extends EditableTable<Member> implements View {
 						(Class<? extends AbstractEntity>) table.getValue()
 								.getClass(),
 						((AbstractEntity) table.getValue()).getId().toString());
-				ComponentHelper.updateTable(table);
+				updateTable();
 			} else if (action.getCaption().equals("DLS Buchen")) {
 				Notification.show("Noch nicht implementiert.",
 						Notification.Type.HUMANIZED_MESSAGE);
@@ -170,7 +169,7 @@ public class MemberView extends EditableTable<Member> implements View {
 				beans.addContainerFilter(new MyGroupFilter("groups",
 						(Group) cbFilterGroup.getValue()));
 			}
-			ComponentHelper.updateTable(table);
+			updateTable();
 		});
 
 		cbFilterSubject.addValueChangeListener(event -> {
@@ -180,7 +179,7 @@ public class MemberView extends EditableTable<Member> implements View {
 				beans.addContainerFilter(new MySubjectFilter("categories",
 						(Category) cbFilterSubject.getValue()));
 			}
-			ComponentHelper.updateTable(table);
+			updateTable();
 		});
 
 		txtFilterName.addTextChangeListener(event -> {
@@ -193,7 +192,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		beans.removeContainerFilters(columnId);
 		beans.addContainerFilter(columnId, value, true, false);
 
-		ComponentHelper.updateTable(table);
+		updateTable();
 	}
 
 	@Override
@@ -336,7 +335,7 @@ public class MemberView extends EditableTable<Member> implements View {
 							.getValue(), txtMemberId.getValue(),
 							dfEntryDate.getValue()));
 				}
-				ComponentHelper.updateTable(table);
+				updateTable();
 				window.close();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -392,7 +391,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		tblMemberElements.setWidth("100%");
 		tblMemberElements.setSelectable(true);
 
-		ComponentHelper.updateTable(tblMemberElements);
+		updateTable(tblMemberElements);
 		layout.addComponent(tblMemberElements);
 
 		btnAdd.addClickListener(event -> {
@@ -401,12 +400,12 @@ public class MemberView extends EditableTable<Member> implements View {
 			if (caption.equals("Gruppen")) {
 				if (cbAll.getValue() != null && !mGroups.containsId(cbAll.getValue())) {
 					mGroups.addItem(cbAll.getValue());
-					ComponentHelper.updateTable(tblMemberElements);
+					updateTable(tblMemberElements);
 				}
 			} else {
 				if (cbAll.getValue() != null && !mCategories.containsId(cbAll.getValue())) {
 					mCategories.addItem(cbAll.getValue());
-					ComponentHelper.updateTable(tblMemberElements);
+					updateTable(tblMemberElements);
 				}
 			}
 		});
@@ -415,7 +414,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		btnRemove.addClickListener(event -> {
 			if (tblMemberElements.getValue() != null) {
 				tblMemberElements.removeItem(tblMemberElements.getValue());
-				ComponentHelper.updateTable(tblMemberElements);
+				updateTable(tblMemberElements);
 			}
 		});
 

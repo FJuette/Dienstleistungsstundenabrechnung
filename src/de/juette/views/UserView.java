@@ -24,7 +24,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
-import de.juette.dlsa.ComponentHelper;
 import de.juette.model.AbstractEntity;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
@@ -49,7 +48,7 @@ public class UserView extends EditableTable<User> implements View {
 						(Class<? extends AbstractEntity>) table.getValue()
 								.getClass(),
 						((AbstractEntity) table.getValue()).getId().toString());
-				ComponentHelper.updateTable(table);
+				updateTable();
 			} else if (action.getCaption().equals("Bearbeiten")) {
 				if (table.getValue() != null) {
 					openUserWindow(beans.getItem(table.getValue()),
@@ -160,7 +159,7 @@ public class UserView extends EditableTable<User> implements View {
 							.getValue()).toString(), cbActive.getValue(), (Role) cbRoles
 							.getValue()));
 				}
-				ComponentHelper.updateTable(table);
+				updateTable();
 				HibernateUtil.saveAll(beans.getItemIds());
 				window.close();
 			} catch (Exception e) {

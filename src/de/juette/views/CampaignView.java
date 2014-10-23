@@ -12,7 +12,6 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -75,7 +74,7 @@ public class CampaignView extends EditableTable<Campaign> implements View {
 			table.commit();
 			beans.addItem(new Campaign(txtYear.getValue(), txtContent
 					.getValue(), (Member) cbContact.getValue()));
-			ComponentHelper.updateTable(table);
+			updateTable();
 			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();
 		});

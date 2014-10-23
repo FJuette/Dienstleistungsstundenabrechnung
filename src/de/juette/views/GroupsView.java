@@ -12,7 +12,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
-import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 
@@ -61,7 +60,7 @@ public class GroupsView extends EditableTable<Group> implements View {
 		
 		btnSaveNewGroup.addClickListener(event -> {
 			beans.addItem(new Group(txtNewGroup.getValue(), cbNewGroup.getValue()));
-			ComponentHelper.updateTable(table);
+			updateTable();
 			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();
 		});

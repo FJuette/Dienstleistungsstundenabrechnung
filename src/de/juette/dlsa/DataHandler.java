@@ -294,6 +294,7 @@ public class DataHandler {
 	public static BeanItemContainer<CourseOfYear> getDummyCycles() {
 		BeanItemContainer<CourseOfYear> cycles = new BeanItemContainer<CourseOfYear>(
 				CourseOfYear.class);
+		@SuppressWarnings("unused")
 		File file = new File(VaadinService.getCurrent().getBaseDirectory()
 				.getAbsolutePath()
 				+ "/WEB-INF/Files/ExampleResult.csv");
@@ -322,7 +323,6 @@ public class DataHandler {
 					"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")));
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -12,7 +12,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
-import de.juette.dlsa.ComponentHelper;
 import de.juette.model.AbstractEntity;
 import de.juette.model.HibernateUtil;
 
@@ -22,6 +21,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 	protected abstract void extendTable();
 
 	protected HorizontalLayout filterLayout;
+	protected VerticalLayout extendLayout;
 
 	protected final Table table = new Table();
 	protected BeanItemContainer<T> beans;
@@ -44,7 +44,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 								.getClass(),
 						((AbstractEntity) table.getValue()).getId().toString());
 				// saveAll((List<? extends AbstractEntity>) beans.getItemIds());
-				ComponentHelper.updateTable(table);
+				updateTable();
 			}
 		}
 
@@ -67,6 +67,10 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		title.addStyleName("h1");
 
 		addComponent(title);
+		
+		if (extendLayout != null) {
+			addComponent(extendLayout);
+		}
 
 		if (filterLayout != null) {
 			addComponent(filterLayout);
@@ -85,7 +89,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 					table.setEditable(true);
 					btnChange.setCaption("Speichern");
 					btnChange.setStyleName("friendly");
-					ComponentHelper.updateTable(table);
+					updateTable();
 				} else {
 					table.setEditable(false);
 					btnChange.setCaption("Bearbeiten");
@@ -94,7 +98,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 					HibernateUtil.saveAll((List<? extends AbstractEntity>) table.getItemIds());
 					Notification.show("Speichern erfolgreich",
 							Notification.Type.TRAY_NOTIFICATION);
-					ComponentHelper.updateTable(table);
+					updateTable();
 				}
 			} catch (Exception e) {
 				Notification.show("Fehler: " + e.getMessage(),
@@ -116,9 +120,27 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		table.setWidth("40%");
 		table.addActionHandler(getActionHandler());
 
-		ComponentHelper.updateTable(table);
+		updateTable();
 	}
 
+	public void updateTable() {
+		setTableSize(table);
+	}
+	
+	public void updateTable(Table table) {
+		setTableSize(table);
+	}
+	
+	private void setTableSize(Table table) {
+		if (table.size() > 15) {
+			table.setPageLength(15);
+		} else {
+			table.setPageLength(table.size() + 1);
+		}
+		table.markAsDirtyRecursive();
+	}
+	
 	protected abstract void newBeanWindow();
-
+	
+	
 }
