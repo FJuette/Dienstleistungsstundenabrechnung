@@ -1,27 +1,30 @@
 package de.juette.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="Rolle")
+@Table(name = "Rollen")
 public class Role extends AbstractEntity {
-	private String rollenname;
-	
+	@Column(name = "rollenname")
+	private String rolename;
+
 	public Role() {
-		
+
 	}
 
-	public Role(String rollenname) {
+	public Role(String rolename) {
 		super();
-		this.rollenname = rollenname;
-	}
-	
-	public String getRollenname() {
-		return rollenname;
+		this.rolename = rolename;
 	}
 
-	public void setRollenname(String rollenname) {
-		this.rollenname = rollenname;
+	public String getRolename() {
+		return rolename;
 	}
+
+	public void setRolename(String rolename) {
+		this.rolename = rolename;
+	}
+
 }

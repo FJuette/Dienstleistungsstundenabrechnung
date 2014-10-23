@@ -1,52 +1,64 @@
 package de.juette.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table (name="UserDetails")
+@Table(name = "Benutzer")
 public class User extends AbstractEntity {
-	private String benutzername;
-	private String passwort;
-	private Boolean aktiv = true;
-	
+	@Column(name = "benutzername")
+	private String username;
+	@Column(name = "passwort")
+	private String password;
+	@Column(name = "aktiv")
+	private Boolean active = true;
 	@ManyToOne
-	private Role rolle;
-	
+	private Role role;
+
 	public User() {
-		
+
 	}
-	
-	public User(String benutzername, String passwort, Boolean aktiv, Role rolle) {
+
+	public User(String username, String password, Boolean active, Role role) {
 		super();
-		this.benutzername = benutzername;
-		this.passwort = passwort;
-		this.aktiv = aktiv;
-		this.rolle = rolle;
+		this.username = username;
+		this.password = password;
+		this.active = active;
+		this.role = role;
 	}
-	public String getBenutzername() {
-		return benutzername;
+
+	public String getUsername() {
+		return username;
 	}
-	public void setBenutzername(String benutzername) {
-		this.benutzername = benutzername;
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
-	public String getPasswort() {
-		return passwort;
+
+	public String getPassword() {
+		return password;
 	}
-	public void setPasswort(String passwort) {
-		this.passwort = passwort;
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
-	public Boolean getAktiv() {
-		return aktiv;
+
+	public Boolean getActive() {
+		return active;
 	}
-	public void setAktiv(Boolean aktiv) {
-		this.aktiv = aktiv;
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
-	public Role getRolle() {
-		return rolle;
+
+	public Role getRole() {
+		return role;
 	}
-	public void setRolle(Role rolle) {
-		this.rolle = rolle;
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
+
 }

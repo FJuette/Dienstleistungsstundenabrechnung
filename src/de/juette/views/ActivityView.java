@@ -13,17 +13,17 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.ComponentHelper;
-import de.juette.model.Activity;
+import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 @SuppressWarnings("serial")
-public class ActivityView extends EditableTable<Activity> implements View {
+public class ActivityView extends EditableTable<Campaign> implements View {
 
 	@SuppressWarnings("unchecked")
 	public ActivityView() {
-		beans = new BeanItemContainer<>(Activity.class);
-		beans.addAll((Collection<? extends Activity>) HibernateUtil.getAllAsList(Activity.class));
+		beans = new BeanItemContainer<>(Campaign.class);
+		beans.addAll((Collection<? extends Campaign>) HibernateUtil.getAllAsList(Campaign.class));
 
 		btnNew.setCaption("Neue Aktion");
 		initLayout("Aktionsverwaltung");
@@ -33,9 +33,10 @@ public class ActivityView extends EditableTable<Activity> implements View {
 
 	@Override
 	protected void extendTable() {
-		table.setVisibleColumns(new Object[] { "jahr", "beschreibung",
-				"umfangDLS" });
-		table.setColumnHeaders("Jahr", "Beschreibung", "Umfang DLS");
+		beans.addNestedContainerProperty("contact.fullName");
+		
+		table.setVisibleColumns(new Object[] { "year", "description", "contact.fullName" });
+		table.setColumnHeaders("Jahr", "Beschreibung", "Kontakt");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -57,10 +58,6 @@ public class ActivityView extends EditableTable<Activity> implements View {
 		txtContent.setWidth("100%");
 		layout.addComponent(txtContent);
 
-		TextField txtDls = new TextField("Umfang der DLS");
-		txtDls.setWidth("100%");
-		layout.addComponent(txtDls);
-
 		BeanItemContainer<Member> members = new BeanItemContainer<Member>(Member.class);
 		members.addAll((Collection<? extends Member>) HibernateUtil.getAllAsList(Member.class));
 		ComboBox cbContact = new ComboBox("Ansprechpartner");
@@ -70,24 +67,14 @@ public class ActivityView extends EditableTable<Activity> implements View {
 		cbContact.setImmediate(true);
 		layout.addComponent(cbContact);
 
-		/*
-		ComboBox cbAuthorised = new ComboBox("Autorisiert von");
-		cbAuthorised.setContainerDataSource(ComponentHelper.getDummyMembers());
-		cbAuthorised.setItemCaptionPropertyId("fullName");
-		cbAuthorised.setFilteringMode(FilteringMode.CONTAINS);
-		cbAuthorised.setImmediate(true);
-		layout.addComponent(cbAuthorised);
-		*/
-
 		Button btnSaveNewGroup = new Button("Speichern");
 		btnSaveNewGroup.setStyleName("friendly");
 		layout.addComponent(btnSaveNewGroup);
 
 		btnSaveNewGroup.addClickListener(event -> {
 			table.commit();
-			beans.addItem(new Activity(txtYear.getValue(), txtContent
-					.getValue(), Float.parseFloat(txtDls.getValue()),
-					(Member) cbContact.getValue()));
+			beans.addItem(new Campaign(txtYear.getValue(), txtContent
+					.getValue(), (Member) cbContact.getValue()));
 			ComponentHelper.updateTable(table);
 			HibernateUtil.saveAll(beans.getItemIds());
 			window.close();

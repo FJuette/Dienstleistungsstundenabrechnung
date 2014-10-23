@@ -25,7 +25,6 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.ComponentHelper;
-import de.juette.dlsa.RoleToRolenameConverter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
@@ -88,15 +87,14 @@ public class UserView extends EditableTable<User> implements View {
 
 	@Override
 	protected void extendTable() {
-		beans.addNestedContainerProperty("rolle.rollenname");
+		beans.addNestedContainerProperty("role.rolename");
 
 		table.removeAllActionHandlers();
 		table.addActionHandler(getActionHandler());
-		table.setVisibleColumns(new Object[] { "benutzername", "aktiv",
-				"rolle.rollenname" });
+		table.setVisibleColumns(new Object[] { "username", "active",
+				"role.rolename" });
 		table.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
-		table.setConverter("aktiv", new BooleanToGermanConverter());
-		table.setConverter("rolle", new RoleToRolenameConverter());
+		table.setConverter("active", new BooleanToGermanConverter());
 		table.setWidth("60%");
 	}
 
@@ -122,35 +120,33 @@ public class UserView extends EditableTable<User> implements View {
 		txtUserName.setWidth("100%");
 		txtUserName.setNullRepresentation("");
 		layout.addComponent(txtUserName);
-		fieldGroup.bind(txtUserName, "benutzername");
+		fieldGroup.bind(txtUserName, "username");
 
 		
 		PasswordField txtUserPass = new PasswordField("Passwort");
 		txtUserPass.addBlurListener(event -> {
-			txtUserPass.setValue(new Sha256Hash(txtUserPass.getValue()).toString());
+			if (txtUserPass.getValue() != null) {
+				txtUserPass.setValue(new Sha256Hash(txtUserPass.getValue()).toString());
+			}
 		});
 		txtUserPass.setWidth("100%");
 		txtUserPass.setNullRepresentation("");
 		layout.addComponent(txtUserPass);
-		fieldGroup.bind(txtUserPass, "passwort");
+		fieldGroup.bind(txtUserPass, "password");
 
 		CheckBox cbActive = new CheckBox("Aktiv");
 		layout.addComponent(cbActive);
-		fieldGroup.bind(cbActive, "aktiv");
+		fieldGroup.bind(cbActive, "active");
 
 		ComboBox cbRoles = new ComboBox("Rolle");
 		BeanItemContainer<Role> roles = new BeanItemContainer<Role>(Role.class);
 		roles.addAll((Collection<? extends Role>) HibernateUtil.getAllAsList(Role.class));
 		cbRoles.setContainerDataSource(roles);
-		cbRoles.setItemCaptionPropertyId("rollenname");
-		fieldGroup.bind(cbRoles, "rolle");
-		// cbRoles.setNullSelectionAllowed(false);
-		// cbRoles.setNullSelectionItemId(roles.getIdByIndex(0));
-		if (caption.equals("Benutzer bearbeiten")) {
-			//cbRoles.setValue(((User)beanItem.).getRolle());
-		}
+		cbRoles.setItemCaptionPropertyId("rolename");
+		fieldGroup.bind(cbRoles, "role");
+		cbRoles.setNullSelectionAllowed(false);
+		//cbRoles.setNullSelectionItemId(roles.getIdByIndex(2));
 		layout.addComponent(cbRoles);
-		// fieldGroup.bind(cbRoles, "rolle");
 
 		Button btnSaveUser = new Button("Speichern");
 		btnSaveUser.setStyleName("friendly");
