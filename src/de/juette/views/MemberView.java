@@ -34,6 +34,7 @@ import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.AbstractEntity;
+import de.juette.model.Booking;
 import de.juette.model.Category;
 import de.juette.model.ColumnMapping;
 import de.juette.model.Group;
@@ -55,7 +56,8 @@ public class MemberView extends EditableTable<Member> implements View {
 		private final Action SUBJECS = new Action("Sparten zuordnen");
 		private final Action REMOVE = new Action("Entfernen");
 		private final Action MASS_CHANGE = new Action("DLS Buchen");
-		private final Action[] ACTIONS = new Action[] { EDIT, GROUPS, SUBJECS,
+		private final Action STATISTIC = new Action("DLS-Statistik");
+		private final Action[] ACTIONS = new Action[] { EDIT, GROUPS, SUBJECS, STATISTIC,
 				MASS_CHANGE, REMOVE };
 
 		@SuppressWarnings("unchecked")
@@ -77,6 +79,8 @@ public class MemberView extends EditableTable<Member> implements View {
 					openMappingWindow(beans.getItem(table.getValue()),
 							"Sparten", "categoryName");
 				}
+			} else if (action.getCaption().equals("DLS-Statistik")) {
+				openStatisticWindow(beans.getItem(((Collection<Member>) table.getValue()).toArray()[0]));
 			} else if (action.getCaption().equals("Entfernen")) {
 				beans.removeItem(table.getValue());
 				HibernateUtil.removeItem(
@@ -98,6 +102,38 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	private Handler getActionHandler() {
 		return actionHandler;
+	}
+
+	protected void openStatisticWindow(BeanItem<Member> beanItem) {
+		if (beanItem != null) {
+			Window window = new Window("DLS-Statistik");
+			window.setModal(true);
+			window.setWidth("500");
+
+			FormLayout layout = new FormLayout();
+			layout.setMargin(true);
+			window.setContent(layout);
+			
+			// Must be set on the default value from the settings
+			float dlsCount = -10;
+			for (Booking b : HibernateUtil.getMembers(beanItem.getBean())) {
+				dlsCount += b.getCountDls();
+			}
+			
+			Label lblStatistic = new Label("Aktueller Stand der Dienstleistungsstunden: " + dlsCount);
+			layout.addComponent(lblStatistic);
+			
+			Button btnClose = new Button("Schliessen");
+			layout.addComponent(btnClose);
+			
+			btnClose.addClickListener(event -> {
+				window.close();
+			});
+			
+			getUI().addWindow(window);
+		} else {
+			Notification.show("Bitte erst ein Mitglied auswählen", Type.ERROR_MESSAGE);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

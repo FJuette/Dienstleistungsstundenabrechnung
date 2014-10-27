@@ -161,6 +161,17 @@ public class HibernateUtil
 		return list;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static List<Booking> getMembers(Member member) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<Booking> list = session.createQuery("from Booking as b where b.member.id = " + member.getId()).list();
+
+		tx.commit();
+		return list;
+	}
+	
 	/**
 	 * Delete item by id.
 	 * 
