@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -24,6 +26,7 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.FileHandler;
+import de.juette.model.ColumnMapping;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Settings;
 
@@ -158,38 +161,28 @@ public class SettingsView extends VerticalLayout implements View {
 				"Vorname", "Mitgliedsnummer", "Eintrittsdatum",
 				"Austrittsdatum", "Aktiv" });
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-		addComponent(mappinglayout);
-
-		mappinglayout.forEach(c -> {
-			((HorizontalLayout) c).forEach(p -> {
-				// Demo of setting the Values
-					if ("com.vaadin.ui.ComboBox".equals(p.getClass()
-							.getTypeName())) {
-						System.out.println(p.getClass().getTypeName());
-					}
-				});
-		});
-
 		addComponent(btnSave);
 
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
+			
 			Notification.show("Speichern erfolgreich.",
 					Notification.Type.TRAY_NOTIFICATION);
 		});
 
+		addComponent(mappinglayout);
 		form.setReadOnly(false);
 
 	}
 
+	private ArrayList<ColumnMapping> mapping = new ArrayList<ColumnMapping>();
+	
+	@SuppressWarnings("unchecked")
 	private VerticalLayout getColumnMappingLayout(String[] database) {
+		mapping = (ArrayList<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
+		
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
-		BeanItemContainer<String> db = new BeanItemContainer<String>(
-				String.class);
-		for (String col : database) {
-			db.addItem(col);
-		}
 
 		HorizontalLayout headLayout = new HorizontalLayout();
 		layout.addComponent(headLayout);
@@ -203,20 +196,33 @@ public class SettingsView extends VerticalLayout implements View {
 		lblCsvHead.setStyleName("h4");
 		lblCsvHead.setWidth("300");
 		headLayout.addComponent(lblCsvHead);
-
-		for (String col : database) {
+		
+		for (ColumnMapping m : mapping) {
+			
 			HorizontalLayout boxesLayout = new HorizontalLayout();
-			layout.addComponent(boxesLayout);
-
-			Label lblDb = new Label(col);
+			Label lblDb = new Label(m.getDisplayname());
 			lblDb.setWidth("200");
 			boxesLayout.addComponent(lblDb);
-
+			layout.addComponent(boxesLayout);
 			ComboBox cbCsv = new ComboBox();
 			cbCsv.setWidth("300");
 			cbCsv.setContainerDataSource(csv);
+			cbCsv.setValue(m.getCsvColumnName());
 			boxesLayout.addComponent(cbCsv);
 		}
+		
+		Button btnSaveMapping = new Button("Speichern");
+		layout.addComponent(btnSaveMapping);
+		btnSaveMapping.addClickListener(event -> {
+			try {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//HibernateUtil.save(beanItem.getBean());
+			Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
+		});
+
 		return layout;
 	}
 

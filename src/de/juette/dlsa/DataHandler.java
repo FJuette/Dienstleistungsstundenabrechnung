@@ -14,6 +14,7 @@ import com.vaadin.server.VaadinService;
 
 import de.juette.model.Campaign;
 import de.juette.model.Booking;
+import de.juette.model.ColumnMapping;
 import de.juette.model.CourseOfYear;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
@@ -39,8 +40,9 @@ public class DataHandler {
 	public static void createDummySubjects() {
 		ArrayList<Category> entrys = new ArrayList<Category>(Arrays.asList(
 				new Category("Freizeitsportler"), new Category(
-						"Gelegenheitssportler"), new Category("Rutinesportler"),
-				new Category("Leistungssportler")));
+						"Gelegenheitssportler"),
+				new Category("Rutinesportler"), new Category(
+						"Leistungssportler")));
 		HibernateUtil.saveAll(entrys);
 	}
 
@@ -317,10 +319,11 @@ public class DataHandler {
 
 		ArrayList<CourseOfYear> entrys;
 		try {
-			entrys = new ArrayList<CourseOfYear>(Arrays.asList(new CourseOfYear(bFile,
-					new SimpleDateFormat("dd.MM.yyyy hh:mm")
-							.parse("13.03.2014 10:23"),
-					"Jahreslauf vom 31.03.2013", "2013-03-31_Jahreslauf.csv")));
+			entrys = new ArrayList<CourseOfYear>(
+					Arrays.asList(new CourseOfYear(bFile, new SimpleDateFormat(
+							"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
+							"Jahreslauf vom 31.03.2013",
+							"2013-03-31_Jahreslauf.csv")));
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -331,6 +334,16 @@ public class DataHandler {
 		ArrayList<Settings> entrys = new ArrayList<Settings>(
 				Arrays.asList(new Settings("31.12", 5, (double) 10, 18, 67,
 						"Anteilig bis zum Stichtag", true, false)));
+		HibernateUtil.saveAll(entrys);
+	}
+
+	public static void createMappingEntrys() {
+		ArrayList<ColumnMapping> entrys = new ArrayList<ColumnMapping>(
+				Arrays.asList(new ColumnMapping("surname", "Nachname"), new ColumnMapping(
+						"forename", "Vorname"), new ColumnMapping("memberId", "Mitgliedsnummer"),
+						new ColumnMapping("entryDate", "Eintrittsdatum"), new ColumnMapping(
+								"leavingDate", "Austrittsdatum"), new ColumnMapping(
+								"categoryName", "Sparte")));
 		HibernateUtil.saveAll(entrys);
 	}
 }

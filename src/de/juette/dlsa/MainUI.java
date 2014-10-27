@@ -92,6 +92,8 @@ public class MainUI extends UI implements ViewChangeListener {
 				DataHandler.createDummyLogs();
 				DataHandler.createDummyCycles();
 				DataHandler.createDummySettings();
+				// Must be created once
+				DataHandler.createMappingEntrys();
 			}
 		}
 	}

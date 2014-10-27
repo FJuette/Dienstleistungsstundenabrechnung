@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
@@ -94,6 +96,40 @@ public class FileHandler implements Receiver, SucceededListener {
 					file), getCharset()));
 			return br.readLine().split(cvsSplitBy);
 
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return new String[] {};
+	}
+	
+	public String[] getContentForColumns(List<String> columns) {
+		BufferedReader br = null;
+		String cvsSplitBy = ";";
+
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(
+					file), getCharset()));
+			ArrayList<Integer> colPos = new ArrayList<Integer>();
+			String line = br.readLine();
+			String[] parts = line.split(cvsSplitBy);
+			for (int p = 0; p < parts.length; p++) {
+				for (String c : columns) {
+					if (c != null && c.equals(parts[p])) {
+						colPos.add(p);
+					}
+				}
+			}
+			while ((line = br.readLine()) != null) {
+		        System.out.println(line);
+		    }
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

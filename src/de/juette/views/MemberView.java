@@ -1,6 +1,8 @@
 package de.juette.views;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -33,6 +35,7 @@ import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Category;
+import de.juette.model.ColumnMapping;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -119,8 +122,10 @@ public class MemberView extends EditableTable<Member> implements View {
 		upload.addSucceededListener(new SucceededListener() {
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
-				Notification.show("Hier fehlt noch der Code...",
-						Type.ERROR_MESSAGE);
+				List<ColumnMapping> mapping = (List<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
+				List<String> map = new ArrayList<String>();
+
+				reciever.getContentForColumns(map);
 			}
 		});
 
@@ -222,66 +227,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		});
 	}
 
-	protected void ImportWindow(String[] csvCols, String[] database) {
-		Window window = new Window("Zuordnung der Spalten");
-		window.setModal(true);
-		window.setWidth("600");
-
-		FormLayout layout = new FormLayout();
-		layout.setMargin(true);
-		window.setContent(layout);
-
-		BeanItemContainer<String> db = new BeanItemContainer<String>(
-				String.class);
-		for (String col : database) {
-			db.addItem(col);
-		}
-		BeanItemContainer<String> csv = new BeanItemContainer<String>(
-				String.class);
-		for (String col : csvCols) {
-			csv.addItem(col);
-		}
-
-		HorizontalLayout headLayout = new HorizontalLayout();
-		headLayout.setSpacing(true);
-		layout.addComponent(headLayout);
-
-		Label lblDbHead = new Label("Datenbankfelder");
-		lblDbHead.setStyleName("h4");
-		lblDbHead.setWidth("200");
-		headLayout.addComponent(lblDbHead);
-
-		Label lblCsvHead = new Label("CSV-Spalten");
-		lblCsvHead.setStyleName("h4");
-		lblCsvHead.setWidth("300");
-		headLayout.addComponent(lblCsvHead);
-
-		for (String col : database) {
-			HorizontalLayout boxesLayout = new HorizontalLayout();
-			boxesLayout.setSpacing(true);
-			layout.addComponent(boxesLayout);
-
-			Label lblDb = new Label(col);
-			lblDb.setWidth("200");
-			boxesLayout.addComponent(lblDb);
-
-			ComboBox cbCsv = new ComboBox();
-			cbCsv.setContainerDataSource(csv);
-			cbCsv.setWidth("300");
-			boxesLayout.addComponent(cbCsv);
-		}
-
-		Button btnSaveNewGroup = new Button("Speichern");
-		btnSaveNewGroup.setStyleName("friendly");
-		layout.addComponent(btnSaveNewGroup);
-
-		btnSaveNewGroup.addClickListener(event -> {
-			window.close();
-		});
-
-		getUI().addWindow(window);
-
-	}
+	
 
 	private void openMemberWindow(Item beanItem, String caption) {
 		Window window = new Window(caption);
@@ -350,6 +296,7 @@ public class MemberView extends EditableTable<Member> implements View {
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Category> mCategories;
 
+	// Categories and Groups
 	private void openMappingWindow(BeanItem<Member> beanItem, String caption,
 			String columnName) {
 		Window window = new Window(caption + " zuordnen");
