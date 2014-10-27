@@ -114,6 +114,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		initLayout("Mitgliederverwaltung");
 		initTable();
 		extendTable();
+		btnMarkAll.setVisible(true);
 
 		FileHandler reciever = new FileHandler();
 		// Create the upload with a caption and set reciever later
@@ -134,6 +135,10 @@ public class MemberView extends EditableTable<Member> implements View {
 		btnNew.addClickListener(event -> {
 			openMemberWindow(new BeanItem<Member>(new Member()),
 					"Anlegen eines neuen Mitglieds");
+		});
+		
+		btnMarkAll.addClickListener(event -> {
+			table.setValue(table.getItemIds());
 		});
 
 		groups.addAll((Collection<? extends Group>) HibernateUtil
@@ -202,11 +207,6 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	@Override
 	protected void extendTable() {
-		table.removeAllActionHandlers();
-
-		// table.setMultiSelect(true);
-		// table.setMultiSelectMode(MultiSelectMode.DEFAULT);
-
 		/*
 		 * Andere Darstellungsmöglichkeit // override html column with a
 		 * component, sorting as by the raw html // field
@@ -216,6 +216,9 @@ public class MemberView extends EditableTable<Member> implements View {
 		 * Label(html, ContentMode.HTML); label.setSizeUndefined(); return
 		 * label; } }); table.setVisibleColumns(new Object[] { "html" });
 		 */
+		
+		table.removeAllActionHandlers();
+		table.setMultiSelect(true);
 		table.setVisibleColumns(new Object[] { "fullName", "memberId" });
 		table.setColumnHeaders("Name", "Mitgliedsnummer");
 		table.addActionHandler(getActionHandler());

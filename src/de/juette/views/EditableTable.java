@@ -28,6 +28,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 
 	protected final Button btnNew = new Button("Neu");
 	protected final Button btnChange = new Button("Bearbeiten");
+	protected final Button btnMarkAll = new Button("Alle Markieren");
 
 	private Handler actionHandler = new Handler() {
 		private final Action REMOVE = new Action("Entfernen");
@@ -81,7 +82,8 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		HorizontalLayout bottomLeftLayout = new HorizontalLayout();
 		bottomLeftLayout.setSpacing(true);
 		addComponent(bottomLeftLayout);
-		bottomLeftLayout.addComponents(btnChange, btnNew);
+		btnMarkAll.setVisible(false);
+		bottomLeftLayout.addComponents(btnChange, btnMarkAll, btnNew);
 
 		btnChange.addClickListener(event -> {
 			try {
