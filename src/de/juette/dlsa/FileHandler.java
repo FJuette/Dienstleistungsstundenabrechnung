@@ -8,8 +8,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.hibernate.Hibernate;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
@@ -18,6 +24,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
+
+import de.juette.model.ColumnMapping;
+import de.juette.model.CsvColumn;
+import de.juette.model.HibernateUtil;
+import de.juette.model.Member;
 
 @SuppressWarnings("serial")
 public class FileHandler implements Receiver, SucceededListener {
@@ -87,14 +98,22 @@ public class FileHandler implements Receiver, SucceededListener {
 		return charset;
 	}
 
-	public String[] getColumnNames() {
+	public List<CsvColumn> getColumnNames() {
 		BufferedReader br = null;
 		String cvsSplitBy = ";";
 
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(
 					file), getCharset()));
-			return br.readLine().split(cvsSplitBy);
+			String line = br.readLine();
+			String[] columns = line.split(cvsSplitBy);
+
+			List<CsvColumn> list = new ArrayList<CsvColumn>();
+			for (int i = 0; i < columns.length; i++) {
+				if (!columns[i].equals(""))
+					list.add(new CsvColumn(i, columns[i]));
+			}
+			return list;
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -107,29 +126,61 @@ public class FileHandler implements Receiver, SucceededListener {
 				e.printStackTrace();
 			}
 		}
-		return new String[] {};
+		return new ArrayList<CsvColumn>();
 	}
-	
-	public String[] getContentForColumns(List<String> columns) {
+
+	public void uploadMembers(List<ColumnMapping> mapping) {
 		BufferedReader br = null;
 		String cvsSplitBy = ";";
 
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(
 					file), getCharset()));
-			ArrayList<Integer> colPos = new ArrayList<Integer>();
+			// Header line
 			String line = br.readLine();
-			String[] parts = line.split(cvsSplitBy);
-			for (int p = 0; p < parts.length; p++) {
-				for (String c : columns) {
-					if (c != null && c.equals(parts[p])) {
-						colPos.add(p);
+
+			List<String[]> lines = new ArrayList<String[]>();
+
+			while ((line = br.readLine()) != null) {
+				lines.add(line.split(cvsSplitBy));
+			}
+			for (String[] entry : lines) {
+				String id = "";
+				for (ColumnMapping mapp : mapping) {
+					if (mapp.getDbColumnName().equals("memberId")) {
+						id = entry[mapp.getCsvColumnIndex()];
 					}
 				}
+				Member m = (Member) HibernateUtil.getUnique(Member.class,
+						"memberId = '" + id + "'");
+				if (m == null) {
+					m = new Member();
+				}
+				for (ColumnMapping mapp : mapping) {
+					if (mapp.getDbColumnName().equals("surname")) {
+						m.setSurname(entry[mapp.getCsvColumnIndex()]);
+					} else if (mapp.getDbColumnName().equals("forename")) {
+						m.setForename(entry[mapp.getCsvColumnIndex()]);
+					} else if (mapp.getDbColumnName().equals("memberId")) {
+						m.setMemberId(entry[mapp.getCsvColumnIndex()]);
+					} else if (mapp.getDbColumnName().equals("entryDate")) {
+						try {
+							m.setEntryDate(new SimpleDateFormat("dd.MM.yyyy")
+									.parse(entry[mapp.getCsvColumnIndex()]));
+						} catch (ParseException e) {
+							//e.printStackTrace();
+						}
+					} else if (mapp.getDbColumnName().equals("leavingDate")) {
+						try {
+							m.setLeavingDate(new SimpleDateFormat("dd.MM.yyyy")
+									.parse(entry[mapp.getCsvColumnIndex()]));
+						} catch (ParseException e) {
+							//e.printStackTrace();
+						}
+					}
+				}
+				HibernateUtil.save(m);
 			}
-			while ((line = br.readLine()) != null) {
-		        System.out.println(line);
-		    }
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -141,6 +192,5 @@ public class FileHandler implements Receiver, SucceededListener {
 				e.printStackTrace();
 			}
 		}
-		return new String[] {};
 	}
 }

@@ -160,9 +160,8 @@ public class MemberView extends EditableTable<Member> implements View {
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
 				List<ColumnMapping> mapping = (List<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
-				List<String> map = new ArrayList<String>();
 
-				reciever.getContentForColumns(map);
+				reciever.uploadMembers(mapping);
 			}
 		});
 
@@ -183,10 +182,12 @@ public class MemberView extends EditableTable<Member> implements View {
 				.getAllAsList(Category.class));
 	}
 
+	/*
 	public void uploadSucceeded(SucceededEvent event) {
 		Notification.show("Datei erfolgreich hochgeladen",
 				Notification.Type.TRAY_NOTIFICATION);
 	}
+	*/
 
 	private HorizontalLayout initFilter() {
 		ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
@@ -254,7 +255,7 @@ public class MemberView extends EditableTable<Member> implements View {
 		 */
 		
 		table.removeAllActionHandlers();
-		table.setMultiSelect(true);
+		//table.setMultiSelect(true);
 		table.setVisibleColumns(new Object[] { "fullName", "memberId" });
 		table.setColumnHeaders("Name", "Mitgliedsnummer");
 		table.addActionHandler(getActionHandler());
@@ -265,8 +266,6 @@ public class MemberView extends EditableTable<Member> implements View {
 			}
 		});
 	}
-
-	
 
 	private void openMemberWindow(Item beanItem, String caption) {
 		Window window = new Window(caption);

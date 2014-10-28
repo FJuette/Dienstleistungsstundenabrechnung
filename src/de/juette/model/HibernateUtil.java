@@ -194,4 +194,16 @@ public class HibernateUtil
 
 		tx.commit();
 	}
+	
+	public static void DeleteAll(Class<? extends AbstractEntity> dataClass) {
+
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		String q = "delete from " + dataClass.getSimpleName();
+		Query query = session.createQuery(q);
+		query.executeUpdate();
+
+		tx.commit();
+	}
 }

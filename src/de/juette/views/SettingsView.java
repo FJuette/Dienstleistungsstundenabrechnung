@@ -2,6 +2,8 @@ package de.juette.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -14,6 +16,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -25,8 +28,10 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 
+import de.juette.dlsa.DataHandler;
 import de.juette.dlsa.FileHandler;
 import de.juette.model.ColumnMapping;
+import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Settings;
 
@@ -49,8 +54,8 @@ public class SettingsView extends VerticalLayout implements View {
 			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
 	private VerticalLayout mappinglayout;
-	private BeanItemContainer<String> csv = new BeanItemContainer<String>(
-			String.class);
+	private BeanItemContainer<CsvColumn> csv = new BeanItemContainer<CsvColumn>(
+			CsvColumn.class);
 
 	public SettingsView() {
 		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
@@ -146,7 +151,7 @@ public class SettingsView extends VerticalLayout implements View {
 		upload.addSucceededListener(new SucceededListener() {
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
-				for (String item : reciever.getColumnNames()) {
+				for (CsvColumn item : reciever.getColumnNames()) {
 					csv.addBean(item);
 				}
 				reciever.getFile().delete();
@@ -157,15 +162,13 @@ public class SettingsView extends VerticalLayout implements View {
 
 		form.addComponent(upload);
 
-		mappinglayout = getColumnMappingLayout(new String[] { "Nachname",
-				"Vorname", "Mitgliedsnummer", "Eintrittsdatum",
-				"Austrittsdatum", "Aktiv" });
+		mappinglayout = getColumnMappingLayout();
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		addComponent(btnSave);
 
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			
+
 			Notification.show("Speichern erfolgreich.",
 					Notification.Type.TRAY_NOTIFICATION);
 		});
@@ -176,11 +179,13 @@ public class SettingsView extends VerticalLayout implements View {
 	}
 
 	private ArrayList<ColumnMapping> mapping = new ArrayList<ColumnMapping>();
-	
+	private String previous = "";
+
 	@SuppressWarnings("unchecked")
-	private VerticalLayout getColumnMappingLayout(String[] database) {
-		mapping = (ArrayList<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
-		
+	private VerticalLayout getColumnMappingLayout() {
+		mapping = (ArrayList<ColumnMapping>) HibernateUtil
+				.getAllAsList(ColumnMapping.class);
+
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
 
@@ -196,9 +201,9 @@ public class SettingsView extends VerticalLayout implements View {
 		lblCsvHead.setStyleName("h4");
 		lblCsvHead.setWidth("300");
 		headLayout.addComponent(lblCsvHead);
-		
+
 		for (ColumnMapping m : mapping) {
-			
+
 			HorizontalLayout boxesLayout = new HorizontalLayout();
 			Label lblDb = new Label(m.getDisplayname());
 			lblDb.setWidth("200");
@@ -207,20 +212,55 @@ public class SettingsView extends VerticalLayout implements View {
 			ComboBox cbCsv = new ComboBox();
 			cbCsv.setWidth("300");
 			cbCsv.setContainerDataSource(csv);
+			cbCsv.setNullSelectionAllowed(false);
+			cbCsv.setItemCaptionPropertyId("value");
 			cbCsv.setValue(m.getCsvColumnName());
 			boxesLayout.addComponent(cbCsv);
 		}
-		
+
 		Button btnSaveMapping = new Button("Speichern");
 		layout.addComponent(btnSaveMapping);
+		
+		
+		
 		btnSaveMapping.addClickListener(event -> {
-			try {
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			//HibernateUtil.save(beanItem.getBean());
-			Notification.show("Speichern erfolgreich", Notification.Type.TRAY_NOTIFICATION);
+			//HibernateUtil.DeleteAll(ColumnMapping.class);
+			//DataHandler.createMappingEntrys();
+			//mapping = (ArrayList<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
+			
+			layout.forEach(c -> {
+				if ("com.vaadin.ui.HorizontalLayout".equals(c.getClass()
+						.getTypeName())) {
+					((HorizontalLayout) c).forEach(p -> {
+						if ("com.vaadin.ui.Label".equals(p.getClass()
+								.getTypeName())
+								&& !"Datenbankfeld".equals(((Label) p)
+										.getValue())
+								&& !"Spalte aus der Migliederliste"
+										.equals(((Label) p).getValue())) {
+							System.out.print(((Label) p).getValue() + ":");
+							previous = ((Label) p).getValue();
+						}
+						if ("com.vaadin.ui.ComboBox".equals(p.getClass()
+								.getTypeName())) {
+							if (((ComboBox) p).getValue() != null) {
+								for (ColumnMapping m : mapping) {
+									if (m.getDisplayname().equals(previous)) {
+										m.setCsvColumnIndex(((CsvColumn) ((ComboBox) p).getValue()).getIndex());
+										m.setCsvColumnName(((CsvColumn) ((ComboBox) p).getValue()).getValue());
+									}
+								}
+								
+								System.out.println( ((CsvColumn) ((ComboBox) p).getValue()).getValue() );
+							}
+						}
+					});
+				}
+				HibernateUtil.saveAll(mapping);
+			});
+
+			Notification.show("Speichern erfolgreich",
+					Notification.Type.TRAY_NOTIFICATION);
 		});
 
 		return layout;
