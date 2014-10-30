@@ -50,6 +50,7 @@ import de.juette.views.BookingView;
 import de.juette.views.ErrorView;
 import de.juette.views.GroupsView;
 import de.juette.views.LogView;
+import de.juette.views.MemberViewOld;
 import de.juette.views.MemberView;
 import de.juette.views.SettingsView;
 import de.juette.views.CategoryView;
@@ -81,7 +82,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.getSessionFactory();
 			
 			// Creates Example data, for fresh Database and to show and test the functionality
-			if (false) {
+			if (true) {
 				DataHandler.createDummySubjects();
 				DataHandler.createDummyGroups();
 				DataHandler.createDummyMember();

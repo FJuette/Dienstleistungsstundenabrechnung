@@ -343,7 +343,7 @@ public class DataHandler {
 						"forename", "Vorname"), new ColumnMapping("memberId", "Mitgliedsnummer"),
 						new ColumnMapping("entryDate", "Eintrittsdatum"), new ColumnMapping(
 								"leavingDate", "Austrittsdatum"), new ColumnMapping(
-								"categoryName", "Sparte")));
+								"categoryName", "Sparte"), new ColumnMapping("birthdate", "Geburtsdatum")));
 		HibernateUtil.saveAll(entrys);
 	}
 }

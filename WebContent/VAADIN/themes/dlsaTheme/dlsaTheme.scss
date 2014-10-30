@@ -33,5 +33,16 @@
   @include valo;
 
   // Insert your own theme rules here
+  .myHeaderLabel {
+  	margin-left: 15px;
+  }
+  
+  .myAddButton {
+  	margin-right: 15px;
+  }
+  
+  .myFormLayout {
+  	margin-top: 25px;
+  }
   
 }

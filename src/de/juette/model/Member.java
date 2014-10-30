@@ -25,6 +25,8 @@ public class Member extends AbstractEntity {
 	private Date leavingDate;
 	@Column(name = "aktiv")
 	private Boolean active = false;
+	@Column(name = "geburtsdatum")
+	private Date birthdate;
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	private Collection<Group> groups = new ArrayList<Group>();
@@ -60,9 +62,9 @@ public class Member extends AbstractEntity {
 	}
 
 	public String getHtmlName() {
-		return "<p style='font-size:0.9em'><strong>" + forename + " " + surname
-				+ "</strong></p><p style='font-size:0.8em'>" + memberId
-				+ "</p>";
+		return "<div style='font-size:0.9em'><strong>" + forename + " "
+				+ surname + "</strong></div> <div style='font-size:0.8em'>Mitgliedernummer: "
+				+ memberId + "</div>";
 	}
 
 	public String getSurname() {
@@ -127,6 +129,14 @@ public class Member extends AbstractEntity {
 
 	public void setCategories(Collection<Category> categories) {
 		this.categories = categories;
+	}
+
+	public Date getBirthdate() {
+		return birthdate;
+	}
+
+	public void setBirthdate(Date birthdate) {
+		this.birthdate = birthdate;
 	}
 
 }

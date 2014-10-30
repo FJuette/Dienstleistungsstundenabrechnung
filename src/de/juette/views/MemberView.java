@@ -1,10 +1,7 @@
 package de.juette.views;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -14,80 +11,104 @@ import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Upload;
-import com.vaadin.ui.Upload.SucceededEvent;
-import com.vaadin.ui.Upload.SucceededListener;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.VerticalLayout;
 
-import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
-import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.Category;
-import de.juette.model.ColumnMapping;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 @SuppressWarnings("serial")
-public class MemberView extends EditableTable<Member> implements View {
+public class MemberView extends VerticalLayout implements View {
 
-	private FieldGroup fieldGroup;
+	protected final Table table = new Table();
+	protected BeanItemContainer<Member> beans;
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
 	private BeanItemContainer<Category> categories = new BeanItemContainer<Category>(
 			Category.class);
+	private BeanItemContainer<Group> mGroups;
+	private BeanItemContainer<Category> mCategories;
+
+	private VerticalLayout headerLayout = new VerticalLayout();
+	private HorizontalSplitPanel contentSplitPanel = new HorizontalSplitPanel();
+	private VerticalLayout contentLayout = new VerticalLayout();
+	private HorizontalLayout contentHeaderLayout = new HorizontalLayout();
+	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
+	private TabSheet contentTabs = new TabSheet();
+	private FormLayout tabData = new FormLayout();
+	private FormLayout tabGroups = new FormLayout();
+	private FormLayout tabCategories = new FormLayout();
+	private FormLayout tabDls = new FormLayout();
+	private Label lblContentHeader = new Label("<strong>Mitglied: </strong>",
+			ContentMode.HTML);
+	private Button btnNew = new Button("Neu");
+
+	private FieldGroup fieldGroup = new BeanFieldGroup<Member>(Member.class);
 
 	private Handler actionHandler = new Handler() {
-		private final Action EDIT = new Action("Bearbeiten");
-		private final Action GROUPS = new Action("Gruppen zuordnen");
-		private final Action SUBJECS = new Action("Sparten zuordnen");
+		private final Action DLS = new Action("DLS Buchen");
+		private final Action GROUPS_ADD = new Action("Gruppe hinzufügen");
+		private final Action CATEGORIES_ADD = new Action("Sparte hinzufügen");
+		private final Action GROUPS_DEL = new Action("Gruppe löschen");
+		private final Action CATEGORIES_DEL = new Action("Sparte löschen");
 		private final Action REMOVE = new Action("Entfernen");
-		private final Action MASS_CHANGE = new Action("DLS Buchen");
-		private final Action STATISTIC = new Action("DLS-Statistik");
-		private final Action[] ACTIONS = new Action[] { EDIT, GROUPS, SUBJECS, STATISTIC,
-				MASS_CHANGE, REMOVE };
+		private final Action[] ACTIONS = new Action[] { DLS, GROUPS_ADD,
+				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, REMOVE };
 
 		@SuppressWarnings("unchecked")
-		@Override
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
-			if (action.getCaption().equals("Bearbeiten")) {
+			if (action.getCaption().equals("Gruppe hinzufügen")) {
 				if (table.getValue() != null) {
-					openMemberWindow(beans.getItem(table.getValue()),
-							"Mitarbeiter bearbeiten");
+					// TODO: Layout
 				}
-			} else if (action.getCaption().equals("Gruppen zuordnen")) {
+			} else if (action.getCaption().equals("Sparte hinzufügen")) {
 				if (table.getValue() != null) {
-					openMappingWindow(beans.getItem(table.getValue()),
-							"Gruppen", "groupName");
+					// TODO: Layout
 				}
-			} else if (action.getCaption().equals("Sparten zuordnen")) {
+			} else if (action.getCaption().equals("Gruppe löschen")) {
 				if (table.getValue() != null) {
-					openMappingWindow(beans.getItem(table.getValue()),
-							"Sparten", "categoryName");
+					// TODO: Layout
 				}
-			} else if (action.getCaption().equals("DLS-Statistik")) {
-				openStatisticWindow(beans.getItem(((Collection<Member>) table.getValue()).toArray()[0]));
+			} else if (action.getCaption().equals("Sparte löschen")) {
+				if (table.getValue() != null) {
+					// TODO: Layout
+				}
 			} else if (action.getCaption().equals("Entfernen")) {
-				beans.removeItem(table.getValue());
-				HibernateUtil.removeItem(
-						(Class<? extends AbstractEntity>) table.getValue()
-								.getClass(),
-						((AbstractEntity) table.getValue()).getId().toString());
-				updateTable();
+				for (Member bean : (Collection<Member>) table.getValue()) {
+					try {
+						beans.removeItem(bean);
+						HibernateUtil.removeItem(Member.class, bean.getId()
+								.toString());
+					} catch (Exception e) {
+						System.out
+								.println("Dieses Mitglied kann nicht gelöscht werden.");
+					}
+
+				}
 			} else if (action.getCaption().equals("DLS Buchen")) {
 				Notification.show("Noch nicht implementiert.",
 						Notification.Type.HUMANIZED_MESSAGE);
@@ -100,81 +121,11 @@ public class MemberView extends EditableTable<Member> implements View {
 		}
 	};
 
-	private Handler getActionHandler() {
-		return actionHandler;
-	}
-
-	protected void openStatisticWindow(BeanItem<Member> beanItem) {
-		if (beanItem != null) {
-			Window window = new Window("DLS-Statistik");
-			window.setModal(true);
-			window.setWidth("500");
-
-			FormLayout layout = new FormLayout();
-			layout.setMargin(true);
-			window.setContent(layout);
-			
-			// Must be set on the default value from the settings
-			float dlsCount = -10;
-			for (Booking b : HibernateUtil.getMembers(beanItem.getBean())) {
-				dlsCount += b.getCountDls();
-			}
-			
-			Label lblStatistic = new Label("Aktueller Stand der Dienstleistungsstunden: " + dlsCount);
-			layout.addComponent(lblStatistic);
-			
-			Button btnClose = new Button("Schliessen");
-			layout.addComponent(btnClose);
-			
-			btnClose.addClickListener(event -> {
-				window.close();
-			});
-			
-			getUI().addWindow(window);
-		} else {
-			Notification.show("Bitte erst ein Mitglied auswählen", Type.ERROR_MESSAGE);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public MemberView() {
-		beans = new BeanItemContainer<Member>(Member.class);
-		beans.addAll((Collection<? extends Member>) HibernateUtil
-				.getAllAsList(Member.class));
-
-		btnChange.setVisible(false);
-		btnNew.setCaption("Neues Mitglied");
-
-		filterLayout = initFilter();
-
-		initLayout("Mitgliederverwaltung");
+		initLayout();
 		initTable();
-		extendTable();
-		btnMarkAll.setVisible(true);
-
-		FileHandler reciever = new FileHandler();
-		// Create the upload with a caption and set reciever later
-		Upload upload = new Upload("", reciever);
-		upload.setButtonCaption("Einlesen");
-		upload.addSucceededListener(new SucceededListener() {
-			@Override
-			public void uploadSucceeded(SucceededEvent event) {
-				List<ColumnMapping> mapping = (List<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
-
-				reciever.uploadMembers(mapping);
-			}
-		});
-
-		addComponent(upload);
-
-		btnNew.addClickListener(event -> {
-			openMemberWindow(new BeanItem<Member>(new Member()),
-					"Anlegen eines neuen Mitglieds");
-		});
-		
-		btnMarkAll.addClickListener(event -> {
-			table.setValue(table.getItemIds());
-		});
+		initTabs();
 
 		groups.addAll((Collection<? extends Group>) HibernateUtil
 				.getAllAsList(Group.class));
@@ -182,31 +133,136 @@ public class MemberView extends EditableTable<Member> implements View {
 				.getAllAsList(Category.class));
 	}
 
-	/*
-	public void uploadSucceeded(SucceededEvent event) {
-		Notification.show("Datei erfolgreich hochgeladen",
-				Notification.Type.TRAY_NOTIFICATION);
+	private void initLayout() {
+		setSpacing(true);
+
+		Label title = new Label("<strong>Mitgliederverwaltung</strong>",
+				ContentMode.HTML);
+		title.addStyleName("h3");
+		title.addStyleName("myHeaderLabel");
+
+		btnNew.setStyleName("primary tiny myAddButton");
+		btnNew.setIcon(FontAwesome.PLUS);
+		HorizontalLayout innerButtonLayout = new HorizontalLayout();
+		innerButtonLayout.setSizeUndefined();
+		innerButtonLayout.addComponent(btnNew);
+
+		innerHeadLayout.addComponent(initFilter());
+		innerHeadLayout.setWidth(100, Unit.PERCENTAGE);
+		innerHeadLayout.addComponent(innerButtonLayout);
+		innerHeadLayout.setComponentAlignment(innerButtonLayout,
+				Alignment.MIDDLE_RIGHT);
+
+		headerLayout.setSpacing(true);
+		headerLayout.addComponent(title);
+		headerLayout.addComponent(innerHeadLayout);
+		addComponent(headerLayout);
+
+		contentSplitPanel.setSplitPosition(22, Unit.PERCENTAGE);
+		contentSplitPanel.setSizeFull();
+		contentSplitPanel.setLocked(true);
+		contentSplitPanel.setFirstComponent(table);
+		contentSplitPanel.setSecondComponent(contentLayout);
+		addComponent(contentSplitPanel);
+
+		contentHeaderLayout.setSpacing(true);
+		lblContentHeader.setStyleName("myHeaderLabel");
+		contentHeaderLayout.addComponent(lblContentHeader);
+		contentLayout.addComponent(contentHeaderLayout);
+		contentTabs.setSizeFull();
+		contentLayout.addComponent(contentTabs);
 	}
-	*/
+
+	@SuppressWarnings("unchecked")
+	private void initTable() {
+		beans = new BeanItemContainer<Member>(Member.class);
+		beans.addAll((Collection<? extends Member>) HibernateUtil.orderedList(
+				Member.class, "surname asc, forename asc, memberId asc"));
+
+		table.setSizeFull();
+		table.setContainerDataSource(beans);
+		table.setSelectable(true);
+		table.setImmediate(true);
+		table.setPageLength(22);
+		table.setMultiSelect(true);
+		table.addActionHandler(getActionHandler());
+		table.addStyleName("no-stripes");
+		table.addGeneratedColumn("html", new ColumnGenerator() {
+			public Component generateCell(Table source, Object itemId,
+					Object columnId) {
+				String html = ((Member) itemId).getHtmlName();
+				Label label = new Label(html, ContentMode.HTML);
+				label.setSizeUndefined();
+				return label;
+			}
+		});
+		table.setVisibleColumns(new Object[] { "html" });
+		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+
+		table.addItemClickListener(event -> {
+			setTabData((BeanItem<Member>) event.getItem());
+		});
+
+		table.select(table.firstItemId());
+		table.focus();
+		table.setValue(table.firstItemId());
+		if (beans.size() > 0) {
+			setTabData(beans.getItem(beans.getIdByIndex(0)));
+		}
+	}
+
+	private void initTabs() {
+		contentTabs.addTab(tabData, "Daten");
+		contentTabs.addTab(tabGroups, "Gruppen");
+		contentTabs.addTab(tabCategories, "Sparten");
+		contentTabs.addTab(tabDls, "DLS-Statistik");
+
+		contentTabs.setStyleName("framed equal-width-tabs padded-tabbar");
+
+		contentTabs
+				.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
+					public void selectedTabChange(SelectedTabChangeEvent event) {
+						// Find the tabsheet
+						TabSheet tabsheet = event.getTabSheet();
+
+						// Find the tab (here we know it's a layout)
+						FormLayout tab = (FormLayout) tabsheet.getSelectedTab();
+
+						// Get the tab caption from the tab object
+						String caption = tabsheet.getTab(tab).getCaption();
+						System.out.println(caption);
+					}
+				});
+	}
 
 	private HorizontalLayout initFilter() {
-		ComboBox cbFilterGroup = new ComboBox("Filter nach Gruppe:");
-		ComboBox cbFilterSubject = new ComboBox("Filter nach Sparte:");
+		ComboBox cbFilterGroup = new ComboBox();
+		ComboBox cbFilterSubject = new ComboBox();
 
 		HorizontalLayout filterLayout = new HorizontalLayout();
 		filterLayout.setSpacing(true);
 
-		TextField txtFilterName = new TextField("Filter nach Name:");
+		Label title = new Label("<strong>Filter:</strong>", ContentMode.HTML);
+		title.addStyleName("myHeaderLabel");
+		filterLayout.addComponent(title);
+
+		TextField txtFilterName = new TextField();
+		txtFilterName.setInputPrompt("Name");
+		txtFilterName.setStyleName("tiny");
 		filterLayout.addComponent(txtFilterName);
 
 		cbFilterGroup.setContainerDataSource(groups);
 		cbFilterGroup.setItemCaptionPropertyId("groupName");
 		cbFilterGroup.setImmediate(true);
+		cbFilterGroup.setStyleName("tiny");
+		cbFilterGroup.setInputPrompt("Gruppe");
 		filterLayout.addComponent(cbFilterGroup);
 
 		cbFilterSubject.setContainerDataSource(categories);
 		cbFilterSubject.setItemCaptionPropertyId("categoryName");
 		cbFilterSubject.setImmediate(true);
+		cbFilterSubject.setStyleName("tiny");
+		cbFilterSubject.setInputPrompt("Sparte");
 		filterLayout.addComponent(cbFilterSubject);
 
 		cbFilterGroup.addValueChangeListener(event -> {
@@ -216,7 +272,6 @@ public class MemberView extends EditableTable<Member> implements View {
 				beans.addContainerFilter(new MyGroupFilter("groups",
 						(Group) cbFilterGroup.getValue()));
 			}
-			updateTable();
 		});
 
 		cbFilterSubject.addValueChangeListener(event -> {
@@ -226,11 +281,10 @@ public class MemberView extends EditableTable<Member> implements View {
 				beans.addContainerFilter(new MySubjectFilter("categories",
 						(Category) cbFilterSubject.getValue()));
 			}
-			updateTable();
 		});
 
 		txtFilterName.addTextChangeListener(event -> {
-			filterTable("surname", event.getText());
+			filterTable("fullName", event.getText());
 		});
 		return filterLayout;
 	}
@@ -238,43 +292,13 @@ public class MemberView extends EditableTable<Member> implements View {
 	private void filterTable(Object columnId, String value) {
 		beans.removeContainerFilters(columnId);
 		beans.addContainerFilter(columnId, value, true, false);
-
-		updateTable();
 	}
 
-	@Override
-	protected void extendTable() {
-		/*
-		 * Andere Darstellungsmöglichkeit // override html column with a
-		 * component, sorting as by the raw html // field
-		 * table.addGeneratedColumn("html", new ColumnGenerator() { public
-		 * Component generateCell(Table source, Object itemId, Object columnId)
-		 * { String html = ((Member)itemId).getHtmlName(); Label label = new
-		 * Label(html, ContentMode.HTML); label.setSizeUndefined(); return
-		 * label; } }); table.setVisibleColumns(new Object[] { "html" });
-		 */
-		
-		table.removeAllActionHandlers();
-		//table.setMultiSelect(true);
-		table.setVisibleColumns(new Object[] { "fullName", "memberId" });
-		table.setColumnHeaders("Name", "Mitgliedsnummer");
-		table.addActionHandler(getActionHandler());
-		table.setWidth("40%");
-		table.addItemClickListener(event -> {
-			if (event.isDoubleClick()) {
-				openMemberWindow(event.getItem(), "Mitarbeiter bearbeiten");
-			}
-		});
-	}
-
-	private void openMemberWindow(Item beanItem, String caption) {
-		Window window = new Window(caption);
-		window.setModal(true);
-		window.setWidth("400");
+	private FormLayout MemberDataTab(BeanItem<Member> beanItem) {
 
 		FormLayout layout = new FormLayout();
-		layout.setMargin(true);
-		window.setContent(layout);
+		layout.setSizeFull();
+		layout.setStyleName("myFormLayout");
 
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
@@ -294,18 +318,15 @@ public class MemberView extends EditableTable<Member> implements View {
 		DateField dfEntryDate = new DateField("Eintrittsdatum");
 		fieldGroup.bind(dfEntryDate, "entryDate");
 
-		layout.addComponents(txtForname, txtSurname, txtMemberId,
-				dfEntryDate);
+		layout.addComponents(txtForname, txtSurname, txtMemberId, dfEntryDate);
 
-		if (caption.equals("Mitarbeiter bearbeiten")) {
-			DateField dfLeavingDate = new DateField("Austrittsdatum");
-			fieldGroup.bind(dfLeavingDate, "leavingDate");
-			layout.addComponent(dfLeavingDate);
+		DateField dfLeavingDate = new DateField("Austrittsdatum");
+		fieldGroup.bind(dfLeavingDate, "leavingDate");
+		layout.addComponent(dfLeavingDate);
 
-			CheckBox cbActive = new CheckBox("Aktiv");
-			fieldGroup.bind(cbActive, "active");
-			layout.addComponent(cbActive);
-		}
+		CheckBox cbActive = new CheckBox("Aktiv");
+		fieldGroup.bind(cbActive, "active");
+		layout.addComponent(cbActive);
 
 		Button btnSaveNewMember = new Button("Speichern");
 		btnSaveNewMember.setStyleName("friendly");
@@ -314,36 +335,42 @@ public class MemberView extends EditableTable<Member> implements View {
 		btnSaveNewMember.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
-				if (caption.equals("Anlegen eines neuen Mitglieds")) {
-					beans.addItem(new Member(txtSurname.getValue(), txtForname
-							.getValue(), txtMemberId.getValue(),
-							dfEntryDate.getValue()));
-				}
-				updateTable();
-				window.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 			HibernateUtil.saveAll(beans.getItemIds());
 		});
-
-		getUI().addWindow(window);
+		return layout;
 	}
 
-	private BeanItemContainer<Group> mGroups;
-	private BeanItemContainer<Category> mCategories;
-
-	// Categories and Groups
-	private void openMappingWindow(BeanItem<Member> beanItem, String caption,
-			String columnName) {
-		Window window = new Window(caption + " zuordnen");
-		window.setModal(true);
-		window.setWidth("500");
+	protected FormLayout StatisticTab(BeanItem<Member> beanItem) {
 
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
-		window.setContent(layout);
+		layout.setSizeFull();
+		layout.setStyleName("myFormLayout");
+
+		// Must be set on the default value from the settings
+		float dlsCount = -10;
+		for (Booking b : HibernateUtil.getMembers(beanItem.getBean())) {
+			dlsCount += b.getCountDls();
+		}
+
+		Label lblStatistic = new Label(
+				"Aktueller Stand der Dienstleistungsstunden: " + dlsCount);
+		layout.addComponent(lblStatistic);
+
+		return layout;
+	}
+
+	// Categories and Groups
+	private FormLayout MappingTab(BeanItem<Member> beanItem, String caption,
+			String columnName) {
+
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		layout.setStyleName("myFormLayout");
 
 		fieldGroup = new BeanFieldGroup<Member>(Member.class);
 		fieldGroup.setItemDataSource(beanItem);
@@ -355,7 +382,7 @@ public class MemberView extends EditableTable<Member> implements View {
 
 		cbAll.setItemCaptionPropertyId(columnName);
 		cbAll.setImmediate(true);
-		cbAll.setWidth("100%");
+		cbAll.setWidth("350");
 
 		layout.addComponent(cbAll);
 
@@ -365,7 +392,8 @@ public class MemberView extends EditableTable<Member> implements View {
 		mGroups = new BeanItemContainer<Group>(Group.class);
 		mGroups.addAll(((BeanItem<Member>) beanItem).getBean().getGroups());
 		mCategories = new BeanItemContainer<Category>(Category.class);
-		mCategories.addAll(((BeanItem<Member>) beanItem).getBean().getCategories());
+		mCategories.addAll(((BeanItem<Member>) beanItem).getBean()
+				.getCategories());
 
 		Table tblMemberElements = new Table("Zugeordnete " + caption + ":");
 		tblMemberElements
@@ -373,34 +401,35 @@ public class MemberView extends EditableTable<Member> implements View {
 						: mCategories);
 		tblMemberElements.setVisibleColumns(new Object[] { columnName });
 		tblMemberElements.setColumnHeaders(caption);
-		tblMemberElements.setWidth("100%");
+		tblMemberElements.setWidth("350");
 		tblMemberElements.setSelectable(true);
+		setTableSize(tblMemberElements);
 
-		updateTable(tblMemberElements);
 		layout.addComponent(tblMemberElements);
 
 		btnAdd.addClickListener(event -> {
 			// Compare the Strings because the Object ID is different even on
 			// the same Object types
 			if (caption.equals("Gruppen")) {
-				if (cbAll.getValue() != null && !mGroups.containsId(cbAll.getValue())) {
+				if (cbAll.getValue() != null
+						&& !mGroups.containsId(cbAll.getValue())) {
 					mGroups.addItem(cbAll.getValue());
-					updateTable(tblMemberElements);
 				}
 			} else {
-				if (cbAll.getValue() != null && !mCategories.containsId(cbAll.getValue())) {
+				if (cbAll.getValue() != null
+						&& !mCategories.containsId(cbAll.getValue())) {
 					mCategories.addItem(cbAll.getValue());
-					updateTable(tblMemberElements);
 				}
 			}
+			setTableSize(tblMemberElements);
 		});
 
 		Button btnRemove = new Button(FontAwesome.MINUS);
 		btnRemove.addClickListener(event -> {
 			if (tblMemberElements.getValue() != null) {
 				tblMemberElements.removeItem(tblMemberElements.getValue());
-				updateTable(tblMemberElements);
 			}
+			setTableSize(tblMemberElements);
 		});
 
 		layout.addComponent(btnRemove);
@@ -415,16 +444,49 @@ public class MemberView extends EditableTable<Member> implements View {
 				if (caption.equals("Gruppen")) {
 					(beanItem.getBean()).setGroups(mGroups.getItemIds());
 				} else {
-					(beanItem.getBean()).setCategories((mCategories.getItemIds()));
+					(beanItem.getBean()).setCategories((mCategories
+							.getItemIds()));
 				}
-				window.close();
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
+			HibernateUtil.save(beanItem.getBean());
 		});
-		HibernateUtil.save(beanItem.getBean());
 
-		getUI().addWindow(window);
+		return layout;
+	}
+
+	private void setTabData(BeanItem<Member> beanItem) {
+		if (beanItem != null) {
+			lblContentHeader.setValue("<strong>Mitglied: </strong> "
+					+ beanItem.getBean().getFullName());
+			tabData.removeAllComponents();
+			tabData.addComponent(MemberDataTab(beanItem));
+
+			tabGroups.removeAllComponents();
+			tabGroups
+					.addComponent(MappingTab(beanItem, "Gruppen", "groupName"));
+
+			tabCategories.removeAllComponents();
+			tabCategories.addComponent(MappingTab(beanItem, "Sparten",
+					"categoryName"));
+
+			tabDls.removeAllComponents();
+			tabDls.addComponent(StatisticTab(beanItem));
+		}
+	}
+
+	private void setTableSize(Table tbl) {
+		if (tbl.size() > 15) {
+			tbl.setPageLength(15);
+		} else {
+			tbl.setPageLength(tbl.size() + 1);
+		}
+		tbl.markAsDirtyRecursive();
+	}
+
+	private Handler getActionHandler() {
+		return actionHandler;
 	}
 
 	@Override
@@ -432,8 +494,4 @@ public class MemberView extends EditableTable<Member> implements View {
 
 	}
 
-	@Override
-	protected void newBeanWindow() {
-
-	}
 }
