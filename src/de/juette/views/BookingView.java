@@ -93,7 +93,13 @@ public class BookingView extends EditableTable<Booking> implements View {
 		Button btnNewBookings = new Button("Neue Buchung(en)");
 		btnNewBookings.setIcon(FontAwesome.PLUS);
 		btnNewBookings.addClickListener(event -> {
-			newBookingsWindow();
+			NewBookingWindow w;
+			getUI().addWindow(w = new NewBookingWindow(true));
+			w.addCloseListener(closeEvent -> {
+				if (w.getBookings().size() > 0) {
+					beans.addAll(w.getBookings());
+				}
+			});
 		});
 		newLayout.addComponent(btnNewBookings);
 		extendLayout = newLayout;
@@ -185,75 +191,6 @@ public class BookingView extends EditableTable<Booking> implements View {
 	private void filterTable(Object columnId, String value) {
 		beans.addContainerFilter(columnId, value, true, false);
 		updateTable();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void newBookingsWindow() {
-		Window window = new Window("Anlegen einer neuen Buchung");
-		window.setModal(true);
-		window.setWidth("400");
-
-		FormLayout layout = new FormLayout();
-		layout.setMargin(true);
-		window.setContent(layout);
-
-		BeanItemContainer<Member> members = new BeanItemContainer<Member>(
-				Member.class);
-		members.addAll((Collection<? extends Member>) HibernateUtil
-				.getAllAsList(Member.class));
-
-		ComboBox cbMembers = new ComboBox("Mitglied");
-		cbMembers.setWidth("100%");
-		cbMembers.setImmediate(true);
-		cbMembers.setContainerDataSource(members);
-		cbMembers.setItemCaptionPropertyId("fullName");
-		cbMembers.setFilteringMode(FilteringMode.CONTAINS);
-		layout.addComponent(cbMembers);
-
-		DateField dfDate = new DateField("Ableistungsdatum");
-		dfDate.setWidth("100%");
-		layout.addComponent(dfDate);
-
-		BeanItemContainer<Campaign> activities = new BeanItemContainer<Campaign>(
-				Campaign.class);
-		activities.addAll((Collection<? extends Campaign>) HibernateUtil
-				.getAllAsList(Campaign.class));
-
-		ComboBox cbCampaigns = new ComboBox("Aktion");
-		cbCampaigns.setWidth("100%");
-		cbCampaigns.setImmediate(true);
-		cbCampaigns.setContainerDataSource(activities);
-		cbCampaigns.setItemCaptionPropertyId("description");
-		cbCampaigns.setFilteringMode(FilteringMode.CONTAINS);
-		layout.addComponent(cbCampaigns);
-
-		TextField txtCountDls = new TextField("Anzahl DLS");
-		txtCountDls.setWidth("100%");
-		layout.addComponent(txtCountDls);
-
-		TextArea txtComment = new TextArea("Bemerkung");
-		txtComment.setWidth("100%");
-		layout.addComponent(txtComment);
-
-		Button btnSaveNewBooking = new Button("Speichern");
-		btnSaveNewBooking.setStyleName("friendly");
-		layout.addComponent(btnSaveNewBooking);
-
-		btnSaveNewBooking.addClickListener(event -> {
-			beans.addItem(new Booking(Double.parseDouble(txtCountDls.getValue()
-					.replace(',', '.')), txtComment.getValue(), dfDate
-					.getValue(), (Member) cbMembers.getValue(),
-					(Campaign) cbCampaigns.getValue()));
-			updateTable();
-			HibernateUtil.saveAll((List<? extends AbstractEntity>) beans
-					.getItemIds());
-			txtCountDls.setValue("");
-			txtComment.setValue("");
-			cbCampaigns.setValue(null);
-			dfDate.focus();
-		});
-
-		getUI().addWindow(window);
 	}
 
 	private void YearWindow() {

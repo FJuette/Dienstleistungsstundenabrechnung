@@ -43,6 +43,7 @@ public class UserView extends EditableTable<User> implements View {
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Entfernen")) {
+				// TODO: Auf aktuellen Benutzer prüfen
 				beans.removeItem(table.getValue());
 				HibernateUtil.removeItem(
 						(Class<? extends AbstractEntity>) table.getValue()

@@ -5,6 +5,7 @@ import java.util.List;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -64,8 +65,8 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		setSpacing(true);
 		setMargin(true);
 
-		Label title = new Label(caption);
-		title.addStyleName("h1");
+		Label title = new Label("<strong>" + caption + "</strong>", ContentMode.HTML);
+		title.addStyleName("h3");
 
 		addComponent(title);
 		
@@ -121,6 +122,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		// table.setRowHeaderMode(Table.RowHeaderMode.INDEX);
 		table.setWidth("40%");
 		table.addActionHandler(getActionHandler());
+		table.addStyleName("no-stripes");
 
 		updateTable();
 	}

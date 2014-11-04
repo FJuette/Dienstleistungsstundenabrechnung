@@ -172,6 +172,16 @@ public class HibernateUtil
 		return list;
 	}
 	
+	public static int getMappingCount() {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		
+		int count = session.createQuery("from ColumnMapping where csvColumnName IS NOT NULL").list().size();
+		
+		tx.commit();
+		return count;
+	}
+	
 	/**
 	 * Delete item by id.
 	 * 

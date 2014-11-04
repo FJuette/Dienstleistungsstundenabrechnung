@@ -83,8 +83,7 @@ public class SettingsView extends VerticalLayout implements View {
 		addComponent(form);
 
 		Label section = new Label("Berechnungsgrundlagen");
-		section.addStyleName("h2");
-		section.addStyleName("colored");
+		section.addStyleName("h2 colored");
 		form.addComponent(section);
 		form.addComponent(txtDueDate);
 		fieldGroup.bind(txtDueDate, "dueDate");
@@ -106,8 +105,7 @@ public class SettingsView extends VerticalLayout implements View {
 		fieldGroup.bind(txtDlsToYear, "ageTo");
 
 		section = new Label("Buchungsverhalten");
-		section.addStyleName("h2");
-		section.addStyleName("colored");
+		section.addStyleName("h2 colored");
 		form.addComponent(section);
 
 		HorizontalLayout wrap = new HorizontalLayout();
@@ -138,9 +136,17 @@ public class SettingsView extends VerticalLayout implements View {
 		fieldGroup.bind(cbTransfer, "dlsTransfer");
 
 		section = new Label("Spaltenzuordnung");
-		section.addStyleName("h2");
-		section.addStyleName("colored");
+		section.addStyleName("h2 colored");
 		form.addComponent(section);
+		
+		addComponent(btnSave);
+
+		btnSave.setStyleName("friendly");
+		btnSave.addClickListener(event -> {
+
+			Notification.show("Speichern erfolgreich.",
+					Notification.Type.TRAY_NOTIFICATION);
+		});
 
 		FileHandler reciever = new FileHandler();
 		// Create the upload with a caption and set reciever later
@@ -164,14 +170,6 @@ public class SettingsView extends VerticalLayout implements View {
 
 		mappinglayout = getColumnMappingLayout();
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-		addComponent(btnSave);
-
-		btnSave.setStyleName("friendly");
-		btnSave.addClickListener(event -> {
-
-			Notification.show("Speichern erfolgreich.",
-					Notification.Type.TRAY_NOTIFICATION);
-		});
 
 		addComponent(mappinglayout);
 		form.setReadOnly(false);
@@ -183,6 +181,7 @@ public class SettingsView extends VerticalLayout implements View {
 
 	@SuppressWarnings("unchecked")
 	private VerticalLayout getColumnMappingLayout() {
+		
 		mapping = (ArrayList<ColumnMapping>) HibernateUtil
 				.getAllAsList(ColumnMapping.class);
 
@@ -201,24 +200,48 @@ public class SettingsView extends VerticalLayout implements View {
 		lblCsvHead.setStyleName("h4");
 		lblCsvHead.setWidth("300");
 		headLayout.addComponent(lblCsvHead);
+		
+		int countMapping = HibernateUtil.getMappingCount();
+		
+		// If nothing set
+		if (countMapping == 0) {
+			for (ColumnMapping m : mapping) {
 
-		for (ColumnMapping m : mapping) {
+				HorizontalLayout boxesLayout = new HorizontalLayout();
+				Label lblDb = new Label(m.getDisplayname());
+				lblDb.setWidth("200");
+				boxesLayout.addComponent(lblDb);
+				layout.addComponent(boxesLayout);
+				ComboBox cbCsv = new ComboBox();
+				cbCsv.setWidth("300");
+				cbCsv.setContainerDataSource(csv);
+				cbCsv.setNullSelectionAllowed(false);
+				cbCsv.setItemCaptionPropertyId("value");
+				cbCsv.setValue(m.getCsvColumnName());
+				boxesLayout.addComponent(cbCsv);
+			}
+		} else {
+			for (ColumnMapping m : mapping) {
 
-			HorizontalLayout boxesLayout = new HorizontalLayout();
-			Label lblDb = new Label(m.getDisplayname());
-			lblDb.setWidth("200");
-			boxesLayout.addComponent(lblDb);
-			layout.addComponent(boxesLayout);
-			ComboBox cbCsv = new ComboBox();
-			cbCsv.setWidth("300");
-			cbCsv.setContainerDataSource(csv);
-			cbCsv.setNullSelectionAllowed(false);
-			cbCsv.setItemCaptionPropertyId("value");
-			cbCsv.setValue(m.getCsvColumnName());
-			boxesLayout.addComponent(cbCsv);
+				HorizontalLayout boxesLayout = new HorizontalLayout();
+				Label lblDb = new Label(m.getDisplayname());
+				lblDb.setWidth("200");
+				boxesLayout.addComponent(lblDb);
+				layout.addComponent(boxesLayout);
+				Label lblCsv = new Label();
+				lblCsv.setWidth("300");
+				lblCsv.setValue(m.getCsvColumnName());
+				boxesLayout.addComponent(lblCsv);
+			}
 		}
-
-		Button btnSaveMapping = new Button("Speichern");
+		
+		
+		Button btnSaveMapping = new Button();
+		if (countMapping == 0) {
+			btnSaveMapping.setCaption("Speichern");
+		} else {
+			btnSaveMapping.setCaption("Bearbeiten");
+		}
 		layout.addComponent(btnSaveMapping);
 		
 		
