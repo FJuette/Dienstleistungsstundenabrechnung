@@ -23,6 +23,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 
 	protected HorizontalLayout filterLayout;
 	protected VerticalLayout extendLayout;
+	protected HorizontalLayout contentLayout;
 
 	protected final Table table = new Table();
 	protected BeanItemContainer<T> beans;
@@ -63,7 +64,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 	@SuppressWarnings("unchecked")
 	protected void initLayout(String caption) {
 		setSpacing(true);
-		setMargin(true);
+		setStyleName("myMainContent");
 
 		Label title = new Label("<strong>" + caption + "</strong>", ContentMode.HTML);
 		title.addStyleName("h3");

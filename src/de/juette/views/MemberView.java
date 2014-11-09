@@ -14,10 +14,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -27,7 +25,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
@@ -38,28 +35,18 @@ import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 @SuppressWarnings("serial")
-public class MemberView extends VerticalLayout implements View {
+public class MemberView extends ComplexLayout implements View {
 
-	protected final Table table = new Table();
 	protected BeanItemContainer<Member> beans;
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
 	private BeanItemContainer<Category> categories = new BeanItemContainer<Category>(
 			Category.class);
 
-	private VerticalLayout headerLayout = new VerticalLayout();
-	private HorizontalSplitPanel contentSplitPanel = new HorizontalSplitPanel();
-	private VerticalLayout contentLayout = new VerticalLayout();
-	private HorizontalLayout contentHeaderLayout = new HorizontalLayout();
-	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
-	private TabSheet contentTabs = new TabSheet();
 	private FormLayout tabData = new FormLayout();
 	private FormLayout tabGroups = new FormLayout();
 	private FormLayout tabCategories = new FormLayout();
 	private FormLayout tabDls = new FormLayout();
-	private Label lblContentHeader = new Label("<strong>Mitglied: </strong>",
-			ContentMode.HTML);
-	private Button btnNew = new Button("Neu");
 	private Button btnImport = new Button("Importieren");
 
 	private Handler actionHandler = new Handler() {
@@ -175,8 +162,10 @@ public class MemberView extends VerticalLayout implements View {
 
 	@SuppressWarnings("unchecked")
 	public MemberView() {
-		initLayout();
+		initLayout("<strong>Mitgliederverwaltung</strong>");
+		extendLayout();
 		initTable();
+		formatTable();
 		initTabs();
 
 		groups.addAll((Collection<? extends Group>) HibernateUtil
@@ -185,48 +174,19 @@ public class MemberView extends VerticalLayout implements View {
 				.getAllAsList(Category.class));
 	}
 
-	private void initLayout() {
-		setSpacing(true);
-
-		Label title = new Label("<strong>Mitgliederverwaltung</strong>",
-				ContentMode.HTML);
-		title.addStyleName("h3 myHeaderLabel");
+	private void extendLayout() {
 		
 		HorizontalLayout innerButtonLayout = new HorizontalLayout();
 		innerButtonLayout.setSizeUndefined();
-		
 		btnImport.setStyleName("tiny myAddButton");
 		btnImport.setIcon(FontAwesome.ARROW_UP);
 		innerButtonLayout.addComponent(btnImport);
-
-		btnNew.setStyleName("primary tiny myAddButton");
-		btnNew.setIcon(FontAwesome.PLUS);
 		innerButtonLayout.addComponent(btnNew);
 		
 		innerHeadLayout.addComponent(initFilter());
-		innerHeadLayout.setWidth(100, Unit.PERCENTAGE);
 		innerHeadLayout.addComponent(innerButtonLayout);
 		innerHeadLayout.setComponentAlignment(innerButtonLayout,
 				Alignment.MIDDLE_RIGHT);
-
-		headerLayout.setSpacing(true);
-		headerLayout.addComponent(title);
-		headerLayout.addComponent(innerHeadLayout);
-		addComponent(headerLayout);
-
-		contentSplitPanel.setSplitPosition(22, Unit.PERCENTAGE);
-		contentSplitPanel.setSizeFull();
-		contentSplitPanel.setLocked(true);
-		contentSplitPanel.setFirstComponent(table);
-		contentSplitPanel.setSecondComponent(contentLayout);
-		addComponent(contentSplitPanel);
-
-		contentHeaderLayout.setSpacing(true);
-		lblContentHeader.setStyleName("myHeaderLabel");
-		contentHeaderLayout.addComponent(lblContentHeader);
-		contentLayout.addComponent(contentHeaderLayout);
-		contentTabs.setSizeFull();
-		contentLayout.addComponent(contentTabs);
 		
 		btnNew.addClickListener(event -> {
 			NewMemberWindow w;
@@ -255,14 +215,9 @@ public class MemberView extends VerticalLayout implements View {
 		beans.addAll((Collection<? extends Member>) HibernateUtil.orderedList(
 				Member.class, "surname asc, forename asc, memberId asc"));
 
-		table.setSizeFull();
 		table.setContainerDataSource(beans);
-		table.setSelectable(true);
-		table.setImmediate(true);
-		table.setPageLength(18);
 		table.setMultiSelect(true);
 		table.addActionHandler(getActionHandler());
-		table.addStyleName("no-stripes");
 		table.addGeneratedColumn("html", new ColumnGenerator() {
 			public Component generateCell(Table source, Object itemId,
 					Object columnId) {

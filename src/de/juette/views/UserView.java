@@ -13,31 +13,39 @@ import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
-import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.User;
 
 @SuppressWarnings("serial")
-public class UserView extends EditableTable<User> implements View {
+public class UserView extends ComplexLayout implements View {
 
+	protected BeanItemContainer<User> beans;
 	private FieldGroup fieldGroup;
+	private FormLayout tabData = new FormLayout();
 
 	private Handler actionHandler = new Handler() {
 		private final Action REMOVE = new Action("Entfernen");
-		private final Action CHANGE = new Action("Bearbeiten");
-		private final Action[] ACTIONS = new Action[] { CHANGE, REMOVE };
+		private final Action[] ACTIONS = new Action[] { REMOVE };
 
 		@SuppressWarnings("unchecked")
 		public void handleAction(final Action action, final Object sender,
@@ -49,12 +57,6 @@ public class UserView extends EditableTable<User> implements View {
 						(Class<? extends AbstractEntity>) table.getValue()
 								.getClass(),
 						((AbstractEntity) table.getValue()).getId().toString());
-				updateTable();
-			} else if (action.getCaption().equals("Bearbeiten")) {
-				if (table.getValue() != null) {
-					openUserWindow(beans.getItem(table.getValue()),
-							"Benutzer bearbeiten");
-				}
 			}
 		}
 
@@ -67,40 +69,60 @@ public class UserView extends EditableTable<User> implements View {
 		return actionHandler;
 	}
 
-	@SuppressWarnings("unchecked")
 	public UserView() {
-
-		beans = new BeanItemContainer<>(User.class);
-		beans.addAll((Collection<? extends User>) HibernateUtil.getAllAsList(User.class));
-
-		btnChange.setVisible(false);
-
 		btnNew.setCaption("Neuer Benutzer");
-		initLayout("Benutzerverwaltung");
+		initLayout("<strong>Benutzerverwaltung</strong>");
+		extendLayout();
 		initTable();
-		extendTable();
+		formatTable();
+		initTabs();
 
 		btnNew.addClickListener(event -> {
 			openUserWindow(new BeanItem<User>(new User()), "Benutzer anlegen");
 		});
 	}
-
-	@Override
-	protected void extendTable() {
-		beans.addNestedContainerProperty("role.rolename");
-
-		table.removeAllActionHandlers();
-		table.addActionHandler(getActionHandler());
-		table.setVisibleColumns(new Object[] { "username", "active",
-				"role.rolename" });
-		table.setColumnHeaders("Benutzername", "Aktiv", "Rolle");
-		table.setConverter("active", new BooleanToGermanConverter());
-		table.setWidth("60%");
+	
+	private void extendLayout() {
+		HorizontalLayout innerButtonLayout = new HorizontalLayout();
+		innerButtonLayout.setSizeUndefined();
+		innerButtonLayout.addComponent(btnNew);
+		innerHeadLayout.addComponent(innerButtonLayout);
+		innerHeadLayout.setComponentAlignment(innerButtonLayout,
+				Alignment.MIDDLE_RIGHT);
+		
+		btnNew.addClickListener(event -> {
+			
+		});
 	}
 
-	@Override
-	protected void newBeanWindow() {
+	@SuppressWarnings("unchecked")
+	private void initTable() {
+		beans = new BeanItemContainer<>(User.class);
+		beans.addAll((Collection<? extends User>) HibernateUtil.getAllAsList(User.class));
 
+		table.setContainerDataSource(beans);
+		table.removeAllActionHandlers();
+		table.addActionHandler(getActionHandler());
+		table.addGeneratedColumn("html", new ColumnGenerator() {
+			public Component generateCell(Table source, Object itemId,
+					Object columnId) {
+				String html = ((User) itemId).getHtmlName();
+				Label label = new Label(html, ContentMode.HTML);
+				label.setSizeUndefined();
+				return label;
+			}
+		});
+		table.setVisibleColumns(new Object[] { "html" });
+		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+		table.addItemClickListener(event -> {
+			setTabData((BeanItem<User>) event.getItem());
+		});
+		table.select(table.firstItemId());
+		table.focus();
+		table.setValue(table.firstItemId());
+		if (beans.size() > 0) {
+			setTabData(beans.getItem(beans.getIdByIndex(0)));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -160,7 +182,6 @@ public class UserView extends EditableTable<User> implements View {
 							.getValue()).toString(), cbActive.getValue(), (Role) cbRoles
 							.getValue()));
 				}
-				updateTable();
 				HibernateUtil.saveAll(beans.getItemIds());
 				window.close();
 			} catch (Exception e) {
@@ -170,7 +191,21 @@ public class UserView extends EditableTable<User> implements View {
 
 		getUI().addWindow(window);
 	}
-
+	
+	private void initTabs() {
+		contentTabs.addTab(tabData, "Daten");
+		contentTabs.setStyleName("framed equal-width-tabs padded-tabbar");
+	}
+	
+	private void setTabData(BeanItem<User> beanItem) {
+		if (beanItem != null) {
+			lblContentHeader.setValue("<strong>Benutzer: </strong> "
+					+ beanItem.getBean().getUsername());
+			tabData.removeAllComponents();
+			tabData.addComponent(new UserDataTab(beanItem));
+		}
+	}
+	
 	@Override
 	public void enter(ViewChangeEvent event) {
 	}

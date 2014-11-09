@@ -28,6 +28,16 @@ public class User extends AbstractEntity {
 		this.active = active;
 		this.role = role;
 	}
+	
+	public String getHtmlName() {
+		String text = "";
+		if (active)
+			text = "Aktiv";
+		else
+			text = "Nicht-Aktiv";
+		return "<div style='font-size:0.9em'><strong>" + username + " </strong></div>"
+				+ " <div style='font-size:0.8em'>Rolle: " + role.getRolename() + "; " +  text + "</div>";
+	}
 
 	public String getUsername() {
 		return username;

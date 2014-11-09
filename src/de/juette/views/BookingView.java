@@ -15,31 +15,28 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
-import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Member;
 
 @SuppressWarnings("serial")
 public class BookingView extends EditableTable<Booking> implements View {
 
+	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
+	
 	private Handler actionHandler = new Handler() {
 		private final Action STORNO = new Action("Stornieren");
 		private final Action[] ACTIONS = new Action[] { STORNO };
@@ -89,22 +86,22 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnChange.setVisible(false);
 		btnNew.setVisible(false);
 		
-		VerticalLayout newLayout = new VerticalLayout();
+		HorizontalLayout innerButtonLayout = new HorizontalLayout();
+		innerButtonLayout.setSizeUndefined();
+		
 		Button btnNewBookings = new Button("Neue Buchung(en)");
+		btnNewBookings.setStyleName("primary tiny");
 		btnNewBookings.setIcon(FontAwesome.PLUS);
-		btnNewBookings.addClickListener(event -> {
-			NewBookingWindow w;
-			getUI().addWindow(w = new NewBookingWindow(true));
-			w.addCloseListener(closeEvent -> {
-				if (w.getBookings().size() > 0) {
-					beans.addAll(w.getBookings());
-				}
-			});
-		});
-		newLayout.addComponent(btnNewBookings);
-		extendLayout = newLayout;
+		innerButtonLayout.addComponent(btnNewBookings);
 
-		filterLayout = initFilter();
+		innerHeadLayout.addComponent(initFilter());
+		innerHeadLayout.setWidth(90, Unit.PERCENTAGE);
+		innerHeadLayout.addComponent(innerButtonLayout);
+		innerHeadLayout.setComponentAlignment(innerButtonLayout,
+				Alignment.MIDDLE_RIGHT);
+		
+		filterLayout = innerHeadLayout;
+		
 		initLayout("Journal");
 		initTable();
 		extendTable();
@@ -127,6 +124,16 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnYear.addClickListener(event -> {
 			YearWindow();
 		});
+		
+		btnNewBookings.addClickListener(event -> {
+			NewBookingWindow w;
+			getUI().addWindow(w = new NewBookingWindow(true));
+			w.addCloseListener(closeEvent -> {
+				if (w.getBookings().size() > 0) {
+					beans.addAll(w.getBookings());
+				}
+			});
+		});
 	}
 
 	@Override
@@ -138,7 +145,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		table.setColumnHeaders("Anzahl DLS", "Ableistungsdatum", "Bemerkung",
 				"Mitgliedsnummer");
 		table.setConverter("doneDate", new DateToShortGermanStringConverter());
-		table.setWidth("100%");
+		table.setWidth("90%");
 		table.addActionHandler(getActionHandler());
 		table.setColumnExpandRatio("countDls", (float) 0.1);
 		table.setColumnExpandRatio("doneDate", (float) 0.2);
@@ -149,8 +156,14 @@ public class BookingView extends EditableTable<Booking> implements View {
 	private HorizontalLayout initFilter() {
 		HorizontalLayout fLayout = new HorizontalLayout();
 		fLayout.setSpacing(true);
-		TextField txtFilterDls = new TextField("Anzahl DLS:");
+		
+		Label title = new Label("<strong>Filter:</strong>", ContentMode.HTML);
+		fLayout.addComponent(title);
+		
+		TextField txtFilterDls = new TextField();
+		txtFilterDls.setInputPrompt("Anzahl DLS");
 		txtFilterDls.setConverter(Integer.class);
+		txtFilterDls.setStyleName("tiny");
 		txtFilterDls
 				.setConversionError("Die Anzahl der Dienstleistungsstunden muss eine Zahl sein.");
 		txtFilterDls.setNullRepresentation("");
@@ -163,7 +176,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		});
 
-		DateField dfFilterDate = new DateField("Datum:");
+		DateField dfFilterDate = new DateField();
+		dfFilterDate.setDescription("Datum");
+		dfFilterDate.setStyleName("tiny");
 		dfFilterDate.addValueChangeListener(event -> {
 			if (((DateField) event.getProperty()).getValue() != null) {
 				filterTable("doneDate", ((DateField) event.getProperty())
@@ -174,8 +189,10 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		});
 
-		TextField txtFilterNote = new TextField("Bemerkung:");
+		TextField txtFilterNote = new TextField();
 		txtFilterNote.setConverter(String.class);
+		txtFilterNote.setInputPrompt("Bemerkung");
+		txtFilterNote.setStyleName("tiny");
 		txtFilterNote.addTextChangeListener(event -> {
 			if (!event.getText().equals("")) {
 				filterTable("comment", event.getText());
