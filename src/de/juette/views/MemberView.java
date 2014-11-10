@@ -342,7 +342,13 @@ public class MemberView extends ComplexLayout implements View {
 			lblContentHeader.setValue("<strong>Mitglied: </strong> "
 					+ beanItem.getBean().getFullName());
 			tabData.removeAllComponents();
-			tabData.addComponent(new MemberDataTab(beanItem));
+			
+			MemberDataTab dataTab = new MemberDataTab(beanItem);
+			tabData.addComponent(dataTab);
+			dataTab.addDataSaveListener(event -> {
+				beans.addBean(event.getBeanItem().getBean());
+				table.refreshRowCache();
+			});
 
 			tabGroups.removeAllComponents();
 			tabGroups

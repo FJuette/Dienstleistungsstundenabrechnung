@@ -1,5 +1,8 @@
 package de.juette.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -17,9 +20,30 @@ import de.juette.model.Member;
 @SuppressWarnings("serial")
 public class MemberDataTab extends FormLayout {
 	
+	public interface DataSaveListener {
+		public void dataSaved(DataSaveEvent event);
+	}
+	
+	public class DataSaveEvent {
+		
+		final BeanItem<Member> beanItem;
+		
+		public DataSaveEvent(BeanItem<Member> beanItem) {
+			this.beanItem = beanItem;
+		}
+		
+		public BeanItem<Member> getBeanItem() {
+			return beanItem;
+		}
+	}
+	
+	private List<DataSaveListener> listeners = null;
+	
 	private FieldGroup fieldGroup = new BeanFieldGroup<Member>(Member.class);
+	private BeanItem<Member> beanItem;
 
 	public MemberDataTab(BeanItem<Member> beanItem) {
+		this.beanItem = beanItem;
 		setSizeFull();
 		setStyleName("myFormLayout");
 
@@ -66,6 +90,30 @@ public class MemberDataTab extends FormLayout {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
 			HibernateUtil.save(beanItem.getBean());
+			fireDataSavedEvent();
 		});
+	}
+
+	private void fireDataSavedEvent() {
+		if (listeners != null) {
+			DataSaveEvent event = new DataSaveEvent(this.beanItem);
+			for (DataSaveListener listener : listeners) {
+				listener.dataSaved(event);
+			}
+		}
+	}
+	
+	public void addDataSaveListener(DataSaveListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<DataSaveListener>();
+		}
+		listeners.add(listener);
+	}
+	
+	public void removeDataSaveListener(DataSaveListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<DataSaveListener>();
+		}
+		listeners.remove(listener);
 	}
 }
