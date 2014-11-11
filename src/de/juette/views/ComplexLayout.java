@@ -10,9 +10,9 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
-@SuppressWarnings("serial")
 public class ComplexLayout extends VerticalLayout {
 
+	private static final long serialVersionUID = 9009877220691387858L;
 	protected final Table table = new Table();
 	protected VerticalLayout headerLayout = new VerticalLayout();
 	protected HorizontalSplitPanel contentSplitPanel = new HorizontalSplitPanel();
@@ -20,22 +20,21 @@ public class ComplexLayout extends VerticalLayout {
 	protected HorizontalLayout contentHeaderLayout = new HorizontalLayout();
 	protected HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	protected TabSheet contentTabs = new TabSheet();
-	protected Label lblContentHeader = new Label("<strong>Mitglied: </strong>",
+	protected Label lblContentHeader = new Label("",
 			ContentMode.HTML);
 	protected Button btnNew = new Button("Neu");
-	
+
 	protected void initLayout(String title) {
 		setSpacing(true);
 
-		Label lblTitle = new Label("<strong>Mitgliederverwaltung</strong>",
-				ContentMode.HTML);
+		Label lblTitle = new Label(title, ContentMode.HTML);
 		lblTitle.addStyleName("h3 myHeaderLabel");
-		
+
 		btnNew.setStyleName("primary tiny myAddButton");
 		btnNew.setIcon(FontAwesome.PLUS);
-		
+
 		innerHeadLayout.setWidth(100, Unit.PERCENTAGE);
-		
+
 		headerLayout.setSpacing(true);
 		headerLayout.addComponent(lblTitle);
 		headerLayout.addComponent(innerHeadLayout);
@@ -55,13 +54,13 @@ public class ComplexLayout extends VerticalLayout {
 		contentTabs.setSizeFull();
 		contentLayout.addComponent(contentTabs);
 	}
-	
+
 	protected void formatTable() {
 		table.setSizeFull();
 		table.setSelectable(true);
 		table.setImmediate(true);
 		table.setPageLength(18);
 		table.addStyleName("no-stripes");
-		
+
 	}
 }

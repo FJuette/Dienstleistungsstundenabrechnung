@@ -19,8 +19,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
@@ -33,10 +31,13 @@ import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.views.tabs.MemberDataTab;
+import de.juette.views.tabs.MemberMappingTab;
+import de.juette.views.tabs.MemberStatisticTab;
 
-@SuppressWarnings("serial")
 public class MemberView extends ComplexLayout implements View {
 
+	private static final long serialVersionUID = 3274586292369413485L;
 	protected BeanItemContainer<Member> beans;
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
@@ -50,6 +51,8 @@ public class MemberView extends ComplexLayout implements View {
 	private Button btnImport = new Button("Importieren");
 
 	private Handler actionHandler = new Handler() {
+
+		private static final long serialVersionUID = -2704399406149413121L;
 		private final Action DLS = new Action("DLS Buchen");
 		private final Action GROUPS_ADD = new Action("Gruppe hinzufügen");
 		private final Action CATEGORIES_ADD = new Action("Sparte hinzufügen");
@@ -65,12 +68,16 @@ public class MemberView extends ComplexLayout implements View {
 			if (action.getCaption().equals("Gruppe hinzufügen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
-					getUI().addWindow(w = new MemberMappingWindow("Gruppe", "groupName", "add"));
+					getUI().addWindow(
+							w = new MemberMappingWindow("Gruppe", "groupName",
+									"add"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getGroup() != null) {
-							for (Member bean : (Collection<Member>) table.getValue()) {
-								if (!bean.getGroups().contains(w.getGroup())) {
-									beans.getItem(bean).getBean().getGroups().add(w.getGroup());
+							for (Member member : (Collection<Member>) table
+									.getValue()) {
+								if (!member.getGroups().contains(w.getGroup())) {
+									beans.getItem(member).getBean().getGroups()
+											.add(w.getGroup());
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -80,12 +87,18 @@ public class MemberView extends ComplexLayout implements View {
 			} else if (action.getCaption().equals("Sparte hinzufügen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
-					getUI().addWindow(w = new MemberMappingWindow("Sparte", "categoryName", "add"));
+					getUI().addWindow(
+							w = new MemberMappingWindow("Sparte",
+									"categoryName", "add"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getCategory() != null) {
-							for (Member bean : (Collection<Member>) table.getValue()) {
-								if (!bean.getCategories().contains(w.getCategory())) {
-									beans.getItem(bean).getBean().getCategories().add(w.getCategory());
+							for (Member bean : (Collection<Member>) table
+									.getValue()) {
+								if (!bean.getCategories().contains(
+										w.getCategory())) {
+									beans.getItem(bean).getBean()
+											.getCategories()
+											.add(w.getCategory());
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -95,12 +108,16 @@ public class MemberView extends ComplexLayout implements View {
 			} else if (action.getCaption().equals("Gruppe löschen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
-					getUI().addWindow(w = new MemberMappingWindow("Gruppe", "groupName", "remove"));
+					getUI().addWindow(
+							w = new MemberMappingWindow("Gruppe", "groupName",
+									"remove"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getGroup() != null) {
-							for (Member bean : (Collection<Member>) table.getValue()) {
+							for (Member bean : (Collection<Member>) table
+									.getValue()) {
 								if (bean.getGroups().contains(w.getGroup())) {
-									beans.getItem(bean).getBean().getGroups().remove(w.getGroup());
+									beans.getItem(bean).getBean().getGroups()
+											.remove(w.getGroup());
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -110,12 +127,18 @@ public class MemberView extends ComplexLayout implements View {
 			} else if (action.getCaption().equals("Sparte löschen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
-					getUI().addWindow(w = new MemberMappingWindow("Sparte", "categoryName", "remove"));
+					getUI().addWindow(
+							w = new MemberMappingWindow("Sparte",
+									"categoryName", "remove"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getCategory() != null) {
-							for (Member bean : (Collection<Member>) table.getValue()) {
-								if (bean.getCategories().contains(w.getCategory())) {
-									beans.getItem(bean).getBean().getCategories().remove(w.getCategory());
+							for (Member bean : (Collection<Member>) table
+									.getValue()) {
+								if (bean.getCategories().contains(
+										w.getCategory())) {
+									beans.getItem(bean).getBean()
+											.getCategories()
+											.remove(w.getCategory());
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -139,7 +162,8 @@ public class MemberView extends ComplexLayout implements View {
 				getUI().addWindow(w = new NewBookingWindow(false));
 				w.addCloseListener(closeEvent -> {
 					if (w.getBooking() != null) {
-						for (Member bean : (Collection<Member>) table.getValue()) {
+						for (Member bean : (Collection<Member>) table
+								.getValue()) {
 							Booking b = new Booking();
 							b.setCampaign(w.getBooking().getCampaign());
 							b.setComment(w.getBooking().getComment());
@@ -152,6 +176,7 @@ public class MemberView extends ComplexLayout implements View {
 					}
 				});
 			}
+			table.refreshRowCache();
 		}
 
 		@Override
@@ -160,7 +185,6 @@ public class MemberView extends ComplexLayout implements View {
 		}
 	};
 
-	@SuppressWarnings("unchecked")
 	public MemberView() {
 		initLayout("<strong>Mitgliederverwaltung</strong>");
 		extendLayout();
@@ -168,26 +192,24 @@ public class MemberView extends ComplexLayout implements View {
 		formatTable();
 		initTabs();
 
-		groups.addAll((Collection<? extends Group>) HibernateUtil
-				.getAllAsList(Group.class));
-		categories.addAll((Collection<? extends Category>) HibernateUtil
-				.getAllAsList(Category.class));
+		groups.addAll(HibernateUtil.getAllAsList(Group.class));
+		categories.addAll(HibernateUtil.getAllAsList(Category.class));
 	}
 
 	private void extendLayout() {
-		
+
 		HorizontalLayout innerButtonLayout = new HorizontalLayout();
 		innerButtonLayout.setSizeUndefined();
 		btnImport.setStyleName("tiny myAddButton");
 		btnImport.setIcon(FontAwesome.ARROW_UP);
 		innerButtonLayout.addComponent(btnImport);
 		innerButtonLayout.addComponent(btnNew);
-		
+
 		innerHeadLayout.addComponent(initFilter());
 		innerHeadLayout.addComponent(innerButtonLayout);
 		innerHeadLayout.setComponentAlignment(innerButtonLayout,
 				Alignment.MIDDLE_RIGHT);
-		
+
 		btnNew.addClickListener(event -> {
 			NewMemberWindow w;
 			getUI().addWindow(w = new NewMemberWindow());
@@ -198,7 +220,7 @@ public class MemberView extends ComplexLayout implements View {
 				}
 			});
 		});
-		
+
 		btnImport.addClickListener(event -> {
 			MemberImportWindow w;
 			getUI().addWindow(w = new MemberImportWindow());
@@ -209,16 +231,17 @@ public class MemberView extends ComplexLayout implements View {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	private void initTable() {
 		beans = new BeanItemContainer<Member>(Member.class);
-		beans.addAll((Collection<? extends Member>) HibernateUtil.orderedList(
-				Member.class, "surname asc, forename asc, memberId asc"));
+		beans.addAll(HibernateUtil.orderedList(Member.class,
+				"surname asc, forename asc, memberId asc"));
 
 		table.setContainerDataSource(beans);
 		table.setMultiSelect(true);
 		table.addActionHandler(getActionHandler());
 		table.addGeneratedColumn("html", new ColumnGenerator() {
+
+			private static final long serialVersionUID = -7474540528395636510L;
 			public Component generateCell(Table source, Object itemId,
 					Object columnId) {
 				String html = ((Member) itemId).getHtmlName();
@@ -228,18 +251,16 @@ public class MemberView extends ComplexLayout implements View {
 			}
 		});
 		table.setVisibleColumns(new Object[] { "html" });
-		//table.setColumnHeaders(new String[] { "" });
 		table.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 		table.addHeaderClickListener(event -> {
 			table.setValue(table.getItemIds());
 		});
 
 		table.addItemClickListener(event -> {
-			setTabData((BeanItem<Member>) event.getItem());
+			setTabData(beans.getItem(event.getItemId()));
 		});
 
 		table.select(table.firstItemId());
-		table.focus();
 		table.setValue(table.firstItemId());
 		if (beans.size() > 0) {
 			setTabData(beans.getItem(beans.getIdByIndex(0)));
@@ -253,21 +274,6 @@ public class MemberView extends ComplexLayout implements View {
 		contentTabs.addTab(tabDls, "DLS-Statistik");
 
 		contentTabs.setStyleName("framed equal-width-tabs padded-tabbar");
-
-		contentTabs
-				.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
-					public void selectedTabChange(SelectedTabChangeEvent event) {
-						// Find the tabsheet
-						TabSheet tabsheet = event.getTabSheet();
-
-						// Find the tab (here we know it's a layout)
-						FormLayout tab = (FormLayout) tabsheet.getSelectedTab();
-
-						// Get the tab caption from the tab object
-						String caption = tabsheet.getTab(tab).getCaption();
-						System.out.println(caption);
-					}
-				});
 	}
 
 	private HorizontalLayout initFilter() {
@@ -305,8 +311,6 @@ public class MemberView extends ComplexLayout implements View {
 		txtBirthdateFrom.setStyleName("tiny");
 		txtBirthdateFrom.setInputPrompt("ab Geburtsdatum");
 		filterLayout.addComponent(txtBirthdateFrom);
-		
-		
 
 		cbFilterGroup.addValueChangeListener(event -> {
 			beans.removeContainerFilters("groups");
@@ -342,21 +346,21 @@ public class MemberView extends ComplexLayout implements View {
 			lblContentHeader.setValue("<strong>Mitglied: </strong> "
 					+ beanItem.getBean().getFullName());
 			tabData.removeAllComponents();
-			
+
 			MemberDataTab dataTab = new MemberDataTab(beanItem);
 			tabData.addComponent(dataTab);
 			dataTab.addDataSaveListener(event -> {
-				beans.addBean(event.getBeanItem().getBean());
+				beans.addBean((Member) event.getBeanItem().getBean());
 				table.refreshRowCache();
 			});
 
 			tabGroups.removeAllComponents();
-			tabGroups
-					.addComponent(new MemberMappingTab(beanItem, "Gruppen", "groupName"));
+			tabGroups.addComponent(new MemberMappingTab(beanItem, "Gruppen",
+					"groupName"));
 
 			tabCategories.removeAllComponents();
-			tabCategories.addComponent(new MemberMappingTab(beanItem, "Sparten",
-					"categoryName"));
+			tabCategories.addComponent(new MemberMappingTab(beanItem,
+					"Sparten", "categoryName"));
 
 			tabDls.removeAllComponents();
 			tabDls.addComponent(new MemberStatisticTab(beanItem));

@@ -1,4 +1,4 @@
-package de.juette.views;
+package de.juette.views.tabs;
 
 import java.util.Collection;
 

@@ -13,9 +13,9 @@ import com.vaadin.ui.Window;
 
 import de.juette.model.Member;
 
-@SuppressWarnings("serial")
 public class NewMemberWindow extends Window {
 
+	private static final long serialVersionUID = -2452111229377020184L;
 	private FieldGroup fieldGroup = new BeanFieldGroup<Member>(Member.class);
 	private BeanItem<Member> member = new BeanItem<Member>(new Member());
 

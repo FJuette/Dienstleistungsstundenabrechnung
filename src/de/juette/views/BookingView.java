@@ -1,7 +1,6 @@
 package de.juette.views;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -32,12 +31,15 @@ import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.HibernateUtil;
 
-@SuppressWarnings("serial")
 public class BookingView extends EditableTable<Booking> implements View {
+
+	private static final long serialVersionUID = 6324354416931646341L;
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	
 	private Handler actionHandler = new Handler() {
+
+		private static final long serialVersionUID = 8008706058827363288L;
 		private final Action STORNO = new Action("Stornieren");
 		private final Action[] ACTIONS = new Action[] { STORNO };
 
@@ -76,11 +78,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 		}
 	};
 
-	@SuppressWarnings("unchecked")
 	public BookingView() {
 		beans = new BeanItemContainer<Booking>(Booking.class);
-		beans.addAll((Collection<? extends Booking>) HibernateUtil
-				.getAllAsList(Booking.class));
+		beans.addAll(HibernateUtil.getAllAsList(Booking.class));
 		beans.addNestedContainerProperty("member.memberId");
 
 		btnChange.setVisible(false);

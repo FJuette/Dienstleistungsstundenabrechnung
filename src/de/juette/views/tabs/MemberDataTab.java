@@ -1,15 +1,10 @@
-package de.juette.views;
-
-import java.util.ArrayList;
-import java.util.List;
+package de.juette.views.tabs;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
@@ -17,30 +12,9 @@ import com.vaadin.ui.TextField;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
-@SuppressWarnings("serial")
-public class MemberDataTab extends FormLayout {
-	
-	public interface DataSaveListener {
-		public void dataSaved(DataSaveEvent event);
-	}
-	
-	public class DataSaveEvent {
+public class MemberDataTab extends MyDataTab<Member> {
 		
-		final BeanItem<Member> beanItem;
-		
-		public DataSaveEvent(BeanItem<Member> beanItem) {
-			this.beanItem = beanItem;
-		}
-		
-		public BeanItem<Member> getBeanItem() {
-			return beanItem;
-		}
-	}
-	
-	private List<DataSaveListener> listeners = null;
-	
-	private FieldGroup fieldGroup = new BeanFieldGroup<Member>(Member.class);
-	private BeanItem<Member> beanItem;
+	private static final long serialVersionUID = -4275563354183555579L;
 
 	public MemberDataTab(BeanItem<Member> beanItem) {
 		this.beanItem = beanItem;
@@ -78,11 +52,11 @@ public class MemberDataTab extends FormLayout {
 		fieldGroup.bind(cbActive, "active");
 		addComponent(cbActive);
 
-		Button btnSaveNewMember = new Button("Speichern");
-		btnSaveNewMember.setStyleName("friendly");
-		addComponent(btnSaveNewMember);
+		Button btnSave = new Button("Speichern");
+		btnSave.setStyleName("friendly");
+		addComponent(btnSave);
 
-		btnSaveNewMember.addClickListener(event -> {
+		btnSave.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
 			} catch (Exception e) {
@@ -92,28 +66,5 @@ public class MemberDataTab extends FormLayout {
 			HibernateUtil.save(beanItem.getBean());
 			fireDataSavedEvent();
 		});
-	}
-
-	private void fireDataSavedEvent() {
-		if (listeners != null) {
-			DataSaveEvent event = new DataSaveEvent(this.beanItem);
-			for (DataSaveListener listener : listeners) {
-				listener.dataSaved(event);
-			}
-		}
-	}
-	
-	public void addDataSaveListener(DataSaveListener listener) {
-		if (listeners == null) {
-			listeners = new ArrayList<DataSaveListener>();
-		}
-		listeners.add(listener);
-	}
-	
-	public void removeDataSaveListener(DataSaveListener listener) {
-		if (listeners == null) {
-			listeners = new ArrayList<DataSaveListener>();
-		}
-		listeners.remove(listener);
 	}
 }

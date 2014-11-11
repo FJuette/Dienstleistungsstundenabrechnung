@@ -25,6 +25,11 @@ public class Campaign extends AbstractEntity {
 		this.description = description;
 		this.contact = contact;
 	}
+	
+	public String getHtml() {
+		return "<div style='font-size:0.9em'><strong>" + description + " </strong></div>"
+				+ " <div style='font-size:0.8em'>Jahr: " + year + "</div>";
+	}
 
 	public String getYear() {
 		return year;

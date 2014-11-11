@@ -1,6 +1,5 @@
 package de.juette.views;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -136,11 +135,9 @@ public class MemberViewOld extends EditableTable<Member> implements View {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public MemberViewOld() {
 		beans = new BeanItemContainer<Member>(Member.class);
-		beans.addAll((Collection<? extends Member>) HibernateUtil
-				.getAllAsList(Member.class));
+		beans.addAll(HibernateUtil.getAllAsList(Member.class));
 
 		btnChange.setVisible(false);
 		btnNew.setCaption("Neues Mitglied");

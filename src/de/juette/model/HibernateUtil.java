@@ -134,7 +134,7 @@ public class HibernateUtil
 	 * @return Ordered list of entities
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<? extends AbstractEntity> orderedList(Class<? extends AbstractEntity> dataClass, String orderByClause) {
+	public static <T extends AbstractEntity>  List<T> orderedList(Class<T> dataClass, String orderByClause) {
 		String orderByHQL = "";
 		if (orderByClause != null && orderByClause.trim().length() > 0)
 			orderByHQL = " order by " + orderByClause;
@@ -142,7 +142,7 @@ public class HibernateUtil
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		List<? extends AbstractEntity> list = session.createQuery("from " + dataClass.getSimpleName() + orderByHQL).list();
+		List<T> list = session.createQuery("from " + dataClass.getSimpleName() + orderByHQL).list();
 
 		tx.commit();
 
@@ -150,11 +150,11 @@ public class HibernateUtil
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<? extends AbstractEntity> getAllAsList(Class<? extends AbstractEntity> dataClass) {
+	public static <T extends AbstractEntity>  List<T> getAllAsList(Class<T> dataClass) {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		List<? extends AbstractEntity> list = session.createQuery("from " + dataClass.getSimpleName()).list();
+		List<T> list = session.createQuery("from " + dataClass.getSimpleName()).list();
 
 		tx.commit();
 
@@ -184,13 +184,14 @@ public class HibernateUtil
 	
 	/**
 	 * Delete item by id.
+	 * @param <T>
 	 * 
 	 * @param dataClass
 	 *            Class of entity
 	 * @param itemId
 	 *            Id of entity to be removed as String
 	 */
-	public static void removeItem(Class<? extends AbstractEntity> dataClass, String itemId) {
+	public static <T extends AbstractEntity> void removeItem(Class<T> dataClass, String itemId) {
 		String whereHQL = "";
 		if (itemId != null && itemId.trim().length() > 0)
 			whereHQL = " where id = '" + itemId + "'";
