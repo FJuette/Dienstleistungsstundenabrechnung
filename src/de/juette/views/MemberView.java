@@ -7,6 +7,7 @@ import java.util.Date;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.Compare;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
@@ -27,6 +28,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
+import com.vaadin.data.util.filter.And;
 
 import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyGroupFilter;
@@ -235,12 +237,12 @@ public class MemberView extends ComplexLayout implements View {
 				Notification.show("Upload fertig", Type.TRAY_NOTIFICATION);
 			});
 		});
-		
+
 		cbPassive.setImmediate(true);
 		cbPassive.setStyleName("tiny myHeaderLabel");
 		cbPassive.setValue(true);
 		leftContentLayout.addComponent(cbPassive);
-		
+
 		cbPassive.addValueChangeListener(event -> {
 			filterActives();
 		});
@@ -253,7 +255,7 @@ public class MemberView extends ComplexLayout implements View {
 			beans.removeContainerFilters("active");
 		}
 	}
-	
+
 	private void initTable() {
 		beans = new BeanItemContainer<Member>(Member.class);
 		beans.addAll(HibernateUtil.orderedList(Member.class,
@@ -266,6 +268,7 @@ public class MemberView extends ComplexLayout implements View {
 		table.addGeneratedColumn("html", new ColumnGenerator() {
 
 			private static final long serialVersionUID = -7474540528395636510L;
+
 			public Component generateCell(Table source, Object itemId,
 					Object columnId) {
 				String html = ((Member) itemId).getHtmlName();
@@ -333,7 +336,8 @@ public class MemberView extends ComplexLayout implements View {
 
 		txtBirthdateFrom.setImmediate(true);
 		txtBirthdateFrom.setStyleName("tiny");
-		txtBirthdateFrom.setInputPrompt("von/bis Geburtsdatum");
+		txtBirthdateFrom.setWidth(250, Unit.PIXELS);
+		txtBirthdateFrom.setInputPrompt("Geburtsdatum, 15.10.2004-31.11.2014");
 		txtBirthdateFrom.setDescription("Beispiel: 15.10.2004 - 31.11.2014");
 		filterLayout.addComponent(txtBirthdateFrom);
 
@@ -354,19 +358,19 @@ public class MemberView extends ComplexLayout implements View {
 						(Category) cbFilterSubject.getValue()));
 			}
 		});
-		
+
 		txtBirthdateFrom.addBlurListener(event -> {
-			if (!"".equals(txtBirthdateFrom.getValue()) && txtBirthdateFrom.getValue().contains("-")) {
+			beans.removeContainerFilters("birthdate");
+			if (!"".equals(txtBirthdateFrom.getValue())
+					&& txtBirthdateFrom.getValue().contains("-")) {
 				String[] parts = txtBirthdateFrom.getValue().split("-");
-				if (parseToDate(parts[0]) != null && parseToDate(parts[1]) != null) {
-					try {
-						Date from = parseToDate(parts[0]);
-						Date to = parseToDate(parts[1]);
-						System.out.println("");
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				if (parseToDate(parts[0]) != null
+						&& parseToDate(parts[1]) != null) {
+					Date from = parseToDate(parts[0]);
+					Date to = parseToDate(parts[1]);
+					beans.addContainerFilter(new And(
+							new Compare.GreaterOrEqual("birthdate", from),
+							new Compare.LessOrEqual("birthdate", to)));
 				}
 			}
 		});
@@ -376,7 +380,7 @@ public class MemberView extends ComplexLayout implements View {
 		});
 		return filterLayout;
 	}
-	
+
 	private Date parseToDate(String s) {
 		try {
 			Date d = new SimpleDateFormat("dd.MM.yyyy").parse(s.trim());
