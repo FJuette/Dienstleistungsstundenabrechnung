@@ -24,7 +24,7 @@ public class Member extends AbstractEntity {
 	@Column(name = "austrittsdatum")
 	private Date leavingDate;
 	@Column(name = "aktiv")
-	private Boolean active = false;
+	private Boolean active = true;
 	@Column(name = "geburtsdatum")
 	private Date birthdate;
 

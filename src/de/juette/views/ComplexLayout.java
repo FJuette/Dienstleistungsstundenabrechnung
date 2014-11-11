@@ -19,6 +19,7 @@ public class ComplexLayout extends VerticalLayout {
 	protected VerticalLayout contentLayout = new VerticalLayout();
 	protected HorizontalLayout contentHeaderLayout = new HorizontalLayout();
 	protected HorizontalLayout innerHeadLayout = new HorizontalLayout();
+	protected VerticalLayout leftContentLayout = new VerticalLayout();
 	protected TabSheet contentTabs = new TabSheet();
 	protected Label lblContentHeader = new Label("",
 			ContentMode.HTML);
@@ -43,7 +44,8 @@ public class ComplexLayout extends VerticalLayout {
 		contentSplitPanel.setSplitPosition(22, Unit.PERCENTAGE);
 		contentSplitPanel.setSizeFull();
 		contentSplitPanel.setLocked(true);
-		contentSplitPanel.setFirstComponent(table);
+		leftContentLayout.addComponent(table);
+		contentSplitPanel.setFirstComponent(leftContentLayout);
 		contentSplitPanel.setSecondComponent(contentLayout);
 		addComponent(contentSplitPanel);
 

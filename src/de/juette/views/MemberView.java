@@ -1,6 +1,9 @@
 package de.juette.views;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -12,6 +15,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
@@ -24,6 +28,7 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.Booking;
@@ -49,6 +54,7 @@ public class MemberView extends ComplexLayout implements View {
 	private FormLayout tabCategories = new FormLayout();
 	private FormLayout tabDls = new FormLayout();
 	private Button btnImport = new Button("Importieren");
+	private CheckBox cbPassive = new CheckBox("Passive ausblenden");
 
 	private Handler actionHandler = new Handler() {
 
@@ -229,12 +235,30 @@ public class MemberView extends ComplexLayout implements View {
 				Notification.show("Upload fertig", Type.TRAY_NOTIFICATION);
 			});
 		});
+		
+		cbPassive.setImmediate(true);
+		cbPassive.setStyleName("tiny myHeaderLabel");
+		cbPassive.setValue(true);
+		leftContentLayout.addComponent(cbPassive);
+		
+		cbPassive.addValueChangeListener(event -> {
+			filterActives();
+		});
 	}
 
+	private void filterActives() {
+		if (cbPassive.getValue()) {
+			beans.addContainerFilter(new MyBooleanFilter("active"));
+		} else {
+			beans.removeContainerFilters("active");
+		}
+	}
+	
 	private void initTable() {
 		beans = new BeanItemContainer<Member>(Member.class);
 		beans.addAll(HibernateUtil.orderedList(Member.class,
 				"surname asc, forename asc, memberId asc"));
+		filterActives();
 
 		table.setContainerDataSource(beans);
 		table.setMultiSelect(true);
@@ -309,7 +333,8 @@ public class MemberView extends ComplexLayout implements View {
 
 		txtBirthdateFrom.setImmediate(true);
 		txtBirthdateFrom.setStyleName("tiny");
-		txtBirthdateFrom.setInputPrompt("ab Geburtsdatum");
+		txtBirthdateFrom.setInputPrompt("von/bis Geburtsdatum");
+		txtBirthdateFrom.setDescription("Beispiel: 15.10.2004 - 31.11.2014");
 		filterLayout.addComponent(txtBirthdateFrom);
 
 		cbFilterGroup.addValueChangeListener(event -> {
@@ -329,11 +354,36 @@ public class MemberView extends ComplexLayout implements View {
 						(Category) cbFilterSubject.getValue()));
 			}
 		});
+		
+		txtBirthdateFrom.addBlurListener(event -> {
+			if (!"".equals(txtBirthdateFrom.getValue()) && txtBirthdateFrom.getValue().contains("-")) {
+				String[] parts = txtBirthdateFrom.getValue().split("-");
+				if (parseToDate(parts[0]) != null && parseToDate(parts[1]) != null) {
+					try {
+						Date from = parseToDate(parts[0]);
+						Date to = parseToDate(parts[1]);
+						System.out.println("");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 
 		txtFilterName.addTextChangeListener(event -> {
 			filterTable("fullName", event.getText());
 		});
 		return filterLayout;
+	}
+	
+	private Date parseToDate(String s) {
+		try {
+			Date d = new SimpleDateFormat("dd.MM.yyyy").parse(s.trim());
+			return d;
+		} catch (ParseException e) {
+			return null;
+		}
 	}
 
 	private void filterTable(Object columnId, String value) {
@@ -352,6 +402,7 @@ public class MemberView extends ComplexLayout implements View {
 			dataTab.addDataSaveListener(event -> {
 				beans.addBean((Member) event.getBeanItem().getBean());
 				table.refreshRowCache();
+				filterActives();
 			});
 
 			tabGroups.removeAllComponents();
