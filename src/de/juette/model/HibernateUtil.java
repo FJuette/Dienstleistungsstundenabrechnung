@@ -150,11 +150,29 @@ public class HibernateUtil
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends AbstractEntity>  List<T> getAllAsList(Class<T> dataClass) {
+	public static <T extends AbstractEntity> List<T> getAllAsList(Class<T> dataClass) {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
 		List<T> list = session.createQuery("from " + dataClass.getSimpleName()).list();
+
+		tx.commit();
+
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends AbstractEntity> List<T> getMaxList(Class<T> dataClass, int count, String orderByClause) {
+		String orderByHQL = "";
+		if (orderByClause != null && orderByClause.trim().length() > 0)
+			orderByHQL = " order by " + orderByClause;
+		
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		Query q = session.createQuery("from " + dataClass.getSimpleName() + orderByHQL);
+		q.setMaxResults(count);
+		List<T> list = q.list();
 
 		tx.commit();
 
