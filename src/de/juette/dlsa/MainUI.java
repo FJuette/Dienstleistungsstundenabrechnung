@@ -7,6 +7,11 @@ import java.util.Map.Entry;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -35,6 +40,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -50,20 +56,24 @@ import de.juette.views.BookingView;
 import de.juette.views.ErrorView;
 import de.juette.views.GroupsView;
 import de.juette.views.LogView;
+import de.juette.views.LoginView;
 import de.juette.views.MemberViewOld;
 import de.juette.views.MemberView;
 import de.juette.views.SettingsView;
 import de.juette.views.CategoryView;
 import de.juette.views.UserView;
 
-@SuppressWarnings("serial")
 @Theme("dlsaTheme")
 @Title("Dienstleistungsstundenabrechung")
 public class MainUI extends UI implements ViewChangeListener {
 
+	private static final long serialVersionUID = 7386404806620809880L;
+
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = MainUI.class)
 	public static class Servlet extends VaadinServlet implements SessionInitListener, SessionDestroyListener {
+
+		private static final long serialVersionUID = 6737000763577891447L;
 
 		@Override
 		protected void servletInitialized() throws ServletException {
@@ -101,6 +111,8 @@ public class MainUI extends UI implements ViewChangeListener {
 
 	private Navigator navigator;
 	private LinkedHashMap<String, Class<? extends View>> routes = new LinkedHashMap<String, Class<? extends View>>() {
+		private static final long serialVersionUID = 703638756416772379L;
+
 		{
 			put("booking", BookingView.class);
 			put("groups", GroupsView.class);
@@ -110,6 +122,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("member", MemberView.class);
 			put("settings", SettingsView.class);
 			put("log", LogView.class);
+			put("", LoginView.class);
 		}
 	};
 
@@ -130,14 +143,14 @@ public class MainUI extends UI implements ViewChangeListener {
 		root.setWidth("100%");
 		root.addMenu(buildMenu());
 		navigator = new Navigator(this, viewDisplay);
+		navigator.addViewChangeListener(this);
 		for (String route : routes.keySet()) {
 			navigator.addView(route, routes.get(route));
 		}
 
 		final String f = Page.getCurrent().getUriFragment();
 		if (f == null || f.equals("")) {
-			navigator.navigateTo("booking");
-			LoginWindow();
+			navigator.navigateTo("");
 		}
 
 		navigator.setErrorView(ErrorView.class);
@@ -145,6 +158,8 @@ public class MainUI extends UI implements ViewChangeListener {
 
 	CssLayout buildMenu() {
 		menuItems = new LinkedHashMap<String, String>() {
+			private static final long serialVersionUID = 8039574987517700848L;
+
 			{
 				put("booking", "Journal");
 				put("user", "Benutzer");
@@ -229,9 +244,8 @@ public class MainUI extends UI implements ViewChangeListener {
 		// Logout Button
 		final Button b = new Button("Abmelden");
 		b.addClickListener(event -> {
-			LoginWindow();
-			Notification.show("Erfolgreich ausgeloggt.",
-					Notification.Type.TRAY_NOTIFICATION);
+			// TODO problem lösen
+			Page.getCurrent().reload();
 		});
 		b.setHtmlContentAllowed(true);
 		b.setPrimaryStyleName("valo-menu-item");
@@ -240,67 +254,26 @@ public class MainUI extends UI implements ViewChangeListener {
 		return menu;
 	}
 
-	private void LoginWindow() {
-		Window window = new Window("");
-		window.setModal(true);
-		window.setWidth("600");
-		window.setHeight("250");
-		
-		FormLayout layout = new FormLayout();
-		layout.setMargin(true);
-		window.setContent(layout);
-
-		final VerticalLayout loginPanel = new VerticalLayout();
-		loginPanel.setSizeUndefined();
-		loginPanel.setSpacing(true);
-		Responsive.makeResponsive(loginPanel);
-		loginPanel.addStyleName("login-panel");
-		
-		CssLayout labels = new CssLayout();
-		labels.addStyleName("labels");
-		Label title = new Label("DLS-Verwaltung Login");
-		title.setSizeUndefined();
-		title.addStyleName(ValoTheme.LABEL_H3);
-		title.addStyleName(ValoTheme.LABEL_LIGHT);
-		labels.addComponent(title);
-		loginPanel.addComponent(labels);
-		
-		HorizontalLayout fields = new HorizontalLayout();
-		fields.setSpacing(true);
-		fields.addStyleName("fields");
-		final TextField username = new TextField("Benutzername");
-		username.setIcon(FontAwesome.USER);
-		username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-		final PasswordField password = new PasswordField("Passwort");
-		password.setIcon(FontAwesome.LOCK);
-		password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-		final Button signin = new Button("Einloggen");
-		signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
-		signin.setClickShortcut(KeyCode.ENTER);
-		signin.focus();
-		fields.addComponents(username, password, signin);
-		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
-		signin.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-				window.close();
-				UI.getCurrent().getNavigator().navigateTo("booking");
-			}
-		});
-		
-		loginPanel.addComponent(fields);
-		loginPanel.addComponent(new CheckBox("Angemeldet bleiben", true));
-
-		layout.addComponent(loginPanel);
-		getUI().addWindow(window);
-	}
-
 	@Override
 	public boolean beforeViewChange(ViewChangeEvent event) {
+		boolean isAuthenticated = SecurityUtils.getSubject().isAuthenticated();
+		// User is logged in but tries to access the LoginView, navigating him to the journal
+		if (isAuthenticated && "".equals(event.getViewName())) {
+			getNavigator().navigateTo("booking");
+			return false;
+		}
+		// User is not authenticated and tries to access something else than the login view
+		if (!isAuthenticated && !"".equals(event.getViewName())) {
+			getNavigator().navigateTo("");
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public void afterViewChange(ViewChangeEvent event) {
+		if (!SecurityUtils.getSubject().isAuthenticated() && getUI().getWindows().size() == 0) {
+			getUI().addWindow(LoginView.getLoginWindow());
+		}
 	}
 }

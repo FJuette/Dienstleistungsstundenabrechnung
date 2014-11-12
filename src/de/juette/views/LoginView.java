@@ -1,8 +1,9 @@
 package de.juette.views;
 
-//import org.apache.shiro.SecurityUtils;
-//import org.apache.shiro.authc.UsernamePasswordToken;
-//import org.apache.shiro.subject.Subject;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
@@ -11,84 +12,88 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SuppressWarnings("serial")
 public class LoginView extends VerticalLayout implements View {
 
+	private static final long serialVersionUID = -1825948076087301147L;
 	public LoginView() {
-		setSizeFull();
-		Component loginForm = buildLoginForm();
-		addComponent(loginForm);
-		setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
+		
 	}
 
-	private Component buildLoginForm() {
+	private static CheckBox cbRemember = new CheckBox("Angemeldet bleiben", true);
+	public static Window getLoginWindow() {
+		Window window = new Window("");
+		window.setModal(true);
+		window.setWidth("600");
+		window.setHeight("250");
+		
+		FormLayout layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+
 		final VerticalLayout loginPanel = new VerticalLayout();
 		loginPanel.setSizeUndefined();
 		loginPanel.setSpacing(true);
 		Responsive.makeResponsive(loginPanel);
 		loginPanel.addStyleName("login-panel");
-		loginPanel.addComponent(buildLabels());
-		loginPanel.addComponent(buildFields());
-		loginPanel.addComponent(new CheckBox("Remember me", true));
-		return loginPanel;
-	}
-
-	private Component buildFields() {
+		
+		CssLayout labels = new CssLayout();
+		labels.addStyleName("labels");
+		Label title = new Label("DLS-Verwaltung Login");
+		title.setSizeUndefined();
+		title.addStyleName(ValoTheme.LABEL_H3);
+		title.addStyleName(ValoTheme.LABEL_LIGHT);
+		labels.addComponent(title);
+		loginPanel.addComponent(labels);
+		
 		HorizontalLayout fields = new HorizontalLayout();
 		fields.setSpacing(true);
 		fields.addStyleName("fields");
-		final TextField username = new TextField("Username");
+		final TextField username = new TextField("Benutzername");
 		username.setIcon(FontAwesome.USER);
 		username.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-		final PasswordField password = new PasswordField("Password");
+		final PasswordField password = new PasswordField("Passwort");
 		password.setIcon(FontAwesome.LOCK);
 		password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-		final Button signin = new Button("Sign In");
+		final Button signin = new Button("Einloggen");
 		signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
 		signin.setClickShortcut(KeyCode.ENTER);
 		signin.focus();
 		fields.addComponents(username, password, signin);
 		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
-		signin.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
+		signin.addClickListener(event -> {
+			Subject currentUser = SecurityUtils.getSubject();
+			UsernamePasswordToken token = new UsernamePasswordToken(
+					username.getValue(), password.getValue(), cbRemember.getValue());
+			try {
+				currentUser.login(token);
+				System.out.println("Ist in Adminrolle: " + currentUser.hasRole("Administrator"));
+				window.close();
 				UI.getCurrent().getNavigator().navigateTo("booking");
+			} catch (AuthenticationException ex) {
+				Notification.show("Leider war der Login nicht erfolgreich.", Type.ERROR_MESSAGE);
 			}
 		});
-		return fields;
-	}
+		
+		loginPanel.addComponent(fields);
+		
+		loginPanel.addComponent(cbRemember);
 
-	private Component buildLabels() {
-		CssLayout labels = new CssLayout();
-		labels.addStyleName("labels");
-		Label welcome = new Label("Welcome");
-		welcome.setSizeUndefined();
-		welcome.addStyleName(ValoTheme.LABEL_H4);
-		welcome.addStyleName(ValoTheme.LABEL_COLORED);
-		labels.addComponent(welcome);
-		Label title = new Label("QuickTickets Dashboard");
-		title.setSizeUndefined();
-		title.addStyleName(ValoTheme.LABEL_H3);
-		title.addStyleName(ValoTheme.LABEL_LIGHT);
-		labels.addComponent(title);
-		return labels;
-	}
-
-	public interface LoginListener {
-		void userLoggedIn();
+		layout.addComponent(loginPanel);
+		return window;
 	}
 
 	@Override
