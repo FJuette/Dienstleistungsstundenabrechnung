@@ -1,9 +1,6 @@
 package de.juette.views;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -16,7 +13,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -35,9 +31,9 @@ import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Settings;
 
-@SuppressWarnings("serial")
 public class SettingsView extends VerticalLayout implements View {
 
+	private static final long serialVersionUID = -8149901292659978760L;
 	private final TextField txtDueDate = new TextField("Stichtag");
 	private final TextField txtCountDls = new TextField(
 			"Anzahl der Dienstleistungsstunden pro Jahr");
@@ -53,15 +49,13 @@ public class SettingsView extends VerticalLayout implements View {
 	private final CheckBox cbTransfer = new CheckBox(
 			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
-	private VerticalLayout mappinglayout;
+	private VerticalLayout mappinglayout = new VerticalLayout();;
 	private BeanItemContainer<CsvColumn> csv = new BeanItemContainer<CsvColumn>(
 			CsvColumn.class);
 
 	public SettingsView() {
 		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
-		@SuppressWarnings("unchecked")
-		List<Settings> settings = (List<Settings>) HibernateUtil
-				.getAllAsList(Settings.class);
+		List<Settings> settings = HibernateUtil.getAllAsList(Settings.class);
 		for (Settings s : settings) {
 			beanItem = new BeanItem<Settings>(s);
 			break;
@@ -77,7 +71,7 @@ public class SettingsView extends VerticalLayout implements View {
 		title.addStyleName("h1");
 		addComponent(title);
 
-		final FormLayout form = new FormLayout();
+		FormLayout form = new FormLayout();
 		form.setMargin(false);
 		form.setWidth("800px");
 		addComponent(form);
@@ -137,9 +131,11 @@ public class SettingsView extends VerticalLayout implements View {
 
 		section = new Label("Spaltenzuordnung");
 		section.addStyleName("h2 colored");
-		form.addComponent(section);
-		
 		addComponent(btnSave);
+		
+		form = new FormLayout();
+		addComponent(form);
+		form.addComponent(section);
 
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
@@ -155,20 +151,23 @@ public class SettingsView extends VerticalLayout implements View {
 				reciever);
 		upload.setButtonCaption("Einlesen");
 		upload.addSucceededListener(new SucceededListener() {
+			private static final long serialVersionUID = -8528719905826739005L;
+
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
 				for (CsvColumn item : reciever.getColumnNames()) {
 					csv.addBean(item);
 				}
 				reciever.getFile().delete();
-				// Notification.show("Hier fehlt noch der Code..." +
-				// reciever.getFile().getAbsolutePath(), Type.ERROR_MESSAGE);
+				mappinglayout.removeAllComponents();
+				mappinglayout.addComponent(getColumnMappingLayout(true));
 			}
 		});
 
 		form.addComponent(upload);
 
-		mappinglayout = getColumnMappingLayout();
+		mappinglayout.removeAllComponents();
+		mappinglayout.addComponent(getColumnMappingLayout(false));
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 
 		addComponent(mappinglayout);
@@ -179,11 +178,13 @@ public class SettingsView extends VerticalLayout implements View {
 	private ArrayList<ColumnMapping> mapping = new ArrayList<ColumnMapping>();
 	private String previous = "";
 
-	@SuppressWarnings("unchecked")
-	private VerticalLayout getColumnMappingLayout() {
+	private VerticalLayout getColumnMappingLayout(Boolean newFile) {
+		if (newFile == true) {
+			HibernateUtil.DeleteAll(ColumnMapping.class);
+			DataHandler.createMappingEntrys();
+		}
 		
-		mapping = (ArrayList<ColumnMapping>) HibernateUtil
-				.getAllAsList(ColumnMapping.class);
+		mapping = (ArrayList<ColumnMapping>) HibernateUtil.orderedList(ColumnMapping.class, "id asc");
 
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
@@ -201,10 +202,7 @@ public class SettingsView extends VerticalLayout implements View {
 		lblCsvHead.setWidth("300");
 		headLayout.addComponent(lblCsvHead);
 		
-		int countMapping = HibernateUtil.getMappingCount();
-		
-		// If nothing set
-		if (countMapping == 0) {
+		if (newFile) {
 			for (ColumnMapping m : mapping) {
 
 				HorizontalLayout boxesLayout = new HorizontalLayout();
@@ -235,21 +233,12 @@ public class SettingsView extends VerticalLayout implements View {
 			}
 		}
 		
-		
 		Button btnSaveMapping = new Button();
-		if (countMapping == 0) {
-			btnSaveMapping.setCaption("Speichern");
-		} else {
-			btnSaveMapping.setCaption("Bearbeiten");
-		}
+		btnSaveMapping.setStyleName("friendly");
+		btnSaveMapping.setCaption("Speichern");
 		layout.addComponent(btnSaveMapping);
 		
-		
-		
 		btnSaveMapping.addClickListener(event -> {
-			//HibernateUtil.DeleteAll(ColumnMapping.class);
-			//DataHandler.createMappingEntrys();
-			//mapping = (ArrayList<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);
 			
 			layout.forEach(c -> {
 				if ("com.vaadin.ui.HorizontalLayout".equals(c.getClass()
@@ -273,8 +262,6 @@ public class SettingsView extends VerticalLayout implements View {
 										m.setCsvColumnName(((CsvColumn) ((ComboBox) p).getValue()).getValue());
 									}
 								}
-								
-								System.out.println( ((CsvColumn) ((ComboBox) p).getValue()).getValue() );
 							}
 						}
 					});
