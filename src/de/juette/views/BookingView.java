@@ -17,6 +17,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -27,16 +28,18 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.DateToShortGermanStringConverter;
+import de.juette.dlsa.MyYearFilter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.HibernateUtil;
+import de.juette.model.Year;
 
 public class BookingView extends EditableTable<Booking> implements View {
 
 	private static final long serialVersionUID = 6324354416931646341L;
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
-	
+
 	private Handler actionHandler = new Handler() {
 
 		private static final long serialVersionUID = 8008706058827363288L;
@@ -85,26 +88,29 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		btnChange.setVisible(false);
 		btnNew.setVisible(false);
-		
+
 		HorizontalLayout innerButtonLayout = new HorizontalLayout();
 		innerButtonLayout.setSizeUndefined();
-		
+
 		Button btnNewBookings = new Button("Neue Buchung(en)");
 		btnNewBookings.setStyleName("primary tiny");
 		btnNewBookings.setIcon(FontAwesome.PLUS);
 		innerButtonLayout.addComponent(btnNewBookings);
 
-		innerHeadLayout.addComponent(initFilter());
+		initTable();
+		extendTable();
+		HorizontalLayout fLayout = initFilter();
+
+		innerHeadLayout.addComponent(fLayout);
 		innerHeadLayout.setWidth(90, Unit.PERCENTAGE);
+		innerHeadLayout.setExpandRatio(fLayout, (float) 0.8);
 		innerHeadLayout.addComponent(innerButtonLayout);
 		innerHeadLayout.setComponentAlignment(innerButtonLayout,
 				Alignment.MIDDLE_RIGHT);
-		
+
 		filterLayout = innerHeadLayout;
-		
+
 		initLayout("Journal");
-		initTable();
-		extendTable();
 
 		Button btnYear = new Button("Jahreslauf durchführen");
 		Button btnThisYear = new Button("Vorläufiger Jahreslauf 2014");
@@ -124,7 +130,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnYear.addClickListener(event -> {
 			YearWindow();
 		});
-		
+
 		btnNewBookings.addClickListener(event -> {
 			NewBookingWindow w;
 			getUI().addWindow(w = new NewBookingWindow(true));
@@ -156,10 +162,32 @@ public class BookingView extends EditableTable<Booking> implements View {
 	private HorizontalLayout initFilter() {
 		HorizontalLayout fLayout = new HorizontalLayout();
 		fLayout.setSpacing(true);
-		
+
 		Label title = new Label("<strong>Filter:</strong>", ContentMode.HTML);
 		fLayout.addComponent(title);
-		
+
+		BeanItemContainer<Year> years = new BeanItemContainer<Year>(Year.class);
+		years.addAll(HibernateUtil.orderedList(Year.class, "year asc"));
+
+		ComboBox cbYears = new ComboBox();
+		cbYears.setImmediate(true);
+		cbYears.setStyleName("tiny");
+		cbYears.setWidth(85, Unit.PIXELS);
+		cbYears.setItemCaptionPropertyId("year");
+		cbYears.setContainerDataSource(years);
+		cbYears.setNullSelectionAllowed(false);
+		fLayout.addComponent(cbYears);
+		cbYears.addValueChangeListener(event -> {
+			beans.removeContainerFilters("doneDate");
+			beans.addContainerFilter(new MyYearFilter("doneDate", ((Year) event
+					.getProperty().getValue()).getYear()));
+			updateTable();
+		});
+		if (cbYears.getItemIds().size() > 0) {
+			cbYears.setValue(cbYears.getItemIds().toArray()[cbYears
+					.getItemIds().size() - 1]);
+		}
+
 		TextField txtFilterDls = new TextField();
 		txtFilterDls.setInputPrompt("Anzahl DLS");
 		txtFilterDls.setConverter(Integer.class);
@@ -193,13 +221,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		txtFilterNote.setConverter(String.class);
 		txtFilterNote.setInputPrompt("Bemerkung");
 		txtFilterNote.setStyleName("tiny");
-		txtFilterNote.addTextChangeListener(event -> {
-			if (!event.getText().equals("")) {
-				filterTable("comment", event.getText());
+		txtFilterNote.addBlurListener(event -> {
+			if (!txtFilterNote.getValue().equals("")) {
+				filterTable("comment", txtFilterNote.getValue());
 			} else {
 				beans.removeContainerFilters("comment");
 			}
-
 		});
 		fLayout.addComponents(txtFilterDls, dfFilterDate, txtFilterNote);
 		return fLayout;

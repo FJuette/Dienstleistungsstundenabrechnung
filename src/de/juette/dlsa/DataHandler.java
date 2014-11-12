@@ -24,6 +24,7 @@ import de.juette.model.Role;
 import de.juette.model.Settings;
 import de.juette.model.Category;
 import de.juette.model.User;
+import de.juette.model.Year;
 
 public class DataHandler {
 
@@ -102,12 +103,9 @@ public class DataHandler {
 		return members;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void createDummyMember() {
-		ArrayList<Group> sGroups = (ArrayList<Group>) HibernateUtil
-				.getAllAsList(Group.class);
-		ArrayList<Category> sSubjects = (ArrayList<Category>) HibernateUtil
-				.getAllAsList(Category.class);
+		ArrayList<Group> sGroups = (ArrayList<Group>) HibernateUtil.getAllAsList(Group.class);
+		ArrayList<Category> sSubjects = (ArrayList<Category>) HibernateUtil.getAllAsList(Category.class);
 
 		sGroups.remove(1);
 		sGroups.remove(2);
@@ -156,7 +154,6 @@ public class DataHandler {
 		return activities;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void createDummyActivities() {
 		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
 				.getAllAsList(Member.class);
@@ -186,7 +183,6 @@ public class DataHandler {
 		return bookings;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void createDummyBookings() {
 		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
 				.getAllAsList(Member.class);
@@ -195,16 +191,18 @@ public class DataHandler {
 				.getAllAsList(Campaign.class);
 
 		ArrayList<Booking> entrys;
+		ArrayList<Year> years;
 		try {
 			entrys = new ArrayList<Booking>(Arrays.asList(
 					new Booking(2, "Erste Buchung", new SimpleDateFormat(
-							"dd.MM.yyyy").parse("01.10.2014"), members.get(3),
+							"dd.MM.yyyy").parse("01.10.2013"), members.get(3),
 							activities.get(1)),
 					new Booking(3, "Zweite Buchung", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("11.01.2014"), members.get(2),
 							activities.get(2))));
-
+			years = new ArrayList<Year>(Arrays.asList(new Year(2013), new Year(2014)));
 			HibernateUtil.saveAll(entrys);
+			HibernateUtil.saveAll(years);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -234,7 +232,6 @@ public class DataHandler {
 		return users;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void createDummyUsers() {
 		ArrayList<Role> roles = (ArrayList<Role>) HibernateUtil
 				.getAllAsList(Role.class);
@@ -267,7 +264,6 @@ public class DataHandler {
 		return logEntrys;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void createDummyLogs() {
 		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
 				.getAllAsList(Member.class);

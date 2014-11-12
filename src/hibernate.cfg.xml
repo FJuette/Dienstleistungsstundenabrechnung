@@ -30,6 +30,7 @@
         <mapping class="de.juette.model.Settings"></mapping>
         <mapping class="de.juette.model.Group"></mapping>
         <mapping class="de.juette.model.Category"></mapping>
+        <mapping class="de.juette.model.Year"></mapping>
         <mapping class="de.juette.model.Member"></mapping>
     </session-factory>
 </hibernate-configuration>
