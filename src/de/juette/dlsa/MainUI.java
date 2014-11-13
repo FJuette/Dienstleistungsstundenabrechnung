@@ -8,20 +8,15 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.Responsive;
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
 import com.vaadin.server.SessionDestroyListener;
@@ -32,35 +27,24 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ValoTheme;
 
 import de.juette.model.HibernateUtil;
-import de.juette.views.CampaignView;
 import de.juette.views.BookingView;
+import de.juette.views.CampaignView;
+import de.juette.views.CategoryView;
 import de.juette.views.ErrorView;
 import de.juette.views.GroupsView;
 import de.juette.views.LogView;
 import de.juette.views.LoginView;
-import de.juette.views.MemberViewOld;
 import de.juette.views.MemberView;
 import de.juette.views.SettingsView;
-import de.juette.views.CategoryView;
 import de.juette.views.UserView;
 
 @Theme("dlsaTheme")
@@ -92,7 +76,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.getSessionFactory();
 			
 			// Creates Example data, for fresh Database and to show and test the functionality
-			if (true) {
+			if (false) {
 				DataHandler.createDummySubjects();
 				DataHandler.createDummyGroups();
 				DataHandler.createDummyMember();
@@ -244,8 +228,13 @@ public class MainUI extends UI implements ViewChangeListener {
 		// Logout Button
 		final Button b = new Button("Abmelden");
 		b.addClickListener(event -> {
-			// TODO problem lösen
-			Page.getCurrent().reload();
+			if (SecurityUtils.getSubject().isAuthenticated())
+			{
+				getUI().getSession().close();
+				SecurityUtils.getSubject().logout();
+				navigator.navigateTo("");
+				getUI().getPage().reload();
+			}
 		});
 		b.setHtmlContentAllowed(true);
 		b.setPrimaryStyleName("valo-menu-item");
@@ -273,7 +262,8 @@ public class MainUI extends UI implements ViewChangeListener {
 	@Override
 	public void afterViewChange(ViewChangeEvent event) {
 		if (!SecurityUtils.getSubject().isAuthenticated() && getUI().getWindows().size() == 0) {
-			getUI().addWindow(LoginView.getLoginWindow());
+			LoginView lw = new LoginView();
+			getUI().addWindow(lw.getLoginWindow());
 		}
 	}
 }

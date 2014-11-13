@@ -3,7 +3,6 @@ package de.juette.views;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
@@ -33,8 +32,8 @@ public class LoginView extends VerticalLayout implements View {
 		
 	}
 
-	private static CheckBox cbRemember = new CheckBox("Angemeldet bleiben", true);
-	public static Window getLoginWindow() {
+	private CheckBox cbRemember = new CheckBox("Angemeldet bleiben", true);
+	public Window getLoginWindow() {
 		Window window = new Window("");
 		window.setModal(true);
 		window.setWidth("600");
@@ -75,12 +74,11 @@ public class LoginView extends VerticalLayout implements View {
 		fields.addComponents(username, password, signin);
 		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
 		signin.addClickListener(event -> {
-			Subject currentUser = SecurityUtils.getSubject();
 			UsernamePasswordToken token = new UsernamePasswordToken(
 					username.getValue(), password.getValue(), cbRemember.getValue());
 			try {
-				currentUser.login(token);
-				System.out.println("Ist in Adminrolle: " + currentUser.hasRole("Administrator"));
+				SecurityUtils.getSubject().login(token);
+				System.out.println("Ist in Adminrolle: " + SecurityUtils.getSubject().hasRole("Administrator"));
 				window.close();
 				UI.getCurrent().getNavigator().navigateTo("booking");
 			} catch (AuthenticationException ex) {
