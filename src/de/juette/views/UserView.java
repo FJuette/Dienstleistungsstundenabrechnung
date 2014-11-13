@@ -1,5 +1,6 @@
 package de.juette.views;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -46,11 +47,14 @@ public class UserView extends ComplexLayout implements View {
 
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
-			if (action.getCaption().equals("Entfernen")) {
-				// TODO: Auf aktuellen Benutzer prüfen
-				beans.removeItem(table.getValue());
-				HibernateUtil.removeItem(User.class, ((User) table.getValue())
-						.getId().toString());
+			if (action.getCaption().equals("Entfernen") && table.getValue() != null) {
+				if (SecurityUtils.getSubject().getPrincipal().equals(((User)table.getValue()).getUsername())) {
+					Notification.show("Der eigene Benutzer kann nicht gelöscht werden.", Type.ERROR_MESSAGE);
+				} else {
+					beans.removeItem(table.getValue());
+					HibernateUtil.removeItem(User.class, ((User) table.getValue())
+							.getId().toString());
+				}
 			}
 		}
 

@@ -25,7 +25,6 @@ public class UserDataTab extends MyDataTab<User> {
 	private static final long serialVersionUID = -6957587750236729225L;
 	private FieldGroup fieldGroup = new BeanFieldGroup<User>(User.class);
 
-	@SuppressWarnings("unchecked")
 	public UserDataTab(BeanItem<User> beanItem) {
 		this.beanItem = beanItem;
 		setSizeFull();
