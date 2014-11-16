@@ -76,7 +76,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.getSessionFactory();
 			
 			// Creates Example data, for fresh Database and to show and test the functionality
-			if (false) {
+			if (true) {
 				DataHandler.createDummySubjects();
 				DataHandler.createDummyGroups();
 				DataHandler.createDummyMember();

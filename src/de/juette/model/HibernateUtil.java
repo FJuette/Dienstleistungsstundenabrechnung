@@ -1,6 +1,7 @@
 package de.juette.model;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -11,48 +12,42 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-public class HibernateUtil
-{
+public class HibernateUtil {
 	private static final SessionFactory sessionFactory;
 	private static Session currentSession;
-	
-    static
-    {
-        try
-        {
-        	final Configuration configuration = new Configuration();
-        	configuration.configure();
-        	final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
-    	            configuration.getProperties()).build();
-    	    sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-        }
-        catch (Throwable ex)
-        {
-        	System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
 
-    public static SessionFactory getSessionFactory()
-    {
-        return sessionFactory;
-    }
-    
-    public static Session getSession() {
+	static {
+		try {
+			final Configuration configuration = new Configuration();
+			configuration.configure();
+			final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+					.applySettings(configuration.getProperties()).build();
+			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		} catch (Throwable ex) {
+			System.err.println("Initial SessionFactory creation failed." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+
+	public static SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public static Session getSession() {
 		if (currentSession == null) {
 			currentSession = sessionFactory.openSession();
 		}
 		return currentSession;
 	}
-    
-    public static void closeSession() {
+
+	public static void closeSession() {
 		if (currentSession != null) {
 			currentSession.close();
 			currentSession = null;
 		}
 	}
-    
-    /**
+
+	/**
 	 * Save/update entity.
 	 * 
 	 * @param entity
@@ -65,7 +60,7 @@ public class HibernateUtil
 		session.saveOrUpdate(entity);
 		tx.commit();
 	}
-	
+
 	/**
 	 * Save/update all in list.
 	 * 
@@ -84,7 +79,7 @@ public class HibernateUtil
 			session.saveOrUpdate(entity);
 		tx.commit();
 	}
-	
+
 	/**
 	 * Get unique entity.
 	 * 
@@ -95,7 +90,8 @@ public class HibernateUtil
 	 * 
 	 * @return Unique entity
 	 */
-	public static AbstractEntity getUnique(Class<? extends AbstractEntity> dataClass, String whereClause) {
+	public static AbstractEntity getUnique(
+			Class<? extends AbstractEntity> dataClass, String whereClause) {
 		String whereHQL = "";
 		if (whereClause != null && whereClause.trim().length() > 0)
 			whereHQL = " where " + whereClause;
@@ -103,13 +99,14 @@ public class HibernateUtil
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		AbstractEntity entity = (AbstractEntity) session.createQuery("from " + dataClass.getSimpleName() + whereHQL).uniqueResult();
+		AbstractEntity entity = (AbstractEntity) session.createQuery(
+				"from " + dataClass.getSimpleName() + whereHQL).uniqueResult();
 
 		tx.commit();
 
 		return entity;
 	}
-	
+
 	/**
 	 * Get entity by id.
 	 * 
@@ -120,10 +117,11 @@ public class HibernateUtil
 	 * 
 	 * @return Entity by id
 	 */
-	public static AbstractEntity getById(Class<? extends AbstractEntity> clazz, long id) {
+	public static AbstractEntity getById(Class<? extends AbstractEntity> clazz,
+			long id) {
 		return (AbstractEntity) getSession().load(clazz, id);
 	}
-	
+
 	/**
 	 * Get list of entities as ordered list.
 	 * 
@@ -135,7 +133,8 @@ public class HibernateUtil
 	 * @return Ordered list of entities
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends AbstractEntity>  List<T> orderedList(Class<T> dataClass, String orderByClause) {
+	public static <T extends AbstractEntity> List<T> orderedList(
+			Class<T> dataClass, String orderByClause) {
 		String orderByHQL = "";
 		if (orderByClause != null && orderByClause.trim().length() > 0)
 			orderByHQL = " order by " + orderByClause;
@@ -143,35 +142,40 @@ public class HibernateUtil
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		List<T> list = session.createQuery("from " + dataClass.getSimpleName() + orderByHQL).list();
+		List<T> list = session.createQuery(
+				"from " + dataClass.getSimpleName() + orderByHQL).list();
 
 		tx.commit();
 
 		return list;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static <T extends AbstractEntity> List<T> getAllAsList(Class<T> dataClass) {
+	public static <T extends AbstractEntity> List<T> getAllAsList(
+			Class<T> dataClass) {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		List<T> list = session.createQuery("from " + dataClass.getSimpleName()).list();
+		List<T> list = session.createQuery("from " + dataClass.getSimpleName())
+				.list();
 
 		tx.commit();
 
 		return list;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static <T extends AbstractEntity> List<T> getMaxList(Class<T> dataClass, int count, String orderByClause) {
+	public static <T extends AbstractEntity> List<T> getMaxList(
+			Class<T> dataClass, int count, String orderByClause) {
 		String orderByHQL = "";
 		if (orderByClause != null && orderByClause.trim().length() > 0)
 			orderByHQL = " order by " + orderByClause;
-		
+
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		Query q = session.createQuery("from " + dataClass.getSimpleName() + orderByHQL);
+		Query q = session.createQuery("from " + dataClass.getSimpleName()
+				+ orderByHQL);
 		q.setMaxResults(count);
 		List<T> list = q.list();
 
@@ -179,30 +183,53 @@ public class HibernateUtil
 
 		return list;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static List<Booking> getMembers(Member member) {
+	public static List<Booking> getBookings(Member member) {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 
-		List<Booking> list = session.createQuery("from Booking as b where b.member.id = " + member.getId()).list();
+		List<Booking> list = session.createQuery(
+				"from Booking as b where b.member.id = " + member.getId())
+				.list();
 
 		tx.commit();
 		return list;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public static List<Booking> getBookingsFromYear(Member member, Date from,
+			Date to) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		Query q = session.createQuery(
+				"from Booking as b where b.member.id = " + member.getId()
+				+ " and doneDate > :from and doneDate <= :to");
+		q.setDate("from", from);
+		q.setDate("to", to);
+		List<Booking> list = q.list();
+
+		tx.commit();
+		return list;
+	}
+
 	public static int getMappingCount() {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
-		
-		int count = session.createQuery("from ColumnMapping where csvColumnName IS NOT NULL").list().size();
-		
+
+		int count = session
+				.createQuery(
+						"from ColumnMapping where csvColumnName IS NOT NULL")
+				.list().size();
+
 		tx.commit();
 		return count;
 	}
-	
+
 	/**
 	 * Delete item by id.
+	 * 
 	 * @param <T>
 	 * 
 	 * @param dataClass
@@ -210,7 +237,8 @@ public class HibernateUtil
 	 * @param itemId
 	 *            Id of entity to be removed as String
 	 */
-	public static <T extends AbstractEntity> void removeItem(Class<T> dataClass, String itemId) {
+	public static <T extends AbstractEntity> void removeItem(
+			Class<T> dataClass, String itemId) {
 		String whereHQL = "";
 		if (itemId != null && itemId.trim().length() > 0)
 			whereHQL = " where id = '" + itemId + "'";
@@ -224,7 +252,7 @@ public class HibernateUtil
 
 		tx.commit();
 	}
-	
+
 	public static void DeleteAll(Class<? extends AbstractEntity> dataClass) {
 
 		Session session = getSession();

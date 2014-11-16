@@ -194,13 +194,31 @@ public class DataHandler {
 		ArrayList<Year> years;
 		try {
 			entrys = new ArrayList<Booking>(Arrays.asList(
-					new Booking(2, "Erste Buchung", new SimpleDateFormat(
+					new Booking(2, "Buchung mitte 2013", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("01.10.2013"), members.get(3),
 							activities.get(1)),
-					new Booking(3, "Zweite Buchung", new SimpleDateFormat(
+					new Booking(2.1, "Buchung 01.01.2014", new SimpleDateFormat(
+									"dd.MM.yyyy").parse("01.01.2014"), members.get(3),
+									activities.get(1)),
+					new Booking(2.2, "Buchung 31.12.2014", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("31.12.2014"), members.get(3),
+							activities.get(2)),
+					new Booking(2.3, "Buchung 01.01.2015", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("01.01.2015"), members.get(3),
+							activities.get(2)),
+					new Booking(2.4, "Buchung 31.12.2013", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("31.12.2013"), members.get(3),
+							activities.get(2)),
+					new Booking(2.5, "Buchung 01.01.2013", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("01.01.2013"), members.get(3),
+							activities.get(2)),
+					new Booking(2.6, "Buchung 30.12.2013", new SimpleDateFormat(
+							"dd.MM.yyyy").parse("30.12.2013"), members.get(3),
+							activities.get(2)),
+					new Booking(3, "Buchung mitte 2014", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("11.01.2014"), members.get(2),
 							activities.get(2))));
-			years = new ArrayList<Year>(Arrays.asList(new Year(2013), new Year(2014)));
+			years = new ArrayList<Year>(Arrays.asList(new Year(2013), new Year(2014), new Year(2015)));
 			HibernateUtil.saveAll(entrys);
 			HibernateUtil.saveAll(years);
 		} catch (ParseException e) {
@@ -251,13 +269,13 @@ public class DataHandler {
 							new SimpleDateFormat("dd.MM.yyyy hh:mm")
 									.parse("13.03.2014 10:23"),
 							"Benutzer Juette bearbeitet, veränderte(s) Feld(er): Nachname",
-							getDummyMembers().getIdByIndex(1)));
+							getDummyMembers().getIdByIndex(1), getDummyMembers().getIdByIndex(1)));
 			logEntrys
 					.addItem(new Log(
 							new SimpleDateFormat("dd.MM.yyyy hh:mm")
 									.parse("14.03.2014 17:53"),
 							"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
-							getDummyMembers().getIdByIndex(0)));
+							getDummyMembers().getIdByIndex(0), getDummyMembers().getIdByIndex(1)));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -276,12 +294,12 @@ public class DataHandler {
 									new SimpleDateFormat("dd.MM.yyyy hh:mm")
 											.parse("13.03.2014 10:23"),
 									"Benutzer Juette bearbeitet, veränderte(s) Feld(er): Nachname",
-									members.get(1)),
+									members.get(1), members.get(1)),
 							new Log(
 									new SimpleDateFormat("dd.MM.yyyy hh:mm")
 											.parse("14.03.2014 17:53"),
 									"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
-									members.get(0))));
+									members.get(0), members.get(1))));
 
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {

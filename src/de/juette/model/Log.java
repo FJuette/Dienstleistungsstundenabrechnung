@@ -10,21 +10,24 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Historie")
 public class Log extends AbstractEntity {
+	@Column(name = "zeitstempel")
 	private Date timestamp;
 	@Column(name = "beschreibung")
 	private String description;
-
 	@ManyToOne
 	private Member editor;
+	@ManyToOne
+	private Member changedMember;
 
 	public Log() {
 
 	}
 
-	public Log(Date timestamp, String description, Member editor) {
+	public Log(Date timestamp, String description, Member editor, Member changedMember) {
 		this.timestamp = timestamp;
 		this.description = description;
 		this.editor = editor;
+		this.changedMember = changedMember;
 	}
 
 	public Date getTimestamp() {
@@ -49,6 +52,14 @@ public class Log extends AbstractEntity {
 
 	public void setEditor(Member editor) {
 		this.editor = editor;
+	}
+
+	public Member getChangedMember() {
+		return changedMember;
+	}
+
+	public void setChangedMember(Member changedMember) {
+		this.changedMember = changedMember;
 	}
 
 }

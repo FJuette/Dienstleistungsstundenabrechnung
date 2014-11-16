@@ -115,7 +115,7 @@ public class MemberViewOld extends EditableTable<Member> implements View {
 			
 			// Must be set on the default value from the settings
 			float dlsCount = -10;
-			for (Booking b : HibernateUtil.getMembers(beanItem.getBean())) {
+			for (Booking b : HibernateUtil.getBookings(beanItem.getBean())) {
 				dlsCount += b.getCountDls();
 			}
 			

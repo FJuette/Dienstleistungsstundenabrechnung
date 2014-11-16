@@ -18,6 +18,8 @@ public class Booking extends AbstractEntity {
 	private Date doneDate;
 	@Column(name = "storniert")
 	private Boolean canceled = false;
+	@Column(name = "buchungsdatum")
+	private Date bookingDate = new Date();
 
 	@ManyToOne
 	private Member member;

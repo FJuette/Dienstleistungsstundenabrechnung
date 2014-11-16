@@ -33,12 +33,14 @@ import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Year;
+import de.juette.model.CourseOfYearWorker;;
 
 public class BookingView extends EditableTable<Booking> implements View {
 
 	private static final long serialVersionUID = 6324354416931646341L;
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
+	private ComboBox cbYears = new ComboBox();
 
 	private Handler actionHandler = new Handler() {
 
@@ -128,7 +130,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 		addComponent(btnsYear);
 
 		btnYear.addClickListener(event -> {
-			YearWindow();
+			//YearWindow();
+			CourseOfYearWorker worker = new CourseOfYearWorker((Year)cbYears.getValue());
+			worker.runCourseOfYear();
 		});
 
 		btnNewBookings.addClickListener(event -> {
@@ -169,7 +173,6 @@ public class BookingView extends EditableTable<Booking> implements View {
 		BeanItemContainer<Year> years = new BeanItemContainer<Year>(Year.class);
 		years.addAll(HibernateUtil.orderedList(Year.class, "year asc"));
 
-		ComboBox cbYears = new ComboBox();
 		cbYears.setImmediate(true);
 		cbYears.setStyleName("tiny");
 		cbYears.setWidth(85, Unit.PIXELS);
