@@ -132,7 +132,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnYear.addClickListener(event -> {
 			//YearWindow();
 			CourseOfYearWorker worker = new CourseOfYearWorker((Year)cbYears.getValue());
-			worker.runCourseOfYear();
+			worker.runCourseOfYear(true);
 		});
 
 		btnNewBookings.addClickListener(event -> {

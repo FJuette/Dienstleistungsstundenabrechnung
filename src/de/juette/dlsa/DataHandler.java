@@ -269,13 +269,13 @@ public class DataHandler {
 							new SimpleDateFormat("dd.MM.yyyy hh:mm")
 									.parse("13.03.2014 10:23"),
 							"Benutzer Juette bearbeitet, veränderte(s) Feld(er): Nachname",
-							getDummyMembers().getIdByIndex(1), getDummyMembers().getIdByIndex(1)));
+							"Fabian Jütte", "Fabian Jütte"));
 			logEntrys
 					.addItem(new Log(
 							new SimpleDateFormat("dd.MM.yyyy hh:mm")
 									.parse("14.03.2014 17:53"),
 							"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
-							getDummyMembers().getIdByIndex(0), getDummyMembers().getIdByIndex(1)));
+							"Fabian Jütte", "Fabian Jütte"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -294,12 +294,12 @@ public class DataHandler {
 									new SimpleDateFormat("dd.MM.yyyy hh:mm")
 											.parse("13.03.2014 10:23"),
 									"Benutzer Juette bearbeitet, veränderte(s) Feld(er): Nachname",
-									members.get(1), members.get(1)),
+									"Fabian Jütte", "Fabian Jütte"),
 							new Log(
 									new SimpleDateFormat("dd.MM.yyyy hh:mm")
 											.parse("14.03.2014 17:53"),
 									"Für das Mitglied Tom Tester sind für die Aktion (Erste Aktion) 4 Dienstleistungssunden verbucht",
-									members.get(0), members.get(1))));
+									"Fabian Jütte", "Fabian Jütte")));
 
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {

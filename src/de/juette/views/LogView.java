@@ -49,7 +49,6 @@ public class LogView extends EditableTable<Log> implements View {
 		beans = new BeanItemContainer<>(Log.class);
 		beans.addAll(HibernateUtil.getMaxList(Log.class,
 				Integer.parseInt(txtMaxItems.getValue()), "timestamp asc"));
-		beans.addNestedContainerProperty("editor.fullName");
 
 		initLayout("Historie");
 		getTableData();
@@ -116,12 +115,13 @@ public class LogView extends EditableTable<Log> implements View {
 	protected void extendTable() {
 		table.removeAllActionHandlers();
 		table.setVisibleColumns(new Object[] { "timestamp", "description",
-				"editor.fullName" });
-		table.setColumnHeaders("Zeitpunkt", "Beschreibung", "Bearbeiter");
+				"changedMember", "editor" });
+		table.setColumnHeaders("Zeitpunkt", "Beschreibung", "Mitglied",
+				"Bearbeiter");
 		table.setWidth("90%");
 		table.setColumnExpandRatio("timestamp", (float) 0.15);
 		table.setColumnExpandRatio("description", (float) 0.6);
-		table.setColumnExpandRatio("editor.fullName", (float) 0.2);
+		table.setColumnExpandRatio("editor", (float) 0.2);
 	}
 
 	private HorizontalLayout initOldCourses() {

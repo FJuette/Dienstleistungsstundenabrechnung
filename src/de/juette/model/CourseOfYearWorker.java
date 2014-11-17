@@ -17,7 +17,7 @@ public class CourseOfYearWorker {
 		this.members = HibernateUtil.getAllAsList(Member.class);
 	}
 
-	public void runCourseOfYear() {
+	public void runCourseOfYear(Boolean finalize) {
 		Date from;
 		Date to;
 		try {

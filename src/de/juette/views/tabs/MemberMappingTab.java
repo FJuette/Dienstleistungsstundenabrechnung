@@ -2,6 +2,8 @@ package de.juette.views.tabs;
 
 import java.util.Collection;
 
+import org.apache.shiro.SecurityUtils;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -18,12 +20,12 @@ import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
+import de.juette.model.Log;
 import de.juette.model.Member;
 
-@SuppressWarnings("serial")
 public class MemberMappingTab extends FormLayout {
 	
-	private FieldGroup fieldGroup = new BeanFieldGroup<Member>(Member.class);
+	private static final long serialVersionUID = 7673240871018265523L;
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
 	private BeanItemContainer<Category> categories = new BeanItemContainer<Category>(
@@ -31,19 +33,17 @@ public class MemberMappingTab extends FormLayout {
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Category> mCategories;
 	
-	@SuppressWarnings("unchecked")
+	private Member mBefore;
+	
 	public MemberMappingTab(BeanItem<Member> beanItem, String caption,
 			String columnName) {
 		
-		groups.addAll((Collection<? extends Group>) HibernateUtil
-				.getAllAsList(Group.class));
-		categories.addAll((Collection<? extends Category>) HibernateUtil
-				.getAllAsList(Category.class));
+		mBefore = beanItem.getBean();
+		groups.addAll(HibernateUtil.getAllAsList(Group.class));
+		categories.addAll(HibernateUtil.getAllAsList(Category.class));
 		
 		setMargin(true);
 		setStyleName("myFormLayout");
-
-		fieldGroup.setItemDataSource(beanItem);
 
 		ComboBox cbAll = new ComboBox("Alle " + caption + ":");
 		// Datenquelle abhängig von der Caption auf Gruppen oder Sparten setzen
@@ -60,10 +60,9 @@ public class MemberMappingTab extends FormLayout {
 		addComponent(btnAdd);
 
 		mGroups = new BeanItemContainer<Group>(Group.class);
-		mGroups.addAll(((BeanItem<Member>) beanItem).getBean().getGroups());
+		mGroups.addAll(beanItem.getBean().getGroups());
 		mCategories = new BeanItemContainer<Category>(Category.class);
-		mCategories.addAll(((BeanItem<Member>) beanItem).getBean()
-				.getCategories());
+		mCategories.addAll(beanItem.getBean().getCategories());
 
 		Table tblMemberElements = new Table("Zugeordnete " + caption + ":");
 		tblMemberElements
@@ -111,9 +110,17 @@ public class MemberMappingTab extends FormLayout {
 
 		btnSaveChanges.addClickListener(event -> {
 			try {
-				fieldGroup.commit();
 				if (caption.equals("Gruppen")) {
 					(beanItem.getBean()).setGroups(mGroups.getItemIds());
+					
+					Log log = new Log();
+					if (!(beanItem.getBean().getGroups().size() == mGroups.size() && beanItem.getBean().getGroups().containsAll(mGroups.getItemIds()))) {
+						log.setChangedMember(beanItem.getBean().getFullName());
+						log.setDescription("Gruppenzugehörigkeit verändert");
+						log.setEditor(SecurityUtils.getSubject().getPrincipal().toString());
+						log.setChangedMemberId(beanItem.getBean().getId());
+						HibernateUtil.save(log);
+					}
 				} else {
 					(beanItem.getBean()).setCategories((mCategories
 							.getItemIds()));

@@ -4,26 +4,28 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "Historie")
 public class Log extends AbstractEntity {
 	@Column(name = "zeitstempel")
-	private Date timestamp;
+	private Date timestamp = new Date();
 	@Column(name = "beschreibung")
 	private String description;
-	@ManyToOne
-	private Member editor;
-	@ManyToOne
-	private Member changedMember;
+	@Column(name = "bearbeiter")
+	private String editor;
+	@Column(name = "veraendertesMitglied")
+	private String changedMember;
+	@Column(name = "mitgliedId")
+	private long changedMemberId;
 
 	public Log() {
 
 	}
 
-	public Log(Date timestamp, String description, Member editor, Member changedMember) {
+	public Log(Date timestamp, String description, String editor,
+			String changedMember) {
 		this.timestamp = timestamp;
 		this.description = description;
 		this.editor = editor;
@@ -46,20 +48,28 @@ public class Log extends AbstractEntity {
 		this.description = description;
 	}
 
-	public Member getEditor() {
+	public String getEditor() {
 		return editor;
 	}
 
-	public void setEditor(Member editor) {
+	public void setEditor(String editor) {
 		this.editor = editor;
 	}
 
-	public Member getChangedMember() {
+	public String getChangedMember() {
 		return changedMember;
 	}
 
-	public void setChangedMember(Member changedMember) {
+	public void setChangedMember(String changedMember) {
 		this.changedMember = changedMember;
+	}
+
+	public long getChangedMemberId() {
+		return changedMemberId;
+	}
+
+	public void setChangedMemberId(long changedMemberId) {
+		this.changedMemberId = changedMemberId;
 	}
 
 }
