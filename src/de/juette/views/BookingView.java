@@ -12,7 +12,9 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.server.ResourceReference;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -31,9 +33,11 @@ import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.dlsa.MyYearFilter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
+import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Year;
-import de.juette.model.CourseOfYearWorker;;
+
+;
 
 public class BookingView extends EditableTable<Booking> implements View {
 
@@ -41,6 +45,8 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	private ComboBox cbYears = new ComboBox();
+	private Button btnYear = new Button();
+	private Button btnYearTest = new Button();
 
 	private Handler actionHandler = new Handler() {
 
@@ -114,25 +120,25 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		initLayout("Journal");
 
-		Button btnYear = new Button("Jahreslauf durchführen");
-		Button btnThisYear = new Button("Vorläufiger Jahreslauf 2014");
-		Button btnYearBefore = new Button("Vorläufiger Jahreslauf 2013");
-
-		btnYear.setStyleName("primary");
-		btnYearBefore.setStyleName("primary");
-		btnThisYear.setStyleName("primary");
+		btnYear.setStyleName("danger");
+		btnYearTest.setStyleName("primary");
 
 		HorizontalLayout btnsYear = new HorizontalLayout();
 		btnsYear.setSpacing(true);
-		btnsYear.addComponent(btnYearBefore);
-		btnsYear.addComponent(btnThisYear);
+		btnsYear.addComponent(btnYearTest);
 		btnsYear.addComponent(btnYear);
 		addComponent(btnsYear);
 
 		btnYear.addClickListener(event -> {
-			//YearWindow();
-			CourseOfYearWorker worker = new CourseOfYearWorker((Year)cbYears.getValue());
-			worker.runCourseOfYear(true);
+			YearWindow();
+		});
+		
+		btnYearTest.addClickListener(event -> {
+			CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue());
+			FileResource res = new FileResource(worker.runCourseOfYear(false));
+			setResource("download", res);
+			ResourceReference rr = ResourceReference.create(res, this, "download");
+			Page.getCurrent().open(rr.getURL(), null);
 		});
 
 		btnNewBookings.addClickListener(event -> {
@@ -185,6 +191,11 @@ public class BookingView extends EditableTable<Booking> implements View {
 			beans.addContainerFilter(new MyYearFilter("doneDate", ((Year) event
 					.getProperty().getValue()).getYear()));
 			updateTable();
+			btnYear.setCaption("Jahreslauf "
+					+ ((Year) event.getProperty().getValue()).getYear()
+					+ " durchführen");
+			btnYearTest.setCaption("Vorläufiger Jahreslauf "
+					+ ((Year) event.getProperty().getValue()).getYear());
 		});
 		if (cbYears.getItemIds().size() > 0) {
 			cbYears.setValue(cbYears.getItemIds().toArray()[cbYears
@@ -268,16 +279,23 @@ public class BookingView extends EditableTable<Booking> implements View {
 		Button btnNo = new Button("Nein");
 		btnLayout.addComponent(btnNo);
 
-		String basepath = VaadinService.getCurrent().getBaseDirectory()
-				.getAbsolutePath();
-		Resource res = new FileResource(new File(basepath
-				+ "/WEB-INF/Files/ExampleResult.csv"));
-		FileDownloader fd = new FileDownloader(res);
-		fd.extend(btnYes);
-
+		
+		
+		//Resource res = new FileResource(worker.runCourseOfYear(true));
+		//FileDownloader fd = new FileDownloader(res);
+		//fd.extend(btnYes);
+		
 		btnYes.addClickListener(evnet -> {
+			CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears
+					.getValue());
+			FileResource res = new FileResource(worker.runCourseOfYear(true));
+			setResource("download", res);
+			ResourceReference rr = ResourceReference.create(res, this, "download");
+			Page.getCurrent().open(rr.getURL(), null);
+			
 			window.close();
 		});
+		
 
 		btnNo.addClickListener(event -> {
 			window.close();

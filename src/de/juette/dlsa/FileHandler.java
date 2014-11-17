@@ -14,11 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.hibernate.Hibernate;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
@@ -205,8 +201,8 @@ public class FileHandler implements Receiver, SucceededListener {
 		}
 	}
 	
-	public void writeCsvFile(Date date, List<String> lines) {
-		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf";
+	public File writeCsvFile(Date date, List<String> lines, Boolean finalize) {
+		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf.csv";
 		String filepath = basepath + filename;
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(filepath));
@@ -217,7 +213,6 @@ public class FileHandler implements Receiver, SucceededListener {
 		} catch (IOException e) {
 			// TODO: handle exception
 		}
-		
 		File file = new File(filepath);
 		byte[] bFile = new byte[(int) file.length()];
 		try {
@@ -228,9 +223,12 @@ public class FileHandler implements Receiver, SucceededListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		CourseOfYear coy = new CourseOfYear(bFile, new Date(),
-				"Jahreslauf vom " + new SimpleDateFormat("dd.MM.yyyy").format(date),
-				filename + ".csv");
-		HibernateUtil.save(coy);
+		if (finalize) {
+			CourseOfYear coy = new CourseOfYear(bFile, new Date(),
+					"Jahreslauf vom " + new SimpleDateFormat("dd.MM.yyyy").format(date),
+					filename + ".csv");
+			HibernateUtil.save(coy);
+		}
+		return file;
 	}
 }

@@ -1,5 +1,6 @@
 package de.juette.model;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class CourseOfYearWorker {
 		this.members = HibernateUtil.getAllAsList(Member.class);
 	}
 
-	public void runCourseOfYear(Boolean finalize) {
+	public File runCourseOfYear(Boolean finalize) {
 		Date from;
 		Date to;
 		try {
@@ -37,7 +38,7 @@ public class CourseOfYearWorker {
 			}
 			
 			List<String> lines = new ArrayList<String>();
-			lines.add("MitgliedNummer;Familienname;Vorname;Alter;geleistete Dls;benötigte Dls;zu Zahlen(+/-);manuell betrachten");
+			lines.add("MitgliedNummer;Familienname;Vorname;Alter;geleistete Dls;benötigte Dls;zu Zahlen in Euro;manuell betrachten");
 
 			for (Member m : members) {
 				double requiredDls = settings.getCountDls();
@@ -66,23 +67,26 @@ public class CourseOfYearWorker {
 					System.out.println(b.getComment());
 					madeDls += b.getCountDls();
 				}
+				double doneDls = 0;
+				if (requiredDls > 0) {
+					doneDls = requiredDls - Math.round(madeDls * 10) / 10;
+				}
 				lines.add(m.getMemberId() + ";" + 
 						m.getSurname()  + ";" + 
 						m.getForename() + ";" + 
 						getAge(m.getBirthdate()) + ";" + 
-						madeDls + ";" + 
+						Math.round(madeDls * 10) / 10 + ";" + 
 						requiredDls + ";" + 
-						(requiredDls - madeDls) * settings.getCostDls() + ";" + 
+						doneDls * settings.getCostDls() + ";" + 
 						isDirty);
 				System.out.println("----------");
 			}
 			FileHandler fh = new FileHandler();
-			fh.writeCsvFile(to, lines);
+			return fh.writeCsvFile(to, lines, finalize);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		return null;
 	}
 	
 	private int getAge(Date date)
