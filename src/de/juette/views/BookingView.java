@@ -1,21 +1,19 @@
 package de.juette.views;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.shiro.SecurityUtils;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.Resource;
 import com.vaadin.server.ResourceReference;
-import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -36,8 +34,6 @@ import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Year;
-
-;
 
 public class BookingView extends EditableTable<Booking> implements View {
 
