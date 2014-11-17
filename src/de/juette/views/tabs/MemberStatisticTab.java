@@ -7,6 +7,7 @@ import com.vaadin.ui.Label;
 import de.juette.model.Booking;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.Year;
 
 @SuppressWarnings("serial")
 public class MemberStatisticTab extends FormLayout {
@@ -15,15 +16,20 @@ public class MemberStatisticTab extends FormLayout {
 		setMargin(true);
 		setSizeFull();
 		setStyleName("myFormLayout");
+		
+		// Auswahl der Jahre mit einer ComboBox?
 
-		// Must be set on the default value from the settings
-		float dlsCount = -10;
+		Label lblBooking = new Label("Bisherige Buchungen ");
+		addComponent(lblBooking);
+		double dlsCount = 0;
 		for (Booking b : HibernateUtil.getBookings(beanItem.getBean())) {
+			Label lblDls = new Label(
+					b.getCountDls() + " DLS für die Aktion " + b.getCampaign().getDescription());
+			addComponent(lblDls);
 			dlsCount += b.getCountDls();
 		}
-
 		Label lblStatistic = new Label(
-				"Aktueller Stand der Dienstleistungsstunden: " + dlsCount);
+				"Stand der Dienstleistungsstunden: " + (Math.round(dlsCount * 100.0) / 100.0));
 		addComponent(lblStatistic);
 	}
 }
