@@ -203,9 +203,6 @@ public class DataHandler {
 					new Booking(2.2, "Buchung 31.12.2014", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("31.12.2014"), members.get(3),
 							activities.get(2)),
-					new Booking(2.3, "Buchung 01.01.2015", new SimpleDateFormat(
-							"dd.MM.yyyy").parse("01.01.2015"), members.get(3),
-							activities.get(2)),
 					new Booking(2.4, "Buchung 31.12.2013", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("31.12.2013"), members.get(3),
 							activities.get(2)),
@@ -218,7 +215,7 @@ public class DataHandler {
 					new Booking(3, "Buchung mitte 2014", new SimpleDateFormat(
 							"dd.MM.yyyy").parse("11.01.2014"), members.get(2),
 							activities.get(2))));
-			years = new ArrayList<Year>(Arrays.asList(new Year(2013), new Year(2014), new Year(2015)));
+			years = new ArrayList<Year>(Arrays.asList(new Year(2013), new Year(2014)));
 			HibernateUtil.saveAll(entrys);
 			HibernateUtil.saveAll(years);
 		} catch (ParseException e) {

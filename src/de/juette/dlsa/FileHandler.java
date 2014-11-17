@@ -1,16 +1,19 @@
 package de.juette.dlsa;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
 import de.juette.model.ColumnMapping;
+import de.juette.model.CourseOfYear;
 import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -177,6 +181,13 @@ public class FileHandler implements Receiver, SucceededListener {
 						} catch (ParseException e) {
 							//e.printStackTrace();
 						}
+					} else if (mapp.getDbColumnName().equals("birthdate")) {
+						try {
+							m.setBirthdate(new SimpleDateFormat("dd.MM.yyyy")
+									.parse(entry[mapp.getCsvColumnIndex()]));
+						} catch (ParseException e) {
+							//e.printStackTrace();
+						}
 					}
 				}
 				HibernateUtil.save(m);
@@ -192,5 +203,34 @@ public class FileHandler implements Receiver, SucceededListener {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void writeCsvFile(Date date, List<String> lines) {
+		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf";
+		String filepath = basepath + filename;
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filepath));
+			for (String line : lines) {
+				writer.write(line + "\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			// TODO: handle exception
+		}
+		
+		File file = new File(filepath);
+		byte[] bFile = new byte[(int) file.length()];
+		try {
+			FileInputStream fileInputStream = new FileInputStream(file);
+			// convert file into array of bytes
+			fileInputStream.read(bFile);
+			fileInputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		CourseOfYear coy = new CourseOfYear(bFile, new Date(),
+				"Jahreslauf vom " + new SimpleDateFormat("dd.MM.yyyy").format(date),
+				filename + ".csv");
+		HibernateUtil.save(coy);
 	}
 }

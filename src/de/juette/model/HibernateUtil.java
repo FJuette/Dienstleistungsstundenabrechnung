@@ -1,7 +1,9 @@
 package de.juette.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -212,6 +214,21 @@ public class HibernateUtil {
 
 		tx.commit();
 		return list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Log> getHistoryIdsFromYear(Date from, Date to) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		Query q = session.createQuery(
+				"from Log where timestamp > :from and timestamp <= :to");
+		q.setDate("from", from);
+		q.setDate("to", to);
+		List<Log> logs = q.list();
+		tx.commit();
+		
+		return logs;
 	}
 
 	public static int getMappingCount() {

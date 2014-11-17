@@ -2,8 +2,13 @@ package de.juette.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import de.juette.dlsa.FileHandler;
 
 public class CourseOfYearWorker {
 	private Settings settings;
@@ -25,23 +30,84 @@ public class CourseOfYearWorker {
 					.getDueDate() + "." + (year.getYear() - 1));
 			to = new SimpleDateFormat("dd.MM.yyyy").parse(settings.getDueDate()
 					+ "." + year.getYear());
+			// List of all history entries made in this year
+			List<Long> historyIds = new ArrayList<Long>();
+			for (Log l : HibernateUtil.getHistoryIdsFromYear(from,to)) {
+				historyIds.add(l.getChangedMemberId());
+			}
+			
+			List<String> lines = new ArrayList<String>();
+			lines.add("MitgliedNummer;Familienname;Vorname;Alter;geleistete Dls;benötigte Dls;zu Zahlen(+/-);manuell betrachten");
 
 			for (Member m : members) {
-				double cDls = -settings.getCountDls();
+				double requiredDls = settings.getCountDls();
+				double madeDls = 0;
+				for (Group g : m.getGroups()) {
+					// If the member is liberated from paying DLS because he is
+					// a member of a group which liberates
+					if (g.getLiberated()) {
+						requiredDls = 0;
+						break;
+					}
+				}
+				// If the member is not active anymore
+				if (!m.getActive()) {
+					requiredDls = 0;
+				}
+				// Member data was changed during the year, this member must be
+				// marked as dirty
+				Boolean isDirty = historyIds.contains(m.getId());
+
 				System.out.println("----------");
 				System.out.println(m.getFullName());
-				List<Booking> bookings = HibernateUtil.getBookingsFromYear(m, from, to);
+				List<Booking> bookings = HibernateUtil.getBookingsFromYear(m,
+						from, to);
 				for (Booking b : bookings) {
 					System.out.println(b.getComment());
-					cDls += b.getCountDls();
+					madeDls += b.getCountDls();
 				}
-				System.out.println("Anzahl Dls: " + Math.floor(cDls) + " Kosten: " + Math.floor(cDls) * settings.getCostDls() );
+				lines.add(m.getMemberId() + ";" + 
+						m.getSurname()  + ";" + 
+						m.getForename() + ";" + 
+						getAge(m.getBirthdate()) + ";" + 
+						madeDls + ";" + 
+						requiredDls + ";" + 
+						(requiredDls - madeDls) * settings.getCostDls() + ";" + 
+						isDirty);
 				System.out.println("----------");
 			}
+			FileHandler fh = new FileHandler();
+			fh.writeCsvFile(to, lines);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
+	
+	private int getAge(Date date)
+    {
+		if (date != null) {
+			GregorianCalendar birthd = new GregorianCalendar();
+	        birthd.setTime(date);
+	       
+	        GregorianCalendar today = new GregorianCalendar();
+	       
+	        int year = today.get(Calendar.YEAR) - birthd.get(Calendar.YEAR);
+	       
+	        if(today.get(Calendar.MONTH) <= birthd.get(Calendar.MONTH))
+	        {
+	            if(today.get(Calendar.DATE) < birthd.get(Calendar.DATE))
+	            {
+	                year -= 1;
+	            }
+	        }
+	       
+	        if(year < 0)
+	            throw new IllegalArgumentException("invalid age: "+year);
+	       
+	        return year;
+		}
+        return 0;
+    }
 }

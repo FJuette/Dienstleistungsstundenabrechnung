@@ -21,7 +21,7 @@ public class Log extends AbstractEntity {
 	private long changedMemberId;
 
 	public Log() {
-
+		
 	}
 
 	public Log(Date timestamp, String description, String editor,

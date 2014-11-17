@@ -1,11 +1,7 @@
 package de.juette.views.tabs;
 
-import java.util.Collection;
-
 import org.apache.shiro.SecurityUtils;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
@@ -13,8 +9,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Table;
 
 import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Category;
@@ -33,12 +29,9 @@ public class MemberMappingTab extends FormLayout {
 	private BeanItemContainer<Group> mGroups;
 	private BeanItemContainer<Category> mCategories;
 	
-	private Member mBefore;
-	
 	public MemberMappingTab(BeanItem<Member> beanItem, String caption,
 			String columnName) {
-		
-		mBefore = beanItem.getBean();
+
 		groups.addAll(HibernateUtil.getAllAsList(Group.class));
 		categories.addAll(HibernateUtil.getAllAsList(Category.class));
 		
