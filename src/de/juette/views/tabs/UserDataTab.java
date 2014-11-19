@@ -65,6 +65,11 @@ public class UserDataTab extends MyDataTab<User> {
 		fieldGroup.bind(cbRoles, "role");
 		cbRoles.setNullSelectionAllowed(false);
 		addComponent(cbRoles);
+		
+		if (beanItem.getBean().getUsername().equals("admin")) {
+			cbActive.setEnabled(false);
+			cbRoles.setEnabled(false);
+		}
 
 		Button btnSaveUser = new Button("Speichern");
 		btnSaveUser.setStyleName("friendly");

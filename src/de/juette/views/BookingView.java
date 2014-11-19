@@ -3,7 +3,9 @@ package de.juette.views;
 import java.util.Date;
 import java.util.List;
 
+
 import org.apache.shiro.SecurityUtils;
+
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
@@ -27,12 +29,14 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+
 import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.dlsa.MyYearFilter;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
+import de.juette.model.Settings;
 import de.juette.model.Year;
 
 public class BookingView extends EditableTable<Booking> implements View {
@@ -41,8 +45,8 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	private ComboBox cbYears = new ComboBox();
-	private Button btnYear = new Button();
-	private Button btnYearTest = new Button();
+	private Button btnYear = new Button("Jahreslauf durchführen");
+	private Button btnYearTest = new Button("Vorläufigen Jahreslauf durchführen");
 
 	private Handler actionHandler = new Handler() {
 
@@ -130,11 +134,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 		
 		btnYearTest.addClickListener(event -> {
-			CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue());
-			FileResource res = new FileResource(worker.runCourseOfYear(false));
-			setResource("download", res);
-			ResourceReference rr = ResourceReference.create(res, this, "download");
-			Page.getCurrent().open(rr.getURL(), null);
+			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
+			CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
+			//FileResource res = new FileResource(worker.runCourseOfYear(false));
+			//setResource("download", res);
+			//ResourceReference rr = ResourceReference.create(res, this, "download");
+			//Page.getCurrent().open(rr.getURL(), null);
 		});
 
 		btnNewBookings.addClickListener(event -> {
@@ -282,12 +287,13 @@ public class BookingView extends EditableTable<Booking> implements View {
 		//fd.extend(btnYes);
 		
 		btnYes.addClickListener(evnet -> {
-			CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears
-					.getValue());
-			FileResource res = new FileResource(worker.runCourseOfYear(true));
-			setResource("download", res);
-			ResourceReference rr = ResourceReference.create(res, this, "download");
-			Page.getCurrent().open(rr.getURL(), null);
+			CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
+			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears
+			//		.getValue(), new Settings());
+			//FileResource res = new FileResource(worker.runCourseOfYear(true));
+			//setResource("download", res);
+			//ResourceReference rr = ResourceReference.create(res, this, "download");
+			//Page.getCurrent().open(rr.getURL(), null);
 			
 			window.close();
 		});

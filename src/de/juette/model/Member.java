@@ -10,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.joda.time.DateTime;
+import org.joda.time.Years;
+
 @Entity
 @Table(name = "Mitglieder")
 public class Member extends AbstractEntity {
@@ -138,5 +141,10 @@ public class Member extends AbstractEntity {
 	public void setBirthdate(Date birthdate) {
 		this.birthdate = birthdate;
 	}
-
+	
+	public int getAge(DateTime dueDate)
+    {
+		Years age = Years.yearsBetween(new DateTime(birthdate), dueDate);
+		return age.getYears();
+    }
 }

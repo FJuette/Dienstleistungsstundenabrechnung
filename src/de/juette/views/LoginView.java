@@ -67,7 +67,7 @@ public class LoginView extends VerticalLayout implements View {
 		final PasswordField password = new PasswordField("Passwort");
 		password.setIcon(FontAwesome.LOCK);
 		password.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
-		final Button signin = new Button("Einloggen");
+		final Button signin = new Button("Anmelden");
 		signin.addStyleName(ValoTheme.BUTTON_PRIMARY);
 		signin.setClickShortcut(KeyCode.ENTER);
 		signin.focus();

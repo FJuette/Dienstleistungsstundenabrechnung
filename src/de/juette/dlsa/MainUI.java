@@ -36,6 +36,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import de.juette.model.HibernateUtil;
+import de.juette.model.Role;
+import de.juette.model.Settings;
+import de.juette.model.User;
 import de.juette.views.BookingView;
 import de.juette.views.CampaignView;
 import de.juette.views.CategoryView;
@@ -75,6 +78,16 @@ public class MainUI extends UI implements ViewChangeListener {
 		public void sessionInit(SessionInitEvent event) throws ServiceException {
 			HibernateUtil.getSessionFactory();
 			
+			if (HibernateUtil.getAllAsList(Role.class).size() == 0) {
+				DataHandler.createRoles();
+			}
+			if (HibernateUtil.getAllAsList(User.class).size() == 0) {
+				DataHandler.createAdminUser();
+			}
+			if (HibernateUtil.getAllAsList(Settings.class).size() == 0) {
+				DataHandler.createSettings();
+			}
+			
 			// Creates Example data, for fresh Database and to show and test the functionality
 			if (false) {
 				DataHandler.createDummySubjects();
@@ -82,10 +95,10 @@ public class MainUI extends UI implements ViewChangeListener {
 				DataHandler.createDummyMember();
 				DataHandler.createDummyActivities();
 				DataHandler.createDummyBookings();
-				DataHandler.createDummyRoles();
+				
 				DataHandler.createDummyUsers();
 				DataHandler.createDummyCycles();
-				DataHandler.createDummySettings();
+				DataHandler.createSettings();
 				// Must be created once
 				DataHandler.createMappingEntrys();
 			}

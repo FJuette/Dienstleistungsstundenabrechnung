@@ -1,117 +1,103 @@
 package de.juette.model;
 
-import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
-import de.juette.dlsa.FileHandler;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class CourseOfYearWorker {
 	private Settings settings;
 	private Year year;
-	private List<Member> members;
-
-	public CourseOfYearWorker(Year year) {
-		this.settings = (Settings) HibernateUtil.getUnique(Settings.class,
-				"1=1");
+	private Member member;
+	private List<Booking> bookings;
+	private DateTime fromDate;
+	private DateTime toDate;
+	
+	
+	public CourseOfYearWorker(Year year, Settings settings) {
+		this.settings = settings;
 		this.year = year;
-		this.members = HibernateUtil.getAllAsList(Member.class);
-	}
-
-	public File runCourseOfYear(Boolean finalize) {
-		Date from;
-		Date to;
-		try {
-			from = new SimpleDateFormat("dd.MM.yyyy").parse(settings
-					.getDueDate() + "." + (year.getYear() - 1));
-			to = new SimpleDateFormat("dd.MM.yyyy").parse(settings.getDueDate()
-					+ "." + year.getYear());
-			// List of all history entries made in this year
-			List<Long> historyIds = new ArrayList<Long>();
-			for (Log l : HibernateUtil.getHistoryIdsFromYear(from,to)) {
-				historyIds.add(l.getChangedMemberId());
-			}
-			
-			List<String> lines = new ArrayList<String>();
-			lines.add("MitgliedNummer;Familienname;Vorname;Alter;geleistete Dls;benötigte Dls;zu Zahlen in Euro;manuell betrachten");
-
-			for (Member m : members) {
-				double requiredDls = settings.getCountDls();
-				double madeDls = 0;
-				for (Group g : m.getGroups()) {
-					// If the member is liberated from paying DLS because he is
-					// a member of a group which liberates
-					if (g.getLiberated()) {
-						requiredDls = 0;
-						break;
-					}
-				}
-				// If the member is not active anymore
-				if (!m.getActive()) {
-					requiredDls = 0;
-				}
-				// Member data was changed during the year, this member must be
-				// marked as dirty
-				Boolean isDirty = historyIds.contains(m.getId());
-
-				System.out.println("----------");
-				System.out.println(m.getFullName());
-				List<Booking> bookings = HibernateUtil.getBookingsFromYear(m,
-						from, to);
-				for (Booking b : bookings) {
-					System.out.println(b.getComment());
-					madeDls += b.getCountDls();
-				}
-				double doneDls = 0;
-				if (requiredDls > 0) {
-					doneDls = requiredDls - Math.round(madeDls * 10) / 10;
-				}
-				lines.add(m.getMemberId() + ";" + 
-						m.getSurname()  + ";" + 
-						m.getForename() + ";" + 
-						getAge(m.getBirthdate()) + ";" + 
-						Math.round(madeDls * 10) / 10 + ";" + 
-						requiredDls + ";" + 
-						doneDls * settings.getCostDls() + ";" + 
-						isDirty);
-				System.out.println("----------");
-			}
-			FileHandler fh = new FileHandler();
-			return fh.writeCsvFile(to, lines, finalize);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
+		
+		calculateDates();
 	}
 	
-	private int getAge(Date date)
-    {
-		if (date != null) {
-			GregorianCalendar birthd = new GregorianCalendar();
-	        birthd.setTime(date);
-	       
-	        GregorianCalendar today = new GregorianCalendar();
-	       
-	        int year = today.get(Calendar.YEAR) - birthd.get(Calendar.YEAR);
-	       
-	        if(today.get(Calendar.MONTH) <= birthd.get(Calendar.MONTH))
-	        {
-	            if(today.get(Calendar.DATE) < birthd.get(Calendar.DATE))
-	            {
-	                year -= 1;
-	            }
-	        }
-	       
-	        if(year < 0)
-	            throw new IllegalArgumentException("invalid age: "+year);
-	       
-	        return year;
+	private void calculateDates() {
+		if (year != null && settings != null && settings.getDueDate() != null) {
+			DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
+			fromDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
+			fromDate = fromDate.minusYears(1);
+			fromDate = fromDate.minusDays(-1);
+			
+			toDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
 		}
-        return 0;
-    }
+	}
+
+	public Boolean isMemberLiberated() {
+		// Member is not active at the moment
+		if (!member.getActive()) {
+			return true;
+		}
+		// Member is too Young
+		if (member.getAge(toDate) < settings.getAgeFrom()) {
+			return true;
+		}
+		// Member is too old
+		if (member.getAge(fromDate) >= settings.getAgeTo()) {
+			return true;
+		}
+		// Entry date is after the due date
+		if ( (new DateTime(member.getEntryDate())).isAfter(toDate) ) {
+			return true;
+		}
+		// Member is part of a group which liberates him at the moment
+		for (Group g : member.getGroups()) {
+			if (g.getLiberated()) {
+				return true;
+			}
+		}
+		// Default is false
+		return false;
+	}
+	
+
+	public DateTime getFromDate() {
+		return fromDate;
+	}
+
+	public DateTime getToDate() {
+		return toDate;
+	}
+	
+	public Settings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
+
+	public Year getYear() {
+		return year;
+	}
+
+	public void setYear(Year year) {
+		this.year = year;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public List<Booking> getBookings() {
+		return bookings;
+	}
+
+	public void setBookings(List<Booking> bookings) {
+		this.bookings = bookings;
+	}
 }

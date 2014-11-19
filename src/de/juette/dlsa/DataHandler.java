@@ -230,7 +230,7 @@ public class DataHandler {
 		return roles;
 	}
 
-	public static void createDummyRoles() {
+	public static void createRoles() {
 		ArrayList<Role> entrys = new ArrayList<Role>(Arrays.asList(new Role(
 				"Administrator"), new Role("Benutzer"), new Role("Gast")));
 		HibernateUtil.saveAll(entrys);
@@ -255,6 +255,16 @@ public class DataHandler {
 				new User("admin", new Sha256Hash("admin").toString(), true,
 						roles.get(0)), new User("Benutzer 1", new Sha256Hash(
 						"geheime").toString(), true, roles.get(1))));
+		HibernateUtil.saveAll(entrys);
+	}
+	
+	public static void createAdminUser() {
+		ArrayList<Role> roles = (ArrayList<Role>) HibernateUtil
+				.getAllAsList(Role.class);
+
+		ArrayList<User> entrys = new ArrayList<User>(Arrays.asList(
+				new User("admin", new Sha256Hash("admin").toString(), true,
+						roles.get(0))));
 		HibernateUtil.saveAll(entrys);
 	}
 
@@ -341,7 +351,7 @@ public class DataHandler {
 		}
 	}
 
-	public static void createDummySettings() {
+	public static void createSettings() {
 		ArrayList<Settings> entrys = new ArrayList<Settings>(
 				Arrays.asList(new Settings("31.12", 5, (double) 10, 18, 67,
 						"Anteilig bis zum Stichtag", true, false)));

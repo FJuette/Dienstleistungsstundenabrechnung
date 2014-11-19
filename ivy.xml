@@ -67,5 +67,11 @@
 		<dependency org="org.apache.shiro" name="shiro-core" rev="1.2.2"/>
 		<dependency org="org.apache.shiro" name="shiro-web" rev="1.2.2"/>
 		
+		<!-- JUnit Testing Framework -->
+		<dependency org="junit" name="junit" rev="4.11"/>
+		
+		<!-- Joda Time for better handling with dates --> 
+		<dependency org="joda-time" name="joda-time" rev="2.3"/>
+		
 	</dependencies>
 </ivy-module>
