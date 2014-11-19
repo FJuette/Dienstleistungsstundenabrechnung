@@ -24,6 +24,7 @@ import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
+import de.juette.model.Category;
 import de.juette.model.ColumnMapping;
 import de.juette.model.CourseOfYear;
 import de.juette.model.CsvColumn;
@@ -177,6 +178,9 @@ public class FileHandler implements Receiver, SucceededListener {
 						} catch (ParseException e) {
 							//e.printStackTrace();
 						}
+						if (m.getLeavingDate() != null) {
+							m.setActive(false);
+						}
 					} else if (mapp.getDbColumnName().equals("birthdate")) {
 						try {
 							m.setBirthdate(new SimpleDateFormat("dd.MM.yyyy")
@@ -184,6 +188,20 @@ public class FileHandler implements Receiver, SucceededListener {
 						} catch (ParseException e) {
 							//e.printStackTrace();
 						}
+					} else if (mapp.getDbColumnName().equals("categoryName")) {
+						List<Category> categories = HibernateUtil.getAllAsList(Category.class);
+						Category category = new Category();
+						for (Category c : categories) {
+							if (c.getCategoryName().equals(entry[mapp.getCsvColumnIndex()])) {
+								category = c;
+							}
+						}
+						List<Category> mCategories = new ArrayList<Category>();
+						if (category.getCategoryName() == null || category.getCategoryName().equals("")) {
+							category.setCategoryName(entry[mapp.getCsvColumnIndex()]);
+						}
+						mCategories.add(category);
+						m.setCategories(mCategories);
 					}
 				}
 				HibernateUtil.save(m);

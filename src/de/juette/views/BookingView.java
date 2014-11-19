@@ -41,8 +41,8 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	private ComboBox cbYears = new ComboBox();
-	private Button btnYear = new Button();
-	private Button btnYearTest = new Button();
+	private Button btnYear = new Button("Jahreslauf durchführen");
+	private Button btnYearTest = new Button("Vorläufigen Jahreslauf durchführen");
 
 	private Handler actionHandler = new Handler() {
 

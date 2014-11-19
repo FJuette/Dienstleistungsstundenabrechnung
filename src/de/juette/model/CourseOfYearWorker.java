@@ -55,6 +55,10 @@ public class CourseOfYearWorker {
 				if (!m.getActive()) {
 					requiredDls = 0;
 				}
+				if (getAge(m.getBirthdate()) < settings.getAgeFrom() && getAge(m.getBirthdate()) >= settings.getAgeTo()) {
+					requiredDls = 0;
+				}
+				
 				// Member data was changed during the year, this member must be
 				// marked as dirty
 				Boolean isDirty = historyIds.contains(m.getId());
