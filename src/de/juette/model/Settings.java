@@ -10,7 +10,7 @@ public class Settings extends AbstractEntity {
 	@Column(name = "stichtag")
 	private String dueDate;
 	@Column(name = "anzahlDls")
-	private Integer countDls;
+	private Double countDls;
 	@Column(name = "kostenDls")
 	private Double costDls;
 	@Column(name = "alterVon")
@@ -28,7 +28,7 @@ public class Settings extends AbstractEntity {
 
 	}
 
-	public Settings(String dueDate, Integer countDls, Double costDls,
+	public Settings(String dueDate, Double countDls, Double costDls,
 			Integer ageFrom, Integer ageTo, String bookingMethod,
 			Boolean clearing, Boolean dlsTransfer) {
 		super();
@@ -98,11 +98,11 @@ public class Settings extends AbstractEntity {
 		this.dlsTransfer = dlsTransfer;
 	}
 
-	public Integer getCountDls() {
+	public Double getCountDls() {
 		return countDls;
 	}
 
-	public void setCountDls(Integer countDls) {
+	public void setCountDls(Double countDls) {
 		this.countDls = countDls;
 	}
 

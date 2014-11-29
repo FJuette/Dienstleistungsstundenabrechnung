@@ -1,5 +1,6 @@
 package de.juette.model;
 
+import java.util.Date;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -13,7 +14,9 @@ public class CourseOfYearWorker {
 	private List<Booking> bookings;
 	private DateTime fromDate;
 	private DateTime toDate;
+	private DateTime lastCOYDueDate;
 	
+	private final DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	
 	public CourseOfYearWorker(Year year, Settings settings) {
 		this.settings = settings;
@@ -22,20 +25,34 @@ public class CourseOfYearWorker {
 		calculateDates();
 	}
 	
+	public CourseOfYearWorker(Year year, Settings settings, Date lastCOYDueDate) {
+		this.settings = settings;
+		this.year = year;
+		this.setLastCOYDueDate(new DateTime(lastCOYDueDate));
+		
+		calculateDates();
+	}
+	
 	private void calculateDates() {
 		if (year != null && settings != null && settings.getDueDate() != null) {
-			DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
+			toDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
+			
 			fromDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
 			fromDate = fromDate.minusYears(1);
-			fromDate = fromDate.minusDays(-1);
+			fromDate = fromDate.plusDays(1);
 			
-			toDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
+			// Did the due date change since the last course of year?
+			if (lastCOYDueDate != null && fromDate.isBefore(lastCOYDueDate)) {
+				fromDate = lastCOYDueDate.plusDays(1);
+			} else {
+				
+			}
 		}
 	}
 
 	public Boolean isMemberLiberated() {
 		// Member is not active at the moment
-		if (!member.getActive()) {
+		if (member.getActive() != null && !member.getActive()) {
 			return true;
 		}
 		// Member is too Young
@@ -47,7 +64,11 @@ public class CourseOfYearWorker {
 			return true;
 		}
 		// Entry date is after the due date
-		if ( (new DateTime(member.getEntryDate())).isAfter(toDate) ) {
+		if ( member.getEntryDate() != null && (new DateTime(member.getEntryDate())).isAfter(toDate) ) {
+			return true;
+		}
+		// Leaving date is before the due date
+		if ( member.getLeavingDate() != null && new DateTime(member.getLeavingDate()).isBefore(fromDate) ) {
 			return true;
 		}
 		// Member is part of a group which liberates him at the moment
@@ -58,6 +79,26 @@ public class CourseOfYearWorker {
 		}
 		// Default is false
 		return false;
+	}
+	
+	public double getMemberDebit(List<Booking> bookings, int month) {
+		double sum = 0;
+		// Calculating the sum of all DLS
+		for (Booking b : bookings) {
+			DateTime dDate = new DateTime(b.getDoneDate());
+			// Only use bookings from the timespan
+			if ( (fromDate.isBefore(dDate) || fromDate.isEqual(dDate) ) && 
+					(toDate.isAfter(dDate) || toDate.isEqual(dDate)) ) {
+				sum += b.getCountDls();
+			}
+		}
+		sum = (settings.getCountDls() / 12) * month - sum;
+		// If the sum is lower than 0, the member has no debt
+		if (sum < 0) {
+			sum = 0;
+		}
+		double debit = sum * settings.getCostDls();
+		return debit;
 	}
 	
 
@@ -99,5 +140,13 @@ public class CourseOfYearWorker {
 
 	public void setBookings(List<Booking> bookings) {
 		this.bookings = bookings;
+	}
+
+	public DateTime getLastCOYDueDate() {
+		return lastCOYDueDate;
+	}
+
+	public void setLastCOYDueDate(DateTime lastCOYDueDate) {
+		this.lastCOYDueDate = lastCOYDueDate;
 	}
 }

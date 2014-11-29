@@ -353,7 +353,7 @@ public class DataHandler {
 
 	public static void createSettings() {
 		ArrayList<Settings> entrys = new ArrayList<Settings>(
-				Arrays.asList(new Settings("31.12", 5, (double) 10, 18, 67,
+				Arrays.asList(new Settings("31.12", 5.0, 10.0, 18, 67,
 						"Anteilig bis zum Stichtag", true, false)));
 		HibernateUtil.saveAll(entrys);
 	}
