@@ -192,7 +192,7 @@ public class HibernateUtil {
 		Transaction tx = session.beginTransaction();
 
 		List<Booking> list = session.createQuery(
-				"from Booking as b where b.member.id = " + member.getId())
+				"from Booking as b where b.member.id = " + member.getId() + " order by bookingDate DESC")
 				.list();
 
 		tx.commit();

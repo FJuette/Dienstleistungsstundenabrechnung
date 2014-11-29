@@ -18,20 +18,23 @@ public class MemberStatisticTab extends FormLayout {
 		
 		// Auswahl der Jahre mit einer ComboBox?
 
-		Label lblBooking = new Label("Bisherige Buchungen:");
+		Label lblBooking = new Label("Letzte 5 Buchungen:");
 		addComponent(lblBooking);
 		double dlsCount = 0;
+		int count = 0;
 		for (Booking b : HibernateUtil.getBookings(beanItem.getBean())) {
-			if (b.getCampaign() != null) {
-				Label lblDls = new Label(
-						b.getCountDls() + " DLS für die Aktion " + b.getCampaign().getDescription());
-				addComponent(lblDls);
-			} else {
-				Label lblDls = new Label(
-						b.getCountDls() + " DLS ohne eine Aktion");
-				addComponent(lblDls);
+			if (count <= 5) {
+				if (b.getCampaign() != null) {
+					Label lblDls = new Label(
+							b.getCountDls() + " DLS für die Aktion " + b.getCampaign().getDescription());
+					addComponent(lblDls);
+				} else {
+					Label lblDls = new Label(
+							b.getCountDls() + " DLS ohne eine Aktion");
+					addComponent(lblDls);
+				}
+				count++;
 			}
-			
 			dlsCount += b.getCountDls();
 		}
 		Label lblStatistic = new Label(
