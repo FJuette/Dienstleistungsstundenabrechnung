@@ -16,10 +16,12 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+import de.juette.dlsa.MyDlsValidator;
 import de.juette.model.Booking;
 import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.Settings;
 import de.juette.model.Year;
 
 public class NewBookingWindow extends Window {
@@ -81,7 +83,8 @@ public class NewBookingWindow extends Window {
 		TextField txtCountDls = new TextField("Anzahl DLS");
 		txtCountDls.setWidth("100%");
 		txtCountDls.setValue("0");
-		txtCountDls.addValidator(new MyDlsValidator());
+		Settings s = HibernateUtil.getSettings();
+		txtCountDls.addValidator(new MyDlsValidator(s.getGranularity()));
 		layout.addComponent(txtCountDls);
 
 		TextArea txtComment = new TextArea("Bemerkung");
@@ -125,15 +128,6 @@ public class NewBookingWindow extends Window {
 		});
 	}
 	
-	private Boolean tryParseDouble(String s) {
-		try {
-			Double.parseDouble(s.replace(',', '.'));
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
-	
 	class MyDateValidator implements Validator {
 
 	private static final long serialVersionUID = 659045920967566923L;
@@ -142,18 +136,6 @@ public class NewBookingWindow extends Window {
 	            throws InvalidValueException {
 	    	if (value instanceof Date && ((Date)value).compareTo(new Date()) > 0)
 	            throw new InvalidValueException("Das Ableistungsdatum kann nicht in der Zukunft liegen.");
-	    }
-	}
-
-	class MyDlsValidator implements Validator {
-
-	private static final long serialVersionUID = 659045920967566923L;
-		@Override
-	    public void validate(Object value)
-	            throws InvalidValueException {
-	    	if (!tryParseDouble((String)value) ) {
-	    		throw new InvalidValueException("Die Anzahl der DLS muss eine Zahl sein.");
-	    	}
 	    }
 	}
 }

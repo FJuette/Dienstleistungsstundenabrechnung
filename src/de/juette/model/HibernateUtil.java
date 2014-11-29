@@ -231,6 +231,19 @@ public class HibernateUtil {
 		return logs;
 	}
 
+	public static Settings getSettings() {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		Query q = session.createQuery(
+				"from Settings");
+		q.setMaxResults(1);
+		Settings s = (Settings) q.list().get(0);
+		tx.commit();
+		
+		return s;
+	}
+
 	public static int getMappingCount() {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();

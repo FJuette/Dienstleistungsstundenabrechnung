@@ -23,6 +23,8 @@ public class Settings extends AbstractEntity {
 	private Boolean clearing = true;
 	@Column(name = "uebertragung")
 	private Boolean dlsTransfer = true;
+	@Column(name = "Granularität")
+	private String granularity;
 
 	public Settings() {
 
@@ -104,6 +106,14 @@ public class Settings extends AbstractEntity {
 
 	public void setCountDls(Double countDls) {
 		this.countDls = countDls;
+	}
+
+	public String getGranularity() {
+		return granularity;
+	}
+
+	public void setGranularity(String granularity) {
+		this.granularity = granularity;
 	}
 
 }

@@ -52,6 +52,7 @@ public class SettingsView extends VerticalLayout implements View {
 	private VerticalLayout mappinglayout = new VerticalLayout();;
 	private BeanItemContainer<CsvColumn> csv = new BeanItemContainer<CsvColumn>(
 			CsvColumn.class);
+	private final ComboBox cbGranularity = new ComboBox("Granularität");
 
 	public SettingsView() {
 		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
@@ -61,7 +62,7 @@ public class SettingsView extends VerticalLayout implements View {
 			break;
 		}
 
-		FieldGroup fieldGroup = new BeanFieldGroup<Settings>(Settings.class);
+		BeanFieldGroup<Settings> fieldGroup = new BeanFieldGroup<Settings>(Settings.class);
 		fieldGroup.setItemDataSource(beanItem);
 
 		setSpacing(true);
@@ -128,6 +129,14 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.addComponent(cbTransfer);
 		form.addComponent(wrap);
 		fieldGroup.bind(cbTransfer, "dlsTransfer");
+		
+		//cbGranularity
+		cbGranularity.addItem("Keine");
+		cbGranularity.addItem("Ganze");
+		cbGranularity.addItem("Halbe");
+		cbGranularity.addItem("Viertel");
+		form.addComponent(cbGranularity);
+		fieldGroup.bind(cbGranularity, "granularity");
 
 		section = new Label("Spaltenzuordnung");
 		section.addStyleName("h2 colored");
@@ -139,7 +148,14 @@ public class SettingsView extends VerticalLayout implements View {
 
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-
+			try {
+				fieldGroup.commit();
+				HibernateUtil.save(fieldGroup.getItemDataSource().getBean());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			Notification.show("Speichern erfolgreich.",
 					Notification.Type.TRAY_NOTIFICATION);
 		});
