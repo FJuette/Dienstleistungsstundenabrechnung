@@ -74,6 +74,8 @@ public class NewBookingWindow extends Window {
 		cbCampaigns.setContainerDataSource(activities);
 		cbCampaigns.setItemCaptionPropertyId("description");
 		cbCampaigns.setFilteringMode(FilteringMode.CONTAINS);
+		cbCampaigns.setRequired(true);
+		cbCampaigns.setNullSelectionAllowed(false);
 		layout.addComponent(cbCampaigns);
 
 		TextField txtCountDls = new TextField("Anzahl DLS");
@@ -91,7 +93,7 @@ public class NewBookingWindow extends Window {
 		layout.addComponent(btnSaveNewBooking);
 
 		btnSaveNewBooking.addClickListener(event -> {
-			if (dfDate.isValid() && txtCountDls.isValid()) {
+			if (dfDate.isValid() && txtCountDls.isValid() && cbCampaigns.isValid()) {
 				booking = new Booking();
 				booking.setCountDls(Double.parseDouble(txtCountDls.getValue()
 						.replace(',', '.')));
