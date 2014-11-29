@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import org.joda.time.DateTime;
+
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.Compare;
@@ -19,6 +21,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -32,6 +35,7 @@ import com.vaadin.data.util.filter.And;
 
 import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyGroupFilter;
+import de.juette.dlsa.MyLeavingMemberDateFilter;
 import de.juette.dlsa.MySubjectFilter;
 import de.juette.model.Booking;
 import de.juette.model.Category;
@@ -62,6 +66,7 @@ public class MemberView extends ComplexLayout implements View {
 	private FormLayout tabDls = new FormLayout();
 	private Button btnImport = new Button("Importieren");
 	private CheckBox cbPassive = new CheckBox("Passive ausblenden");
+	private DateField dfLostMembers = new DateField("Ausgetretene anzeigen ab:");
 
 	private Handler actionHandler = new Handler() {
 
@@ -269,6 +274,22 @@ public class MemberView extends ComplexLayout implements View {
 		cbPassive.addValueChangeListener(event -> {
 			filterActives();
 		});
+		
+		dfLostMembers.setImmediate(true);
+		dfLostMembers.setStyleName("tiny myHeaderLabel");
+		dfLostMembers.setValue(DateTime.now().minusYears(1).toDate());
+		leftContentLayout.addComponent(dfLostMembers);
+		
+		dfLostMembers.addValueChangeListener(event -> {
+			filterLeavingDate();
+		});
+	}
+
+	private void filterLeavingDate() {
+		beans.removeContainerFilters("leavingDate");
+		if (dfLostMembers.getValue() != null) {
+			beans.addContainerFilter(new MyLeavingMemberDateFilter("leavingDate", dfLostMembers.getValue()));
+		}
 	}
 
 	private void filterActives() {
@@ -284,6 +305,7 @@ public class MemberView extends ComplexLayout implements View {
 		beans.addAll(HibernateUtil.orderedList(Member.class,
 				"surname asc, forename asc, memberId asc"));
 		filterActives();
+		filterLeavingDate();
 
 		table.setContainerDataSource(beans);
 		table.setMultiSelect(true);
