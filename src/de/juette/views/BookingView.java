@@ -3,9 +3,7 @@ package de.juette.views;
 import java.util.Date;
 import java.util.List;
 
-
 import org.apache.shiro.SecurityUtils;
-
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
@@ -29,7 +27,6 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
-
 import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.dlsa.MyYearFilter;
 import de.juette.model.AbstractEntity;
@@ -38,6 +35,7 @@ import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Settings;
 import de.juette.model.Year;
+import de.juette.views.windows.NewBookingWindow;
 
 public class BookingView extends EditableTable<Booking> implements View {
 

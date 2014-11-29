@@ -41,6 +41,11 @@ import de.juette.model.Member;
 import de.juette.views.tabs.MemberDataTab;
 import de.juette.views.tabs.MemberMappingTab;
 import de.juette.views.tabs.MemberStatisticTab;
+import de.juette.views.windows.MemberAPWindow;
+import de.juette.views.windows.MemberImportWindow;
+import de.juette.views.windows.MemberMappingWindow;
+import de.juette.views.windows.NewBookingWindow;
+import de.juette.views.windows.NewMemberWindow;
 
 public class MemberView extends ComplexLayout implements View {
 
@@ -66,9 +71,10 @@ public class MemberView extends ComplexLayout implements View {
 		private final Action CATEGORIES_ADD = new Action("Sparte hinzufügen");
 		private final Action GROUPS_DEL = new Action("Gruppe löschen");
 		private final Action CATEGORIES_DEL = new Action("Sparte löschen");
+		private final Action ACTIVE_PASSIVE = new Action("Aktiv/Passiv buchen");
 		private final Action REMOVE = new Action("Entfernen");
 		private final Action[] ACTIONS = new Action[] { DLS, GROUPS_ADD,
-				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, REMOVE };
+				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, ACTIVE_PASSIVE, REMOVE };
 
 		@SuppressWarnings("unchecked")
 		public void handleAction(final Action action, final Object sender,
@@ -150,6 +156,23 @@ public class MemberView extends ComplexLayout implements View {
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
+						}
+					});
+				}
+			}  else if (action.getCaption().equals("Aktiv/Passiv buchen")) {
+				if (table.getValue() != null) {
+					MemberAPWindow w;
+					getUI().addWindow(
+							w = new MemberAPWindow());
+					w.addCloseListener(closeEvent -> {
+						if (w.getChoice() != null) {
+							for (Member bean : (Collection<Member>) table
+									.getValue()) {
+								beans.getItem(bean).getBean()
+										.setActive(w.getChoice());
+							}
+							HibernateUtil.saveAll(beans.getItemIds());
+							table.refreshRowCache();
 						}
 					});
 				}
