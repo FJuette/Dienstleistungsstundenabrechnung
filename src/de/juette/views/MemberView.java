@@ -451,7 +451,10 @@ public class MemberView extends ComplexLayout implements View {
 			dataTab.addDataSaveListener(event -> {
 				beans.addBean((Member) event.getBeanItem().getBean());
 				table.refreshRowCache();
+				lblContentHeader.setValue("<strong>Mitglied: </strong> "
+						+ beanItem.getBean().getFullName());
 				filterActives();
+				filterLeavingDate();
 			});
 
 			tabGroups.removeAllComponents();
