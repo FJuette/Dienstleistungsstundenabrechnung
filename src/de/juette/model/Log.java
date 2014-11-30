@@ -19,7 +19,9 @@ public class Log extends AbstractEntity {
 	private String changedMember;
 	@Column(name = "mitgliedId")
 	private long changedMemberId;
-
+	@Column(name = "bezugsdatum")
+	private Date referenceDate;
+	
 	public Log() {
 		
 	}
@@ -70,6 +72,14 @@ public class Log extends AbstractEntity {
 
 	public void setChangedMemberId(long changedMemberId) {
 		this.changedMemberId = changedMemberId;
+	}
+
+	public Date getReferenceDate() {
+		return referenceDate;
+	}
+
+	public void setReferenceDate(Date referenceDate) {
+		this.referenceDate = referenceDate;
 	}
 
 }
