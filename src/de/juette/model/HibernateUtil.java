@@ -294,4 +294,14 @@ public class HibernateUtil {
 
 		tx.commit();
 	}
+
+	public static void writeLogEntry(String member, String description,
+			String editor, long id) {
+		Log log = new Log();
+		log.setChangedMember(member);
+		log.setDescription(description);
+		log.setEditor(editor);
+		log.setChangedMemberId(id);
+		save(log);
+	}
 }

@@ -16,6 +16,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.vaadin.server.VaadinService;
@@ -34,6 +39,7 @@ import de.juette.model.Member;
 @SuppressWarnings("serial")
 public class FileHandler implements Receiver, SucceededListener {
 	protected File file;
+	DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	private String basepath = VaadinService.getCurrent().getBaseDirectory()
 			.getAbsolutePath()
 			+ "/WEB-INF/Files/";
@@ -154,8 +160,11 @@ public class FileHandler implements Receiver, SucceededListener {
 				}
 				Member m = (Member) HibernateUtil.getUnique(Member.class,
 						"memberId = '" + id + "'");
+				Boolean newMember = true;
 				if (m == null) {
 					m = new Member();
+				} else {
+					newMember = false;
 				}
 				for (ColumnMapping mapp : mapping) {
 					if (mapp.getDbColumnName().equals("surname")) {
@@ -166,16 +175,34 @@ public class FileHandler implements Receiver, SucceededListener {
 						m.setMemberId(entry[mapp.getCsvColumnIndex()]);
 					} else if (mapp.getDbColumnName().equals("entryDate")) {
 						try {
-							m.setEntryDate(new SimpleDateFormat("dd.MM.yyyy")
-									.parse(entry[mapp.getCsvColumnIndex()]));
-						} catch (ParseException e) {
+							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
+							if (!newMember) {
+								if (!dt.equals(new DateTime(m.getEntryDate()))) {
+									m.setEntryDate(dt.toDate());
+									HibernateUtil.writeLogEntry(m.getFullName(), 
+											"Eintrittsdatum von " + getFormattedDate(m.getEntryDate()) + " nach "
+											+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
+								}
+							} else {
+								m.setEntryDate(dt.toDate());
+							}
+						} catch (Exception e) {
 							//e.printStackTrace();
 						}
 					} else if (mapp.getDbColumnName().equals("leavingDate")) {
 						try {
-							m.setLeavingDate(new SimpleDateFormat("dd.MM.yyyy")
-									.parse(entry[mapp.getCsvColumnIndex()]));
-						} catch (ParseException e) {
+							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
+							if (!newMember) {
+								if (!dt.equals(new DateTime(m.getLeavingDate()))) {
+									m.setLeavingDate(dt.toDate());
+									HibernateUtil.writeLogEntry(m.getFullName(), 
+											"Austrittsdatum von " + getFormattedDate(m.getLeavingDate()) + " nach "
+											+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
+								}
+							} else {
+								m.setEntryDate(dt.toDate());
+							}
+						} catch (Exception e) {
 							//e.printStackTrace();
 						}
 					} else if (mapp.getDbColumnName().equals("birthdate")) {
@@ -245,5 +272,9 @@ public class FileHandler implements Receiver, SucceededListener {
 			HibernateUtil.save(coy);
 		}
 		return file;
+	}
+	
+	private String getFormattedDate(Date d) {
+		return new SimpleDateFormat("dd.MM.yyyy").format(d);
 	}
 }

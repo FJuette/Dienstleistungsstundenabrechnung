@@ -13,7 +13,6 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.TextField;
 
 import de.juette.model.HibernateUtil;
-import de.juette.model.Log;
 import de.juette.model.Member;
 
 public class MemberDataTab extends MyDataTab<Member> {
@@ -74,21 +73,21 @@ public class MemberDataTab extends MyDataTab<Member> {
 				e.printStackTrace();
 			}
 			if (beanItem.getBean().getActive() != activeState) {
-				writeLogEntry(beanItem.getBean().getFullName(), "Aktiv von "
+				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(), "Aktiv von "
 						+ activeState + " nach "
 						+ beanItem.getBean().getActive() + " geändert",
 						SecurityUtils.getSubject().getPrincipal().toString(),
 						beanItem.getBean().getId());
 			}
 			if (beanItem.getBean().getLeavingDate() != null && leavingDate == null) {
-				writeLogEntry(beanItem.getBean().getFullName(),
+				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum eingetragen: " + getFormattedDate(beanItem.getBean().getLeavingDate()), 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
 						beanItem.getBean().getId());
 			}
 			else if (beanItem.getBean().getLeavingDate() == null
 					&& leavingDate != null) {
-				writeLogEntry(beanItem.getBean().getFullName(),
+				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum gelöscht", 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
 						beanItem.getBean().getId());
@@ -96,7 +95,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 			else if (beanItem.getBean().getEntryDate() != null
 					&& leavingDate != null
 					&& beanItem.getBean().getLeavingDate().compareTo(leavingDate) != 0) {
-				writeLogEntry(beanItem.getBean().getFullName(),
+				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum von " + getFormattedDate(leavingDate) + " nach "
 								+ getFormattedDate(beanItem.getBean().getLeavingDate())
 								+ " geändert", SecurityUtils.getSubject()
@@ -106,7 +105,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 			if (beanItem.getBean().getEntryDate() != null
 					&& entryDate != null
 					&& beanItem.getBean().getEntryDate().compareTo(entryDate) != 0) {
-				writeLogEntry(beanItem.getBean().getFullName(),
+				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Eintrittsdatum von " + getFormattedDate(entryDate) + " nach "
 								+ getFormattedDate(beanItem.getBean().getEntryDate())
 								+ " geändert", SecurityUtils.getSubject()
@@ -116,16 +115,6 @@ public class MemberDataTab extends MyDataTab<Member> {
 			HibernateUtil.save(beanItem.getBean());
 			fireDataSavedEvent();
 		});
-	}
-
-	private void writeLogEntry(String member, String description,
-			String editor, long id) {
-		Log log = new Log();
-		log.setChangedMember(member);
-		log.setDescription(description);
-		log.setEditor(editor);
-		log.setChangedMemberId(id);
-		HibernateUtil.save(log);
 	}
 	
 	private String getFormattedDate(Date d) {
