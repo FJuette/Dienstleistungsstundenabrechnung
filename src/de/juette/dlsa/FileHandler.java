@@ -178,9 +178,6 @@ public class FileHandler implements Receiver, SucceededListener {
 						} catch (ParseException e) {
 							//e.printStackTrace();
 						}
-						if (m.getLeavingDate() != null) {
-							m.setActive(false);
-						}
 					} else if (mapp.getDbColumnName().equals("birthdate")) {
 						try {
 							m.setBirthdate(new SimpleDateFormat("dd.MM.yyyy")
