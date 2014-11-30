@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -177,7 +176,7 @@ public class FileHandler implements Receiver, SucceededListener {
 						try {
 							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
 							if (!newMember) {
-								if (!dt.equals(new DateTime(m.getEntryDate()))) {
+								if (!dt.isEqual(new DateTime(m.getEntryDate()))) {
 									m.setEntryDate(dt.toDate());
 									HibernateUtil.writeLogEntry(m.getFullName(), 
 											"Eintrittsdatum von " + getFormattedDate(m.getEntryDate()) + " nach "
@@ -193,7 +192,7 @@ public class FileHandler implements Receiver, SucceededListener {
 						try {
 							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
 							if (!newMember) {
-								if (!dt.equals(new DateTime(m.getLeavingDate()))) {
+								if (!dt.isEqual(new DateTime(m.getLeavingDate()))) {
 									m.setLeavingDate(dt.toDate());
 									HibernateUtil.writeLogEntry(m.getFullName(), 
 											"Austrittsdatum von " + getFormattedDate(m.getLeavingDate()) + " nach "

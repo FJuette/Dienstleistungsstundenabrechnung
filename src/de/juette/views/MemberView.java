@@ -1,15 +1,11 @@
 package de.juette.views;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 
 import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.filter.Compare;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
@@ -31,9 +27,11 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.data.util.filter.And;
+import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.MyBooleanFilter;
+import de.juette.dlsa.MyDateRangeFilter;
+import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MyLeavingMemberDateFilter;
 import de.juette.dlsa.MySubjectFilter;
@@ -67,6 +65,7 @@ public class MemberView extends ComplexLayout implements View {
 	private Button btnImport = new Button("Importieren");
 	private CheckBox cbPassive = new CheckBox("Passive ausblenden");
 	private DateField dfLostMembers = new DateField("Ausgetretene anzeigen ab:");
+	private VerticalLayout contentFooterLayout;
 
 	private Handler actionHandler = new Handler() {
 
@@ -283,6 +282,14 @@ public class MemberView extends ComplexLayout implements View {
 		dfLostMembers.addValueChangeListener(event -> {
 			filterLeavingDate();
 		});
+		
+		contentFooterLayout = new VerticalLayout();
+		contentFooterLayout.addStyleName("myFormLayout");
+		contentLayout.addComponent(contentFooterLayout);
+		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
+		dfRefDate.setValue(DateTime.now().toDate());
+		dfRefDate.setDateFormat("dd.MM.yyyy");
+		contentFooterLayout.addComponent(dfRefDate);
 	}
 
 	private void filterLeavingDate() {
@@ -382,8 +389,11 @@ public class MemberView extends ComplexLayout implements View {
 		txtBirthdateFrom.setImmediate(true);
 		txtBirthdateFrom.setStyleName("tiny");
 		txtBirthdateFrom.setWidth(250, Unit.PIXELS);
-		txtBirthdateFrom.setInputPrompt("Geburtsdatum, 15.10.2004-31.11.2014");
-		txtBirthdateFrom.setDescription("Beispiel: 15.10.2004 - 31.11.2014");
+		txtBirthdateFrom.setInputPrompt("Geburtsdatum");
+		txtBirthdateFrom.addValidator(new MyDateRangeValidator());
+		txtBirthdateFrom.setDescription("Beispiel <br /> "
+				+ "15.10.2004 - 31.11.2014 <br />"
+				+ "<>= 01.01.2014");
 		filterLayout.addComponent(txtBirthdateFrom);
 
 		cbFilterGroup.addValueChangeListener(event -> {
@@ -406,17 +416,8 @@ public class MemberView extends ComplexLayout implements View {
 
 		txtBirthdateFrom.addBlurListener(event -> {
 			beans.removeContainerFilters("birthdate");
-			if (!"".equals(txtBirthdateFrom.getValue())
-					&& txtBirthdateFrom.getValue().contains("-")) {
-				String[] parts = txtBirthdateFrom.getValue().split("-");
-				if (parseToDate(parts[0]) != null
-						&& parseToDate(parts[1]) != null) {
-					Date from = parseToDate(parts[0]);
-					Date to = parseToDate(parts[1]);
-					beans.addContainerFilter(new And(
-							new Compare.GreaterOrEqual("birthdate", from),
-							new Compare.LessOrEqual("birthdate", to)));
-				}
+			if (txtBirthdateFrom.getValue() != null && !txtBirthdateFrom.getValue().trim().equals("") && txtBirthdateFrom.isValid()) {
+				beans.addContainerFilter(new MyDateRangeFilter("birthdate", txtBirthdateFrom.getValue()));
 			}
 		});
 
@@ -424,15 +425,6 @@ public class MemberView extends ComplexLayout implements View {
 			filterTable("fullName", event.getText());
 		});
 		return filterLayout;
-	}
-
-	private Date parseToDate(String s) {
-		try {
-			Date d = new SimpleDateFormat("dd.MM.yyyy").parse(s.trim());
-			return d;
-		} catch (ParseException e) {
-			return null;
-		}
 	}
 
 	private void filterTable(Object columnId, String value) {

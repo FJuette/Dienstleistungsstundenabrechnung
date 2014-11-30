@@ -74,6 +74,7 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.closeSession();
 		}
 
+		@SuppressWarnings("unused")
 		@Override
 		public void sessionInit(SessionInitEvent event) throws ServiceException {
 			HibernateUtil.getSessionFactory();

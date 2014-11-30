@@ -1,9 +1,6 @@
 package de.juette.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -13,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.joda.time.DateTime;
 
 public class HibernateUtil {
 	private static final SessionFactory sessionFactory;
@@ -302,6 +300,18 @@ public class HibernateUtil {
 		log.setDescription(description);
 		log.setEditor(editor);
 		log.setChangedMemberId(id);
+		log.setReferenceDate(DateTime.now().toDate());
+		save(log);
+	}
+
+	public static void writeLogEntry(String member, String description,
+			String editor, long id, Date referenceDate) {
+		Log log = new Log();
+		log.setChangedMember(member);
+		log.setDescription(description);
+		log.setEditor(editor);
+		log.setChangedMemberId(id);
+		log.setReferenceDate(referenceDate);
 		save(log);
 	}
 }

@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.shiro.SecurityUtils;
+import org.joda.time.DateTime;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -77,20 +78,20 @@ public class MemberDataTab extends MyDataTab<Member> {
 						+ activeState + " nach "
 						+ beanItem.getBean().getActive() + " geändert",
 						SecurityUtils.getSubject().getPrincipal().toString(),
-						beanItem.getBean().getId());
+						beanItem.getBean().getId(), DateTime.now().toDate());
 			}
 			if (beanItem.getBean().getLeavingDate() != null && leavingDate == null) {
 				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum eingetragen: " + getFormattedDate(beanItem.getBean().getLeavingDate()), 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId());
+						beanItem.getBean().getId(), DateTime.now().toDate());
 			}
 			else if (beanItem.getBean().getLeavingDate() == null
 					&& leavingDate != null) {
 				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum gelöscht", 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId());
+						beanItem.getBean().getId(), DateTime.now().toDate());
 			}
 			else if (beanItem.getBean().getEntryDate() != null
 					&& leavingDate != null
@@ -100,7 +101,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 								+ getFormattedDate(beanItem.getBean().getLeavingDate())
 								+ " geändert", SecurityUtils.getSubject()
 								.getPrincipal().toString(), beanItem.getBean()
-								.getId());
+								.getId(), DateTime.now().toDate());
 			}
 			if (beanItem.getBean().getEntryDate() != null
 					&& entryDate != null
@@ -110,7 +111,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 								+ getFormattedDate(beanItem.getBean().getEntryDate())
 								+ " geändert", SecurityUtils.getSubject()
 								.getPrincipal().toString(), beanItem.getBean()
-								.getId());
+								.getId(), DateTime.now().toDate());
 			}
 			HibernateUtil.save(beanItem.getBean());
 			fireDataSavedEvent();

@@ -114,9 +114,9 @@ public class LogView extends EditableTable<Log> implements View {
 	@Override
 	protected void extendTable() {
 		table.removeAllActionHandlers();
-		table.setVisibleColumns(new Object[] { "timestamp", "description",
+		table.setVisibleColumns(new Object[] { "timestamp", "referenceDate", "description",
 				"changedMember", "editor" });
-		table.setColumnHeaders("Zeitpunkt", "Beschreibung", "Mitglied",
+		table.setColumnHeaders("Timestamp", "Bezugsdatum", "Beschreibung", "Mitglied",
 				"Bearbeiter");
 		table.setWidth("90%");
 		table.setColumnExpandRatio("timestamp", (float) 0.15);
