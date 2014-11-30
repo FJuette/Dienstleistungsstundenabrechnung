@@ -161,7 +161,7 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("user", "Benutzer");
 				put("member", "Mitglieder");
 				put("campain", "Aktionen");
-				put("groups", "Gruppen");
+				put("groups", "Funktionsgruppen");
 				put("category", "Sparten");
 				put("settings", "Einstellungen");
 				put("log", "Historie");

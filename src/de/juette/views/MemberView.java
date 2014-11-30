@@ -341,7 +341,7 @@ public class MemberView extends ComplexLayout implements View {
 
 	private void initTabs() {
 		contentTabs.addTab(tabData, "Daten");
-		contentTabs.addTab(tabGroups, "Gruppen");
+		contentTabs.addTab(tabGroups, "Funktionsgruppen");
 		contentTabs.addTab(tabCategories, "Sparten");
 		contentTabs.addTab(tabDls, "DLS-Statistik");
 
