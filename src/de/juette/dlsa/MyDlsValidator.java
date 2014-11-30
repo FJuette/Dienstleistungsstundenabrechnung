@@ -1,7 +1,6 @@
 package de.juette.dlsa;
 
 import com.vaadin.data.Validator;
-import com.vaadin.data.Validator.InvalidValueException;
 
 public class MyDlsValidator implements Validator {
 

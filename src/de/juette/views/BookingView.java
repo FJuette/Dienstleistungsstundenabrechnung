@@ -1,19 +1,15 @@
 package de.juette.views;
 
-import java.util.Date;
 import java.util.List;
 
-import org.apache.shiro.SecurityUtils;
+import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Page;
-import com.vaadin.server.ResourceReference;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -28,7 +24,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.DateToShortGermanStringConverter;
-import de.juette.dlsa.MyYearFilter;
+import de.juette.dlsa.MyDateRangeFilter;
+import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
@@ -118,10 +115,11 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		initLayout("Journal");
 
-		btnYear.setStyleName("danger");
-		btnYearTest.setStyleName("primary");
+		btnYear.setStyleName("danger tiny");
+		btnYearTest.setStyleName("primary tiny");
 
 		HorizontalLayout btnsYear = new HorizontalLayout();
+		btnsYear.addComponent(cbYears);
 		btnsYear.setSpacing(true);
 		btnsYear.addComponent(btnYearTest);
 		btnsYear.addComponent(btnYear);
@@ -133,7 +131,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		
 		btnYearTest.addClickListener(event -> {
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
-			CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
+			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
 			//FileResource res = new FileResource(worker.runCourseOfYear(false));
 			//setResource("download", res);
 			//ResourceReference rr = ResourceReference.create(res, this, "download");
@@ -184,12 +182,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		cbYears.setItemCaptionPropertyId("year");
 		cbYears.setContainerDataSource(years);
 		cbYears.setNullSelectionAllowed(false);
-		fLayout.addComponent(cbYears);
+		//fLayout.addComponent(cbYears);
 		cbYears.addValueChangeListener(event -> {
-			beans.removeContainerFilters("doneDate");
-			beans.addContainerFilter(new MyYearFilter("doneDate", ((Year) event
-					.getProperty().getValue()).getYear()));
-			updateTable();
+			//beans.removeContainerFilters("doneDate");
+			//beans.addContainerFilter(new MyYearFilter("doneDate", ((Year) event
+			//		.getProperty().getValue()).getYear()));
+			//updateTable();
 			btnYear.setCaption("Jahreslauf "
 					+ ((Year) event.getProperty().getValue()).getYear()
 					+ " durchführen");
@@ -217,18 +215,26 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		});
 
-		DateField dfFilterDate = new DateField();
-		dfFilterDate.setDescription("Datum");
-		dfFilterDate.setStyleName("tiny");
-		dfFilterDate.addValueChangeListener(event -> {
-			if (((DateField) event.getProperty()).getValue() != null) {
-				filterTable("doneDate", ((DateField) event.getProperty())
-						.getValue().toString());
-			} else {
-				beans.removeContainerFilters("doneDate");
+		TextField txtFilterDate = new TextField();
+		txtFilterDate.setDescription("Filter nach Ableistungsdatum");
+		txtFilterDate.setInputPrompt("Filter nach Ableistungsdatum");
+		txtFilterDate.setDescription("<ul>" +
+			    "  <li>01.01.2014</li>" +
+			    "  <li>= 01.01.2014</li>" +
+			    "  <li>> 01.01.2014</li>" +
+			    "  <li>< 01.01.2014</li>" +
+			    "  <li>01.01.2014 - 31.12.2014</li>" +
+			    "</ul>");
+		txtFilterDate.setStyleName("tiny");
+		txtFilterDate.addValidator(new MyDateRangeValidator());
+		txtFilterDate.setValue("> " + DateTime.now().minusYears(1).toString("dd.MM.yyyy"));
+		txtFilterDate.addBlurListener(event -> {
+			beans.removeContainerFilters("doneDate");
+			if (txtFilterDate.getValue() != null && !txtFilterDate.getValue().trim().equals("") && txtFilterDate.isValid()) {
+				beans.addContainerFilter(new MyDateRangeFilter("doneDate", txtFilterDate.getValue()));
 			}
-
 		});
+		beans.addContainerFilter(new MyDateRangeFilter("doneDate", txtFilterDate.getValue()));
 
 		TextField txtFilterNote = new TextField();
 		txtFilterNote.setConverter(String.class);
@@ -241,7 +247,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				beans.removeContainerFilters("comment");
 			}
 		});
-		fLayout.addComponents(txtFilterDls, dfFilterDate, txtFilterNote);
+		fLayout.addComponents(txtFilterDls, txtFilterDate, txtFilterNote);
 		return fLayout;
 	}
 
@@ -285,7 +291,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		//fd.extend(btnYes);
 		
 		btnYes.addClickListener(evnet -> {
-			CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
+			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears
 			//		.getValue(), new Settings());
 			//FileResource res = new FileResource(worker.runCourseOfYear(true));
