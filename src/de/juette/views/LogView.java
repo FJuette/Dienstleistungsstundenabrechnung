@@ -48,7 +48,7 @@ public class LogView extends EditableTable<Log> implements View {
 
 		beans = new BeanItemContainer<>(Log.class);
 		beans.addAll(HibernateUtil.getMaxList(Log.class,
-				Integer.parseInt(txtMaxItems.getValue()), "timestamp asc"));
+				Integer.parseInt(txtMaxItems.getValue()), "timestamp desc"));
 
 		initLayout("Historie");
 		getTableData();
@@ -59,7 +59,7 @@ public class LogView extends EditableTable<Log> implements View {
 	private void getTableData() {
 		beans.removeAllItems();
 		beans.addAll(HibernateUtil.getMaxList(Log.class,
-				Integer.parseInt(txtMaxItems.getValue()), "timestamp asc"));
+				Integer.parseInt(txtMaxItems.getValue()), "timestamp desc"));
 		table.refreshRowCache();
 		updateTable();
 	}

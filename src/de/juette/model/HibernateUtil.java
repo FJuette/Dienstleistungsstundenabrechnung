@@ -222,7 +222,7 @@ public class HibernateUtil {
 		Transaction tx = session.beginTransaction();
 
 		Query q = session.createQuery(
-				"from Log where timestamp > :from and timestamp <= :to");
+				"from Log where timestamp > :from and timestamp <= :to order by timestamp desc");
 		q.setDate("from", from);
 		q.setDate("to", to);
 		List<Log> logs = q.list();
