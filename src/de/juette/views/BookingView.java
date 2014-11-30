@@ -58,7 +58,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 			if (action.getCaption().equals("Stornieren")) {
 				if (!((Booking) table.getValue()).getCanceled()) {
 					Booking b = new Booking();
-					b.setDoneDate(new Date());
+					b.setDoneDate(((Booking) table.getValue()).getDoneDate());
 					b.setCampaign(((Booking) table.getValue()).getCampaign());
 					b.setCountDls(-((Booking) table.getValue()).getCountDls());
 					b.setComment("Stornierung von "
