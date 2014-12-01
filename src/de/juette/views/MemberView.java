@@ -27,7 +27,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyDateRangeFilter;
@@ -63,9 +62,8 @@ public class MemberView extends ComplexLayout implements View {
 	private FormLayout tabCategories = new FormLayout();
 	private FormLayout tabDls = new FormLayout();
 	private Button btnImport = new Button("Importieren");
-	private CheckBox cbPassive = new CheckBox("Passive ausblenden");
-	private DateField dfLostMembers = new DateField("Ausgetretene anzeigen ab:");
-	private VerticalLayout contentFooterLayout;
+	private CheckBox cbPassive = new CheckBox();
+	private DateField dfLostMembers = new DateField();
 
 	private Handler actionHandler = new Handler() {
 
@@ -233,6 +231,9 @@ public class MemberView extends ComplexLayout implements View {
 
 	private void extendLayout() {
 
+		HorizontalLayout innerHeadFirstLineLayout = new HorizontalLayout();
+		innerHeadFirstLineLayout.setWidth(100, Unit.PERCENTAGE);
+		
 		HorizontalLayout innerButtonLayout = new HorizontalLayout();
 		innerButtonLayout.setSizeUndefined();
 		btnImport.setStyleName("tiny myAddButton");
@@ -240,10 +241,43 @@ public class MemberView extends ComplexLayout implements View {
 		innerButtonLayout.addComponent(btnImport);
 		innerButtonLayout.addComponent(btnNew);
 
-		innerHeadLayout.addComponent(initFilter());
-		innerHeadLayout.addComponent(innerButtonLayout);
-		innerHeadLayout.setComponentAlignment(innerButtonLayout,
+		innerHeadLayout.addComponent(innerHeadFirstLineLayout);
+		innerHeadFirstLineLayout.addComponent(initFilter());
+		innerHeadFirstLineLayout.addComponent(innerButtonLayout);
+		innerHeadFirstLineLayout.setComponentAlignment(innerButtonLayout,
 				Alignment.MIDDLE_RIGHT);
+		
+		Label lblShowPassive = new Label("<strong>Passive ausblenden: </strong>", ContentMode.HTML);
+		lblShowPassive.setStyleName("myLabelStyle mySecondHeadLayoutFirst");
+		
+		cbPassive.setImmediate(true);
+		cbPassive.setValue(true);
+		cbPassive.setStyleName("mySecondHeadLayoutRest");
+		leftContentLayout.addComponent(cbPassive);
+
+		cbPassive.addValueChangeListener(event -> {
+			filterActives();
+		});
+		
+		Label lblLostMembers = new Label("<strong>Ausgetretene anzeigen ab:</strong>", ContentMode.HTML);
+		lblLostMembers.setStyleName("myLabelStyle mySecondHeadLayoutRest");
+		
+		dfLostMembers.setImmediate(true);
+		dfLostMembers.setStyleName("tiny mySecondHeadLayoutDF");
+		dfLostMembers.setValue(DateTime.now().minusYears(1).toDate());
+		leftContentLayout.addComponent(dfLostMembers);
+		
+		dfLostMembers.addValueChangeListener(event -> {
+			filterLeavingDate();
+		});
+		HorizontalLayout innerHeadSecondLineLayout = new HorizontalLayout();
+		innerHeadLayout.addComponent(innerHeadSecondLineLayout);
+		innerHeadSecondLineLayout.setSpacing(true);
+		innerHeadSecondLineLayout.addComponent(lblShowPassive);
+		innerHeadSecondLineLayout.addComponent(cbPassive);
+		innerHeadSecondLineLayout.addComponent(lblLostMembers);
+		innerHeadSecondLineLayout.addComponent(dfLostMembers);
+		
 
 		btnNew.addClickListener(event -> {
 			NewMemberWindow w;
@@ -264,32 +298,6 @@ public class MemberView extends ComplexLayout implements View {
 				Notification.show("Upload fertig", Type.TRAY_NOTIFICATION);
 			});
 		});
-
-		cbPassive.setImmediate(true);
-		cbPassive.setStyleName("tiny myHeaderLabel");
-		cbPassive.setValue(true);
-		leftContentLayout.addComponent(cbPassive);
-
-		cbPassive.addValueChangeListener(event -> {
-			filterActives();
-		});
-		
-		dfLostMembers.setImmediate(true);
-		dfLostMembers.setStyleName("tiny myHeaderLabel");
-		dfLostMembers.setValue(DateTime.now().minusYears(1).toDate());
-		leftContentLayout.addComponent(dfLostMembers);
-		
-		dfLostMembers.addValueChangeListener(event -> {
-			filterLeavingDate();
-		});
-		
-		contentFooterLayout = new VerticalLayout();
-		contentFooterLayout.addStyleName("myFormLayout");
-		contentLayout.addComponent(contentFooterLayout);
-		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
-		dfRefDate.setValue(DateTime.now().toDate());
-		dfRefDate.setDateFormat("dd.MM.yyyy");
-		contentFooterLayout.addComponent(dfRefDate);
 	}
 
 	private void filterLeavingDate() {

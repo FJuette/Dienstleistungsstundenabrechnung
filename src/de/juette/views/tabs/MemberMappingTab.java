@@ -1,12 +1,14 @@
 package de.juette.views.tabs;
 
 import org.apache.shiro.SecurityUtils;
+import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -16,7 +18,6 @@ import de.juette.dlsa.ComponentHelper;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Log;
 import de.juette.model.Member;
 
 public class MemberMappingTab extends FormLayout {
@@ -100,19 +101,25 @@ public class MemberMappingTab extends FormLayout {
 		Button btnSaveChanges = new Button("Speichern");
 		btnSaveChanges.setStyleName("friendly");
 		addComponent(btnSaveChanges);
+		
+		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
+		dfRefDate.setStyleName("tiny");
+		dfRefDate.setValue(DateTime.now().toDate());
+		dfRefDate.setDateFormat("dd.MM.yyyy");
+		if (caption.equals("Gruppen")) {
+			addComponent(dfRefDate);
+		}
 
 		btnSaveChanges.addClickListener(event -> {
 			try {
 				if (caption.equals("Gruppen")) {
 					(beanItem.getBean()).setGroups(mGroups.getItemIds());
 					
-					Log log = new Log();
 					if (!(beanItem.getBean().getGroups().size() == mGroups.size() && beanItem.getBean().getGroups().containsAll(mGroups.getItemIds()))) {
-						log.setChangedMember(beanItem.getBean().getFullName());
-						log.setDescription("Gruppenzugehörigkeit verändert");
-						log.setEditor(SecurityUtils.getSubject().getPrincipal().toString());
-						log.setChangedMemberId(beanItem.getBean().getId());
-						HibernateUtil.save(log);
+						HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+								"Gruppenzugehörigkeit verändert", SecurityUtils.getSubject()
+										.getPrincipal().toString(), beanItem.getBean()
+										.getId(), dfRefDate.getValue());
 					}
 				} else {
 					(beanItem.getBean()).setCategories((mCategories

@@ -18,7 +18,7 @@ public class ComplexLayout extends VerticalLayout {
 	protected HorizontalSplitPanel contentSplitPanel = new HorizontalSplitPanel();
 	protected VerticalLayout contentLayout = new VerticalLayout();
 	protected HorizontalLayout contentHeaderLayout = new HorizontalLayout();
-	protected HorizontalLayout innerHeadLayout = new HorizontalLayout();
+	protected VerticalLayout innerHeadLayout = new VerticalLayout();
 	protected VerticalLayout leftContentLayout = new VerticalLayout();
 	protected TabSheet contentTabs = new TabSheet();
 	protected Label lblContentHeader = new Label("",

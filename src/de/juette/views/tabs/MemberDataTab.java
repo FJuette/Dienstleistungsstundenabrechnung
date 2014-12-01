@@ -66,6 +66,12 @@ public class MemberDataTab extends MyDataTab<Member> {
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
 		addComponent(btnSave);
+		
+		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
+		dfRefDate.setStyleName("tiny");
+		dfRefDate.setValue(DateTime.now().toDate());
+		dfRefDate.setDateFormat("dd.MM.yyyy");
+		addComponent(dfRefDate);
 
 		btnSave.addClickListener(event -> {
 			try {
@@ -78,30 +84,31 @@ public class MemberDataTab extends MyDataTab<Member> {
 						+ activeState + " nach "
 						+ beanItem.getBean().getActive() + " geändert",
 						SecurityUtils.getSubject().getPrincipal().toString(),
-						beanItem.getBean().getId(), DateTime.now().toDate());
+						beanItem.getBean().getId(), dfRefDate.getValue());
 			}
 			if (beanItem.getBean().getLeavingDate() != null && leavingDate == null) {
 				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum eingetragen: " + getFormattedDate(beanItem.getBean().getLeavingDate()), 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId(), DateTime.now().toDate());
+						beanItem.getBean().getId(), dfRefDate.getValue());
 			}
 			else if (beanItem.getBean().getLeavingDate() == null
 					&& leavingDate != null) {
 				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum gelöscht", 
 						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId(), DateTime.now().toDate());
+						beanItem.getBean().getId(), dfRefDate.getValue());
 			}
 			else if (beanItem.getBean().getEntryDate() != null
 					&& leavingDate != null
 					&& beanItem.getBean().getLeavingDate().compareTo(leavingDate) != 0) {
+								
 				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
 						"Austrittsdatum von " + getFormattedDate(leavingDate) + " nach "
 								+ getFormattedDate(beanItem.getBean().getLeavingDate())
 								+ " geändert", SecurityUtils.getSubject()
 								.getPrincipal().toString(), beanItem.getBean()
-								.getId(), DateTime.now().toDate());
+								.getId(), dfRefDate.getValue());
 			}
 			if (beanItem.getBean().getEntryDate() != null
 					&& entryDate != null
@@ -111,7 +118,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 								+ getFormattedDate(beanItem.getBean().getEntryDate())
 								+ " geändert", SecurityUtils.getSubject()
 								.getPrincipal().toString(), beanItem.getBean()
-								.getId(), DateTime.now().toDate());
+								.getId(), dfRefDate.getValue());
 			}
 			HibernateUtil.save(beanItem.getBean());
 			fireDataSavedEvent();
