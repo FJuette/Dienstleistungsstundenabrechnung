@@ -12,8 +12,9 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinService;
 
-import de.juette.model.Campaign;
 import de.juette.model.Booking;
+import de.juette.model.Campaign;
+import de.juette.model.Category;
 import de.juette.model.ColumnMapping;
 import de.juette.model.CourseOfYear;
 import de.juette.model.Group;
@@ -22,7 +23,6 @@ import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Role;
 import de.juette.model.Settings;
-import de.juette.model.Category;
 import de.juette.model.User;
 import de.juette.model.Year;
 
@@ -290,8 +290,6 @@ public class DataHandler {
 	}
 
 	public static void createDummyLogs() {
-		ArrayList<Member> members = (ArrayList<Member>) HibernateUtil
-				.getAllAsList(Member.class);
 
 		ArrayList<Log> entrys;
 		try {
@@ -354,7 +352,7 @@ public class DataHandler {
 	public static void createSettings() {
 		ArrayList<Settings> entrys = new ArrayList<Settings>(
 				Arrays.asList(new Settings("31.12", 5.0, 10.0, 18, 67,
-						"Anteilig bis zum Stichtag", true, false)));
+						"Anteilig bis zum Stichtag", true, false, "Keine")));
 		HibernateUtil.saveAll(entrys);
 	}
 

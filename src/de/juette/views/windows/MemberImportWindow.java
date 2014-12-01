@@ -31,7 +31,6 @@ public class MemberImportWindow extends Window {
 		Upload upload = new Upload("", reciever);
 		upload.setButtonCaption("Einlesen");
 		upload.addSucceededListener(new SucceededListener() {
-			@SuppressWarnings("unchecked")
 			@Override
 			public void uploadSucceeded(SucceededEvent event) {
 				mapping = (List<ColumnMapping>) HibernateUtil.getAllAsList(ColumnMapping.class);

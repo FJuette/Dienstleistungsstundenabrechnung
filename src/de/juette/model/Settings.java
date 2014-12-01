@@ -32,7 +32,7 @@ public class Settings extends AbstractEntity {
 
 	public Settings(String dueDate, Double countDls, Double costDls,
 			Integer ageFrom, Integer ageTo, String bookingMethod,
-			Boolean clearing, Boolean dlsTransfer) {
+			Boolean clearing, Boolean dlsTransfer, String granularity) {
 		super();
 		this.dueDate = dueDate;
 		this.countDls = countDls;
