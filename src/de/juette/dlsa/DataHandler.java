@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinService;
@@ -27,6 +29,8 @@ import de.juette.model.User;
 import de.juette.model.Year;
 
 public class DataHandler {
+	
+	static DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 
 	public static BeanItemContainer<Category> getDummySubjects() {
 		BeanItemContainer<Category> subjects = new BeanItemContainer<Category>(
@@ -342,7 +346,7 @@ public class DataHandler {
 					Arrays.asList(new CourseOfYear(bFile, new SimpleDateFormat(
 							"dd.MM.yyyy hh:mm").parse("13.03.2014 10:23"),
 							"Jahreslauf vom 31.03.2013",
-							"2013-03-31_Jahreslauf.csv")));
+							"2013-03-31_Jahreslauf.csv", dateStringFormat.parseDateTime("31.12.2012").toDate())));
 			HibernateUtil.saveAll(entrys);
 		} catch (ParseException e) {
 			e.printStackTrace();

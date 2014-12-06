@@ -42,6 +42,7 @@ public class Settings extends AbstractEntity {
 		this.bookingMethod = bookingMethod;
 		this.clearing = clearing;
 		this.dlsTransfer = dlsTransfer;
+		this.granularity = granularity;
 	}
 
 	public String getDueDate() {

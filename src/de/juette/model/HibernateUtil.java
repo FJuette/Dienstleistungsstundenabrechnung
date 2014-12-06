@@ -12,6 +12,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.joda.time.DateTime;
 
+import de.juette.dlsa.NoCOYAvailableException;
+
 public class HibernateUtil {
 	private static final SessionFactory sessionFactory;
 	private static Session currentSession;
@@ -253,6 +255,19 @@ public class HibernateUtil {
 
 		tx.commit();
 		return count;
+	}
+
+	public static Date getLastCOYDate() throws NoCOYAvailableException {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<?> list = session.createQuery("from CourseOfYear order by stichtagsdatum").list();
+
+		tx.commit();
+		if (list.size() > 0) {
+			return ((CourseOfYear) list.get(0)).getDueDate();
+		} else
+			throw new NoCOYAvailableException();
 	}
 
 	/**

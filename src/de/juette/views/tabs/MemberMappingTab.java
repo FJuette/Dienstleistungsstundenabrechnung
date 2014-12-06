@@ -15,6 +15,7 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
 import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.RefDateHandler;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
@@ -128,7 +129,13 @@ public class MemberMappingTab extends FormLayout {
 			} catch (Exception e) {
 				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 			}
-			HibernateUtil.save(beanItem.getBean());
+			if (caption.equals("Sparten")) {
+				HibernateUtil.save(beanItem.getBean());
+			} else if (caption.equals("Gruppen") && RefDateHandler.isRefDateValid(dfRefDate.getValue())) {
+				HibernateUtil.save(beanItem.getBean());
+			} else {
+				RefDateHandler.showNoVaildRefDateException();
+			}
 		});
 	}
 	

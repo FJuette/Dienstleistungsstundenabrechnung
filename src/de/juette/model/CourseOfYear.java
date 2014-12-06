@@ -16,17 +16,20 @@ public class CourseOfYear extends AbstractEntity {
 	private String displayName;
 	@Column(name = "dateiname")
 	private String filename;
+	@Column(name = "stichtagsdatum")
+	private Date dueDate;
 
 	public CourseOfYear() {
 
 	}
 
 	public CourseOfYear(byte[] file, Date timestamp, String displayName,
-			String filename) {
+			String filename, Date dueDate) {
 		this.file = file;
 		this.timestamp = timestamp;
 		this.displayName = displayName;
 		this.filename = filename;
+		this.dueDate = dueDate;
 	}
 
 	public byte[] getFile() {
@@ -59,6 +62,14 @@ public class CourseOfYear extends AbstractEntity {
 
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+
+	public Date getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 
 }

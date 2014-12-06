@@ -3,16 +3,12 @@ package de.juette.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;

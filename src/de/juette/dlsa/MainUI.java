@@ -35,6 +35,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.Settings;
@@ -87,6 +88,11 @@ public class MainUI extends UI implements ViewChangeListener {
 			}
 			if (HibernateUtil.getAllAsList(Settings.class).size() == 0) {
 				DataHandler.createSettings();
+			}
+			
+			// temporary
+			if (HibernateUtil.getAllAsList(CourseOfYear.class).size() == 0) {
+				DataHandler.createDummyCycles();
 			}
 			
 			// Creates Example data, for fresh Database and to show and test the functionality

@@ -13,6 +13,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.RefDateHandler;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
@@ -79,49 +80,54 @@ public class MemberDataTab extends MyDataTab<Member> {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (beanItem.getBean().getActive() != activeState) {
-				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(), "Aktiv von "
-						+ activeState + " nach "
-						+ beanItem.getBean().getActive() + " geändert",
-						SecurityUtils.getSubject().getPrincipal().toString(),
-						beanItem.getBean().getId(), dfRefDate.getValue());
+			
+			if (RefDateHandler.isRefDateValid(dfRefDate.getValue())) {
+				if (beanItem.getBean().getActive() != activeState) {
+					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(), "Aktiv von "
+							+ activeState + " nach "
+							+ beanItem.getBean().getActive() + " geändert",
+							SecurityUtils.getSubject().getPrincipal().toString(),
+							beanItem.getBean().getId(), dfRefDate.getValue());
+				}
+				if (beanItem.getBean().getLeavingDate() != null && leavingDate == null) {
+					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+							"Austrittsdatum eingetragen: " + getFormattedDate(beanItem.getBean().getLeavingDate()), 
+							SecurityUtils.getSubject().getPrincipal().toString(), 
+							beanItem.getBean().getId(), dfRefDate.getValue());
+				}
+				else if (beanItem.getBean().getLeavingDate() == null
+						&& leavingDate != null) {
+					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+							"Austrittsdatum gelöscht", 
+							SecurityUtils.getSubject().getPrincipal().toString(), 
+							beanItem.getBean().getId(), dfRefDate.getValue());
+				}
+				else if (beanItem.getBean().getEntryDate() != null
+						&& leavingDate != null
+						&& beanItem.getBean().getLeavingDate().compareTo(leavingDate) != 0) {
+									
+					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+							"Austrittsdatum von " + getFormattedDate(leavingDate) + " nach "
+									+ getFormattedDate(beanItem.getBean().getLeavingDate())
+									+ " geändert", SecurityUtils.getSubject()
+									.getPrincipal().toString(), beanItem.getBean()
+									.getId(), dfRefDate.getValue());
+				}
+				if (beanItem.getBean().getEntryDate() != null
+						&& entryDate != null
+						&& beanItem.getBean().getEntryDate().compareTo(entryDate) != 0) {
+					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+							"Eintrittsdatum von " + getFormattedDate(entryDate) + " nach "
+									+ getFormattedDate(beanItem.getBean().getEntryDate())
+									+ " geändert", SecurityUtils.getSubject()
+									.getPrincipal().toString(), beanItem.getBean()
+									.getId(), dfRefDate.getValue());
+				}
+				HibernateUtil.save(beanItem.getBean());
+				fireDataSavedEvent();
+			} else {
+				RefDateHandler.showNoVaildRefDateException();
 			}
-			if (beanItem.getBean().getLeavingDate() != null && leavingDate == null) {
-				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
-						"Austrittsdatum eingetragen: " + getFormattedDate(beanItem.getBean().getLeavingDate()), 
-						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId(), dfRefDate.getValue());
-			}
-			else if (beanItem.getBean().getLeavingDate() == null
-					&& leavingDate != null) {
-				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
-						"Austrittsdatum gelöscht", 
-						SecurityUtils.getSubject().getPrincipal().toString(), 
-						beanItem.getBean().getId(), dfRefDate.getValue());
-			}
-			else if (beanItem.getBean().getEntryDate() != null
-					&& leavingDate != null
-					&& beanItem.getBean().getLeavingDate().compareTo(leavingDate) != 0) {
-								
-				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
-						"Austrittsdatum von " + getFormattedDate(leavingDate) + " nach "
-								+ getFormattedDate(beanItem.getBean().getLeavingDate())
-								+ " geändert", SecurityUtils.getSubject()
-								.getPrincipal().toString(), beanItem.getBean()
-								.getId(), dfRefDate.getValue());
-			}
-			if (beanItem.getBean().getEntryDate() != null
-					&& entryDate != null
-					&& beanItem.getBean().getEntryDate().compareTo(entryDate) != 0) {
-				HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
-						"Eintrittsdatum von " + getFormattedDate(entryDate) + " nach "
-								+ getFormattedDate(beanItem.getBean().getEntryDate())
-								+ " geändert", SecurityUtils.getSubject()
-								.getPrincipal().toString(), beanItem.getBean()
-								.getId(), dfRefDate.getValue());
-			}
-			HibernateUtil.save(beanItem.getBean());
-			fireDataSavedEvent();
 		});
 	}
 	
