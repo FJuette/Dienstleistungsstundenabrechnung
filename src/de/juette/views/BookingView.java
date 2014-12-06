@@ -2,6 +2,7 @@ package de.juette.views;
 
 import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -18,11 +19,13 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.DateToShortGermanStringConverter;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.NoCOYAvailableException;
@@ -84,6 +87,10 @@ public class BookingView extends EditableTable<Booking> implements View {
 	};
 
 	public BookingView() {
+		if (SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		beans = new BeanItemContainer<Booking>(Booking.class);
 		beans.addAll(HibernateUtil.getAllAsList(Booking.class));
 		beans.addNestedContainerProperty("member.memberId");

@@ -28,6 +28,7 @@ import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.User;
@@ -68,6 +69,10 @@ public class UserView extends ComplexLayout implements View {
 	}
 
 	public UserView() {
+		if (!SecurityUtils.getSubject().hasRole("Administrator")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		btnNew.setCaption("Neuer Benutzer");
 		initLayout("<strong>Benutzerverwaltung</strong>");
 		extendLayout();

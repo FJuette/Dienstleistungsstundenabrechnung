@@ -3,6 +3,8 @@ package de.juette.views;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.apache.shiro.SecurityUtils;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -20,6 +22,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
@@ -40,6 +43,10 @@ public class LogView extends EditableTable<Log> implements View {
 			CourseOfYear.class);
 
 	public LogView() {
+		if (SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		btnChange.setVisible(false);
 		btnNew.setVisible(false);
 

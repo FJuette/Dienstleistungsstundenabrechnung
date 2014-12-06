@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import org.apache.shiro.SecurityUtils;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -17,13 +19,14 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -60,6 +63,10 @@ public class CampaignView extends ComplexLayout implements View {
 	}
 
 	public CampaignView() {
+		if (SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		btnNew.setCaption("Neue Aktion");
 		initLayout("<strong>Aktionsverwaltung</strong>");
 		extendLayout();

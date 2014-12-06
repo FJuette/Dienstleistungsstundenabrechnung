@@ -15,7 +15,7 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
 import de.juette.dlsa.ComponentHelper;
-import de.juette.dlsa.RefDateHandler;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
@@ -101,14 +101,19 @@ public class MemberMappingTab extends FormLayout {
 
 		Button btnSaveChanges = new Button("Speichern");
 		btnSaveChanges.setStyleName("friendly");
-		addComponent(btnSaveChanges);
 		
 		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
 		dfRefDate.setStyleName("tiny");
 		dfRefDate.setValue(DateTime.now().toDate());
 		dfRefDate.setDateFormat("dd.MM.yyyy");
-		if (caption.equals("Gruppen")) {
-			addComponent(dfRefDate);
+		
+		
+		// Show these two fields not in the guest role
+		if (!SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(btnSaveChanges);
+			if (caption.equals("Gruppen")) {
+				addComponent(dfRefDate);
+			}
 		}
 
 		btnSaveChanges.addClickListener(event -> {
@@ -131,10 +136,10 @@ public class MemberMappingTab extends FormLayout {
 			}
 			if (caption.equals("Sparten")) {
 				HibernateUtil.save(beanItem.getBean());
-			} else if (caption.equals("Gruppen") && RefDateHandler.isRefDateValid(dfRefDate.getValue())) {
+			} else if (caption.equals("Gruppen") && GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
 				HibernateUtil.save(beanItem.getBean());
 			} else {
-				RefDateHandler.showNoVaildRefDateException();
+				GeneralHandler.showNoVaildRefDateException();
 			}
 		});
 	}

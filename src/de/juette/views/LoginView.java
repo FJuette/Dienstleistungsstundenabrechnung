@@ -80,7 +80,7 @@ public class LoginView extends VerticalLayout implements View {
 				SecurityUtils.getSubject().login(token);
 				System.out.println("Ist in Adminrolle: " + SecurityUtils.getSubject().hasRole("Administrator"));
 				window.close();
-				UI.getCurrent().getNavigator().navigateTo("booking");
+				UI.getCurrent().getNavigator().navigateTo("member");
 			} catch (AuthenticationException ex) {
 				Notification.show("Leider war der Login nicht erfolgreich.", Type.ERROR_MESSAGE);
 			}

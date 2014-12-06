@@ -2,6 +2,8 @@ package de.juette.views;
 
 import java.util.Collection;
 
+import org.apache.shiro.SecurityUtils;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -12,14 +14,18 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 
 @SuppressWarnings("serial")
 public class GroupsView extends EditableTable<Group> implements View {
 	
-	@SuppressWarnings("unchecked")
 	public GroupsView() {
+		if (SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		beans = new BeanItemContainer<>(Group.class);
 		beans.addAll((Collection<? extends Group>) HibernateUtil.getAllAsList(Group.class));
 		

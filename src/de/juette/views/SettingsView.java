@@ -3,6 +3,8 @@ package de.juette.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.shiro.SecurityUtils;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -25,6 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.DataHandler;
 import de.juette.dlsa.FileHandler;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.ColumnMapping;
 import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
@@ -54,6 +57,10 @@ public class SettingsView extends VerticalLayout implements View {
 	private final ComboBox cbGranularity = new ComboBox("Granularität");
 
 	public SettingsView() {
+		if (!SecurityUtils.getSubject().hasRole("Administrator")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
 		List<Settings> settings = HibernateUtil.getAllAsList(Settings.class);
 		for (Settings s : settings) {

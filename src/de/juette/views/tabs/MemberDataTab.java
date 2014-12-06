@@ -13,7 +13,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.TextField;
 
-import de.juette.dlsa.RefDateHandler;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
@@ -66,13 +66,18 @@ public class MemberDataTab extends MyDataTab<Member> {
 
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
-		addComponent(btnSave);
+		
 		
 		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
 		dfRefDate.setStyleName("tiny");
 		dfRefDate.setValue(DateTime.now().toDate());
 		dfRefDate.setDateFormat("dd.MM.yyyy");
-		addComponent(dfRefDate);
+		
+		// Show these two fields not in the guest role
+		if (!SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(btnSave);
+			addComponent(dfRefDate);
+		}
 
 		btnSave.addClickListener(event -> {
 			try {
@@ -81,7 +86,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 				e.printStackTrace();
 			}
 			
-			if (RefDateHandler.isRefDateValid(dfRefDate.getValue())) {
+			if (GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
 				if (beanItem.getBean().getActive() != activeState) {
 					HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(), "Aktiv von "
 							+ activeState + " nach "
@@ -126,7 +131,7 @@ public class MemberDataTab extends MyDataTab<Member> {
 				HibernateUtil.save(beanItem.getBean());
 				fireDataSavedEvent();
 			} else {
-				RefDateHandler.showNoVaildRefDateException();
+				GeneralHandler.showNoVaildRefDateException();
 			}
 		});
 	}
