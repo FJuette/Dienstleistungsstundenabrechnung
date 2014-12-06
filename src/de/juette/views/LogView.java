@@ -11,6 +11,7 @@ import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinService;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -22,6 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
+import de.juette.model.Member;
 
 public class LogView extends EditableTable<Log> implements View {
 
@@ -30,7 +32,10 @@ public class LogView extends EditableTable<Log> implements View {
 
 	private final ComboBox oldCourses = new ComboBox();
 	private TextField txtMaxItems = new TextField();
-
+	
+	private BeanItemContainer<Member> member = new BeanItemContainer<>(Member.class);
+	private ComboBox cbMember = new ComboBox();
+	
 	private BeanItemContainer<CourseOfYear> courses = new BeanItemContainer<>(
 			CourseOfYear.class);
 
@@ -65,6 +70,7 @@ public class LogView extends EditableTable<Log> implements View {
 	}
 
 	private HorizontalLayout initFilter() {
+		member.addAll(HibernateUtil.getAllAsList(Member.class));
 		HorizontalLayout fLayout = new HorizontalLayout();
 		fLayout.setSpacing(true);
 
@@ -82,11 +88,25 @@ public class LogView extends EditableTable<Log> implements View {
 		txtMaxItems.setNullSettingAllowed(false);
 		txtMaxItems.setValue("20");
 		fLayout.addComponent(txtMaxItems);
+		
+		cbMember.setContainerDataSource(member);
+		cbMember.setImmediate(true);
+		cbMember.setInputPrompt("Mitglieder");
+		cbMember.setFilteringMode(FilteringMode.CONTAINS);
+		cbMember.setItemCaptionPropertyId("fullName");
+		cbMember.setStyleName("tiny");
+		fLayout.addComponent(cbMember);
 
 		txtMaxItems.addBlurListener(event -> {
 			if (tryParseInt(txtMaxItems.getValue())) {
 				getTableData();
 			}
+		});
+		
+		cbMember.addValueChangeListener(event -> {
+			beans.removeContainerFilters("changedMember");
+			if (event.getProperty().getValue() != null)
+				beans.addContainerFilter("changedMember", ((Member)event.getProperty().getValue()).getFullName(), true, false);
 		});
 
 		Label title = new Label("<strong>Filter:</strong>", ContentMode.HTML);
@@ -98,6 +118,13 @@ public class LogView extends EditableTable<Log> implements View {
 		txtFilter.setStyleName("tiny");
 		txtFilter.setNullRepresentation("");
 		fLayout.addComponent(txtFilter);
+		
+		txtFilter.addTextChangeListener(event -> {
+			beans.removeContainerFilters("description");
+			if (event.getText() != null) {
+				beans.addContainerFilter("description", event.getText(), true, false);
+			}
+		});
 
 		return fLayout;
 	}
