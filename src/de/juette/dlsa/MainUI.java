@@ -1,6 +1,8 @@
 package de.juette.dlsa;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
@@ -36,8 +38,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import de.juette.model.CourseOfYear;
+import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
+import de.juette.model.Sector;
 import de.juette.model.Settings;
 import de.juette.model.User;
 import de.juette.views.BookingView;
@@ -48,7 +52,9 @@ import de.juette.views.GroupsView;
 import de.juette.views.LogView;
 import de.juette.views.LoginView;
 import de.juette.views.MemberView;
+import de.juette.views.SectorView;
 import de.juette.views.SettingsView;
+import de.juette.views.StatisticsView;
 import de.juette.views.UserView;
 
 @Theme("dlsaTheme")
@@ -95,10 +101,19 @@ public class MainUI extends UI implements ViewChangeListener {
 				DataHandler.createDummyCycles();
 			}
 			
+			if (false) {
+				DataHandler.createDummyGroups();
+				Sector s = new Sector();
+				s.setSectorname("Test Bereich");
+				List<Group> gps = new ArrayList<Group>();
+				gps.add(HibernateUtil.getAllAsList(Group.class).get(0));
+				s.setGroups(gps);
+				HibernateUtil.save(s);
+			}
+			
 			// Creates Example data, for fresh Database and to show and test the functionality
 			if (false) {
 				DataHandler.createDummySubjects();
-				DataHandler.createDummyGroups();
 				DataHandler.createDummyMember();
 				DataHandler.createDummyActivities();
 				DataHandler.createDummyBookings();
@@ -121,8 +136,10 @@ public class MainUI extends UI implements ViewChangeListener {
 			put("groups", GroupsView.class);
 			put("category", CategoryView.class);
 			put("campain", CampaignView.class);
+			put("sector", SectorView.class);
 			put("user", UserView.class);
 			put("member", MemberView.class);
+			put("statistic", StatisticsView.class);
 			put("settings", SettingsView.class);
 			put("log", LogView.class);
 			put("", LoginView.class);
@@ -169,7 +186,9 @@ public class MainUI extends UI implements ViewChangeListener {
 				put("member", "Mitglieder");
 				put("campain", "Aktionen");
 				put("groups", "Funktionsgruppen");
+				put("sector", "Bereiche");
 				put("category", "Sparten");
+				put("statistic", "Statistik");
 				put("settings", "Einstellungen");
 				put("log", "Historie");
 			}
