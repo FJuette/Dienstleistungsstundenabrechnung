@@ -110,15 +110,15 @@ public class StatisticsView extends VerticalLayout implements View {
 	
 	private double getDlsForGroup(Group g) {
 		
-		Collection<Long> bookingIds = new ArrayList<Long>();
+		Collection<String> bookingIds = new ArrayList<String>();
 		
 		double dlsCount = 0;
 		for (Member m : members) {
 			if (m.getGroups().contains(g)) {
 				for (Booking b : HibernateUtil.getBookings(m)) {
-					if (!bookingIds.contains(b.getId())) { // Do not count the same booking twice
+					if (!bookingIds.contains(b.getId().toString())) { // Do not count the same booking twice
 						System.out.println(b.getComment() + "  " + b.getCountDls() + "   " + b.getId());
-						bookingIds.add(b.getId());
+						bookingIds.add(b.getId().toString());
 						dlsCount += b.getCountDls();
 					}
 				}
