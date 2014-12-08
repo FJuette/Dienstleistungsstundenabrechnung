@@ -13,6 +13,7 @@ import org.junit.Test;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.Group;
+import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Settings;
 import de.juette.model.Year;
@@ -215,5 +216,29 @@ public class CourseOfYearRunner {
 		// No DLS and only 1 month
 		bookings = new ArrayList<Booking>();
 		assertEquals( 10.0 / 12.0 * 1.0 * 5.0, worker.getMemberDebit(bookings, 1), 0.01);
+	}
+
+	@Test
+	public void testFullMonthCalc() {
+		Settings s = new Settings();
+		s.setDueDate("31.12");
+		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2013), s);
+		List<Log> logEntrys = new ArrayList<Log>();
+		assertEquals(12 , worker.getFullDlsMonth(logEntrys));
+		
+		// Not liberated Member
+		Member m = new Member();
+		m.setActive(true);
+		m.setBirthdate(dateStringFormat.parseDateTime("27.05.1987").toDate());
+		m.setEntryDate(dateStringFormat.parseDateTime("01.01.1999").toDate());
+		
+		List<Group> groups = new ArrayList<Group>();
+		m.setGroups(groups);
+		
+		Log l = new Log();
+		l.setChangedMemberId(m.getId());
+		l.setReferenceDate(dateStringFormat.parseDateTime("01.02.2013").toDate());
+		logEntrys.add(l);
+		assertEquals(11 , worker.getFullDlsMonth(logEntrys));
 	}
 }

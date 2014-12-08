@@ -231,6 +231,22 @@ public class HibernateUtil {
 		return logs;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static List<Log> getLogsFromMemberInYear(Date from, Date to, Long mId) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		Query q = session.createQuery(
+				"from Log where timestamp > :from and timestamp <= :to and changedMemberId = :mId order by timestamp desc");
+		q.setDate("from", from);
+		q.setDate("to", to);
+		q.setLong("mId", mId);
+		List<Log> logs = q.list();
+		tx.commit();
+		
+		return logs;
+	}
+
 	public static Settings getSettings() {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
@@ -319,14 +335,28 @@ public class HibernateUtil {
 		save(log);
 	}
 
-	public static void writeLogEntry(String member, String description,
-			String editor, long id, Date referenceDate) {
+	public static void writeLogEntry(Member member, String description,
+			String editor, Date referenceDate) {
+		
 		Log log = new Log();
-		log.setChangedMember(member);
+		log.setChangedMember(member.getFullName());
 		log.setDescription(description);
 		log.setEditor(editor);
-		log.setChangedMemberId(id);
+		log.setChangedMemberId(member.getId());
 		log.setReferenceDate(referenceDate);
+		log.setmLogId(writeMemberLog(member, referenceDate));
 		save(log);
+	}
+	
+	public static long writeMemberLog(Member member, Date referenceDate) {
+		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(new DateTime(referenceDate).getYear()), getSettings());
+		worker.setMember(member);
+		
+		MemberLog ml = new MemberLog();
+		ml.setRefMemberId(member.getId());
+		ml.setRefDate(referenceDate);
+		ml.setLiberated(worker.isMemberLiberated());
+		save(ml);
+		return ml.getId();
 	}
 }

@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
@@ -33,6 +35,8 @@ import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
+import de.juette.model.Log;
+import de.juette.model.Member;
 import de.juette.model.Year;
 import de.juette.views.windows.NewBookingWindow;
 
@@ -132,17 +136,44 @@ public class BookingView extends EditableTable<Booking> implements View {
 		addComponent(btnsYear);
 
 		btnYear.addClickListener(event -> {
-			CourseOfYearWorker worker;
+			DateTime lastCoyDate = null;
 			try {
-				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), HibernateUtil.getLastCOYDate());
+				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
 			} catch (NoCOYAvailableException e) {
+				
+			}
+			CourseOfYearWorker worker;
+			if (lastCoyDate != null) {
+				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), lastCoyDate.toDate());
+				
+			} else {
 				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
 			}
-			
-			YearWindow();
+			if (DateTime.now().isAfter(worker.getToDate())) {
+				YearWindow();
+				// Do the COY....
+			} else {
+				Notification.show("Der Jahreslauf kann erst gestartet werden, wenn der Zeitraum beendet ist.", Type.ERROR_MESSAGE);
+			}
 		});
 		
 		btnYearTest.addClickListener(event -> {
+			DateTime lastCoyDate = null;
+			try {
+				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
+			} catch (NoCOYAvailableException e) {
+				
+			}
+			CourseOfYearWorker worker;
+			if (lastCoyDate != null) {
+				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), lastCoyDate.toDate());
+				
+			} else {
+				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
+			}
+			
+			
+			// Old code but still needed for later use
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
 			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
 			//FileResource res = new FileResource(worker.runCourseOfYear(false));
@@ -160,6 +191,77 @@ public class BookingView extends EditableTable<Booking> implements View {
 				}
 			});
 		});
+	}
+	
+	private void runCourseOfYear(CourseOfYearWorker worker) {
+		List<String> lines = new ArrayList<String>();
+		lines.add("Vorname;Nachname;Derzeit DLS befreit;Geleistete DLS;Benötigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in €;Bemerkung");
+		for (Member member : HibernateUtil.getAllAsList(Member.class)) {
+			String line = member.getForename() + ";" + member.getSurname() + ";";
+			worker.setMember(member);
+			
+			// Member is Liberated and no changes in the history
+			if (worker.isMemberLiberated() && !historyContainsMember(member, worker.getFromDate().toDate(), worker.getToDate().toDate())) 
+			{
+				line += "Ja;" + worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";0;Keine";
+				
+				System.out.println(line);
+				
+			// Member is not Liberated and no changes in the history
+			} else if(!worker.isMemberLiberated() && !historyContainsMember(member, worker.getFromDate().toDate(), worker.getToDate().toDate())) {
+				
+				line += "Nein;" + worker.getAchievedDls() + ";" + worker.getSettings().getCountDls() + ";" + worker.getSettings().getCostDls() + ";" + 
+						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
+								worker.getFullDlsMonth(new ArrayList<Log>())) + ";Keine";
+			
+			// Member has changes in the history
+			} else {
+				if (worker.isMemberLiberated()) {
+					line += "Ja;";
+				} else {
+					line += "Nein;";
+				}
+				line += worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";" +
+						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
+								worker.getFullDlsMonth(new ArrayList<Log>()));	
+				// TODO für morgen: getFullDlsMonth implementieren, Finalisierung hinzufügen, Überprüfen welche Modus in den Einstellungen gewählt ist
+				// Tests für getFullDlsMonth schreiben
+				// Ausgabe des Jahreslaufs als Datei
+				// manueller test...
+				// Bereich und Statistikfunktion (rudimentär)
+				// Auf den SwEb schieben
+				
+				// Comment...
+				int c = getCountOfChangesInHistory(member, worker.getFromDate().toDate(), worker.getToDate().toDate());
+				if (c > 5) {
+					line += "Manuelle Überprüfung erforderlich, es gab " + c + " Änderungen zu dem Mitglied im Zeitraum";
+				} else if (c > 2) {
+					line += "Manuelle Überprüfung empfohlen, es gab " + c + " Änderungen zu dem Mitglied im Zeitraum";
+				} else {
+					line += c + "Änderungen zu dem Mitglied im Zeitraum";
+				}
+			}
+			
+		}
+	}
+	
+	private boolean historyContainsMember(Member m, Date from, Date to) {
+		for (Log l : HibernateUtil.getHistoryIdsFromYear(from, to)) {
+			if (l.getChangedMemberId() == m.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private int getCountOfChangesInHistory(Member m, Date from, Date to) {
+		int c = 0;
+		for (Log l : HibernateUtil.getHistoryIdsFromYear(from, to)) {
+			if (l.getChangedMemberId() == m.getId()) {
+				c++;
+			}
+		}
+		return c;
 	}
 
 	@Override

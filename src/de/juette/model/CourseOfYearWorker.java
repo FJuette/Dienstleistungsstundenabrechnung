@@ -15,6 +15,7 @@ public class CourseOfYearWorker {
 	private DateTime fromDate;
 	private DateTime toDate;
 	private DateTime lastCOYDueDate;
+	private Double achievedDls;
 	
 	private final DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	
@@ -80,7 +81,7 @@ public class CourseOfYearWorker {
 		// Default is false
 		return false;
 	}
-	
+		
 	public double getMemberDebit(List<Booking> bookings, int month) {
 		double sum = 0;
 		// Calculating the sum of all DLS
@@ -92,6 +93,7 @@ public class CourseOfYearWorker {
 				sum += b.getCountDls();
 			}
 		}
+		achievedDls = sum;
 		sum = (settings.getCountDls() / 12) * month - sum;
 		// If the sum is lower than 0, the member has no debt
 		if (sum < 0) {
@@ -99,6 +101,16 @@ public class CourseOfYearWorker {
 		}
 		double debit = sum * settings.getCostDls();
 		return debit;
+	}
+	
+	public int getFullDlsMonth(List<Log> logs) {
+		// TODO: Need to implement the function to get the right count...
+		// Create a virtual member than count from 1 to 12 and put every change on the member in that month
+		// Than test if the member is liberated with a new worker...
+		for (int i = 0; i < 12; i++) {
+			Member m = member;
+		}
+		return 12;
 	}
 	
 
@@ -148,5 +160,13 @@ public class CourseOfYearWorker {
 
 	public void setLastCOYDueDate(DateTime lastCOYDueDate) {
 		this.lastCOYDueDate = lastCOYDueDate;
+	}
+
+	public Double getAchievedDls() {
+		return achievedDls;
+	}
+
+	public void setAchievedDls(Double achievedDls) {
+		this.achievedDls = achievedDls;
 	}
 }

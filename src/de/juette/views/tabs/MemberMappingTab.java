@@ -33,7 +33,6 @@ public class MemberMappingTab extends FormLayout {
 	
 	public MemberMappingTab(BeanItem<Member> beanItem, String caption,
 			String columnName) {
-
 		groups.addAll(HibernateUtil.getAllAsList(Group.class));
 		categories.addAll(HibernateUtil.getAllAsList(Category.class));
 		
@@ -122,10 +121,10 @@ public class MemberMappingTab extends FormLayout {
 					(beanItem.getBean()).setGroups(mGroups.getItemIds());
 					
 					if (!(beanItem.getBean().getGroups().size() == mGroups.size() && beanItem.getBean().getGroups().containsAll(mGroups.getItemIds()))) {
-						HibernateUtil.writeLogEntry(beanItem.getBean().getFullName(),
+						HibernateUtil.writeLogEntry(beanItem.getBean(),
 								"Gruppenzugehörigkeit verändert", SecurityUtils.getSubject()
-										.getPrincipal().toString(), beanItem.getBean()
-										.getId(), dfRefDate.getValue());
+										.getPrincipal().toString(), 
+										dfRefDate.getValue());
 					}
 				} else {
 					(beanItem.getBean()).setCategories((mCategories
@@ -136,8 +135,10 @@ public class MemberMappingTab extends FormLayout {
 			}
 			if (caption.equals("Sparten")) {
 				HibernateUtil.save(beanItem.getBean());
+				Notification.show("Speichern Erfolgreich.", Type.TRAY_NOTIFICATION);
 			} else if (caption.equals("Gruppen") && GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
 				HibernateUtil.save(beanItem.getBean());
+				Notification.show("Speichern Erfolgreich.", Type.TRAY_NOTIFICATION);
 			} else {
 				GeneralHandler.showNoVaildRefDateException();
 			}
