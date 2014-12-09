@@ -167,6 +167,20 @@ public class HibernateUtil {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static <T extends AbstractEntity> List<T> getFilterAsList(
+			Class<T> dataClass, String where) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<T> list = session.createQuery("from " + dataClass.getSimpleName() + " where " + where)
+				.list();
+
+		tx.commit();
+
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public static <T extends AbstractEntity> List<T> getMaxList(
 			Class<T> dataClass, int count, String orderByClause) {
 		String orderByHQL = "";

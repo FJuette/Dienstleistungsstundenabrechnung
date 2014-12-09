@@ -44,7 +44,6 @@ public class StatisticsView extends VerticalLayout implements View {
 		dlsPerSection();
 		dlsPerGroup();
 		dlsPerCategory();
-
 	}
 	
 	private void dlsPerCategory() {
@@ -79,6 +78,7 @@ public class StatisticsView extends VerticalLayout implements View {
 		addComponent(title);
 
 		for (Group g : HibernateUtil.getAllAsList(Group.class)) {
+			bookingIds = new ArrayList<String>();
 			double dlsCount = getDlsForGroup(g);
 			Label lblEntry = new Label("<strong>" + g.getGroupName() + ":</strong> " + dlsCount, ContentMode.HTML);
 			lblEntry.addStyleName("myHeaderLabel");
@@ -87,6 +87,7 @@ public class StatisticsView extends VerticalLayout implements View {
 		
 	}
 
+	private Collection<String> bookingIds;
 	private void dlsPerSection() {
 		Label title = new Label("<strong>Aktuell gebuchte DLS pro Bereich:</strong>", ContentMode.HTML);
 		title.addStyleName("myFormLayout");
@@ -95,7 +96,9 @@ public class StatisticsView extends VerticalLayout implements View {
 		List<Member> members = new ArrayList<Member>();
 		members.addAll(HibernateUtil.getAllAsList(Member.class));
 		
+		
 		for (Sector s : HibernateUtil.getAllAsList(Sector.class)) {
+			bookingIds = new ArrayList<String>();
 			double dlsCount = 0;
 			for (Group g : s.getGroups()) {
 				dlsCount += getDlsForGroup(g);
@@ -109,23 +112,45 @@ public class StatisticsView extends VerticalLayout implements View {
 	}
 	
 	private double getDlsForGroup(Group g) {
-		
-		Collection<String> bookingIds = new ArrayList<String>();
-		
 		double dlsCount = 0;
 		for (Member m : members) {
 			if (m.getGroups().contains(g)) {
 				for (Booking b : HibernateUtil.getBookings(m)) {
 					if (!bookingIds.contains(b.getId().toString())) { // Do not count the same booking twice
-						System.out.println(b.getComment() + "  " + b.getCountDls() + "   " + b.getId());
+						System.out.println("Gesucht: " + b.getId().toString() + " Booking IDs enhält:");
+						bookingIds.forEach(item -> {
+							System.out.print(item + ", ");
+						});
 						bookingIds.add(b.getId().toString());
 						dlsCount += b.getCountDls();
 					}
 				}
 			}
-			
 		}
 		return dlsCount;
 	}
+	
+	/*
+	private void dlsForCampaign() {
+		Label title = new Label("<strong>Aktuell gebuchte DLS pro Aktion:</strong>", ContentMode.HTML);
+		title.addStyleName("myFormLayout");
+		addComponent(title);
+		
+		List<Member> members = new ArrayList<Member>();
+		members.addAll(HibernateUtil.getAllAsList(Member.class));
+		
+		
+		for (Campaign c : HibernateUtil.getAllAsList(Campaign.class)) {
+			double dlsCount = 0;
+			for (Booking b : HibernateUtil.getFilterAsList(Booking.class, "campaign = " + c)) {
+				dlsCount += b.getCountDls();
+			}
+			
+			Label lblEntry = new Label("<strong>" + c.getDescription() + ":</strong> " + dlsCount, ContentMode.HTML);
+			lblEntry.addStyleName("myHeaderLabel");
+			addComponent(lblEntry);
+		}
+	}
+	*/
 
 }
