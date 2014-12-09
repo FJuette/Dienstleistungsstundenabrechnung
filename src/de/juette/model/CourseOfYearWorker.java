@@ -1,5 +1,6 @@
 package de.juette.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,6 +112,10 @@ public class CourseOfYearWorker {
 			Member m = member;
 		}
 		return 12;
+	}
+	
+	public List<DateTime> getLiberatedDatesFromAP(List<Log> logs) {
+		return new ArrayList<DateTime>();
 	}
 	
 

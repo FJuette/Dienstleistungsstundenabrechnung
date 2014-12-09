@@ -171,7 +171,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 			} else {
 				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
 			}
-			
+			for (Member m : HibernateUtil.getAllAsList(Member.class)) {
+				
+			}
 			
 			// Old code but still needed for later use
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());

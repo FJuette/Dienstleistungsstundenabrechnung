@@ -2,6 +2,7 @@ package de.juette.views;
 
 import java.util.Collection;
 
+import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItem;
@@ -285,6 +286,9 @@ public class MemberView extends ComplexLayout implements View {
 			w.addCloseListener(closeEvent -> {
 				if (w.getMember().getBean().getSurname() != null) {
 					HibernateUtil.save(w.getMember().getBean());
+					HibernateUtil.writeLogEntry(w.getMember().getBean(),
+							"Mitglied neu angelegt", SecurityUtils.getSubject()
+									.getPrincipal().toString(), DateTime.now().toDate());
 					beans.addItem(w.getMember().getBean());
 				}
 			});
