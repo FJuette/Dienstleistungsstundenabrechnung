@@ -15,6 +15,7 @@ import de.juette.model.CourseOfYearWorker;
 import de.juette.model.Group;
 import de.juette.model.Log;
 import de.juette.model.Member;
+import de.juette.model.MemberLog;
 import de.juette.model.Settings;
 import de.juette.model.Year;
 
@@ -221,10 +222,9 @@ public class CourseOfYearRunner {
 	@Test
 	public void testFullMonthCalc() {
 		Settings s = new Settings();
-		s.setDueDate("31.12");
+		s.setDueDate("01.08");
 		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2013), s);
-		List<Log> logEntrys = new ArrayList<Log>();
-		assertEquals(12 , worker.getFullDlsMonth(logEntrys));
+		List<MemberLog> logEntrys = new ArrayList<MemberLog>();
 		
 		// Not liberated Member
 		Member m = new Member();
@@ -235,10 +235,7 @@ public class CourseOfYearRunner {
 		List<Group> groups = new ArrayList<Group>();
 		m.setGroups(groups);
 		
-		Log l = new Log();
-		l.setChangedMemberId(m.getId());
-		l.setReferenceDate(dateStringFormat.parseDateTime("01.02.2013").toDate());
-		logEntrys.add(l);
-		assertEquals(11 , worker.getFullDlsMonth(logEntrys));
+		worker.setMember(m);
+		assertEquals(12 , worker.getFullDlsMonth(logEntrys));
 	}
 }

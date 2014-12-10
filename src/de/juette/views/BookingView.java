@@ -37,6 +37,7 @@ import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 import de.juette.model.Member;
+import de.juette.model.MemberLog;
 import de.juette.model.Year;
 import de.juette.views.windows.NewBookingWindow;
 
@@ -214,7 +215,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				
 				line += "Nein;" + worker.getAchievedDls() + ";" + worker.getSettings().getCountDls() + ";" + worker.getSettings().getCostDls() + ";" + 
 						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth(new ArrayList<Log>())) + ";Keine";
+								worker.getFullDlsMonth(new ArrayList<MemberLog>())) + ";Keine";
 			
 			// Member has changes in the history
 			} else {
@@ -225,7 +226,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				}
 				line += worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";" +
 						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth(new ArrayList<Log>()));	
+								worker.getFullDlsMonth(new ArrayList<MemberLog>()));	
 				// TODO für morgen: getFullDlsMonth implementieren, Finalisierung hinzufügen, Überprüfen welche Modus in den Einstellungen gewählt ist
 				// Tests für getFullDlsMonth schreiben
 				// Ausgabe des Jahreslaufs als Datei

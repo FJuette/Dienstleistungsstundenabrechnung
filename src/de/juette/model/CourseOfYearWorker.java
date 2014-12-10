@@ -2,7 +2,9 @@ package de.juette.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -35,6 +37,7 @@ public class CourseOfYearWorker {
 		calculateDates();
 	}
 	
+	// Tested
 	private void calculateDates() {
 		if (year != null && settings != null && settings.getDueDate() != null) {
 			toDate = dateStringFormat.parseDateTime(settings.getDueDate() + "." + (year.getYear()));
@@ -52,6 +55,7 @@ public class CourseOfYearWorker {
 		}
 	}
 
+	// Tested
 	public Boolean isMemberLiberated() {
 		// Member is not active at the moment
 		if (member.getActive() != null && !member.getActive()) {
@@ -83,6 +87,7 @@ public class CourseOfYearWorker {
 		return false;
 	}
 		
+	// Tested
 	public double getMemberDebit(List<Booking> bookings, int month) {
 		double sum = 0;
 		// Calculating the sum of all DLS
@@ -104,20 +109,41 @@ public class CourseOfYearWorker {
 		return debit;
 	}
 	
-	public int getFullDlsMonth(List<Log> logs) {
+	public int getFullDlsMonth(List<MemberLog> logs) {
 		// TODO: Need to implement the function to get the right count...
 		// Create a virtual member than count from 1 to 12 and put every change on the member in that month
 		// Than test if the member is liberated with a new worker...
-		for (int i = 0; i < 12; i++) {
-			Member m = member;
+		
+		// Made a List of all full month in that timespan
+		DateTime month = getStartMonthDate(fromDate);
+		List<DateTime> months = new ArrayList<DateTime>();
+		do {
+			months.add(month);
+			month = getNextMonth(month);
+		} while (month.isBefore(toDate) || month.isEqual(toDate));
+
+		for (DateTime dt : months) {
+			System.out.println("From: " + dt.toString("dd.MM.yyyy") + " To: " + getLastDayOfMonth(dt).toString("dd.MM.yyyy"));
 		}
+
 		return 12;
 	}
 	
-	public List<DateTime> getLiberatedDatesFromAP(List<Log> logs) {
-		return new ArrayList<DateTime>();
+	private DateTime getNextMonth(DateTime dt) {
+		return dt.plusDays(1).plusMonths(1).minusDays(1);
 	}
 	
+	private DateTime getLastDayOfMonth(DateTime dt) {
+		return dt.plusMonths(1).minusDays(1);
+	}
+	
+	private DateTime getStartMonthDate(DateTime dt) {
+		if (dt.equals(dt.withDayOfMonth(1))) {
+			return dt;
+		} else {
+			return dt.plusMonths(1).withDayOfMonth(1);
+		}
+	}
 
 	public DateTime getFromDate() {
 		return fromDate;

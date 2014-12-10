@@ -36,7 +36,7 @@ import de.juette.model.Settings;
 public class SettingsView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = -8149901292659978760L;
-	private final TextField txtDueDate = new TextField("Stichtag");
+	private final TextField txtDueDate = new TextField("Stichtag (Enddatum eines Monats)");
 	private final TextField txtCountDls = new TextField(
 			"Anzahl der Dienstleistungsstunden pro Jahr");
 	private final TextField txtCostDls = new TextField(
