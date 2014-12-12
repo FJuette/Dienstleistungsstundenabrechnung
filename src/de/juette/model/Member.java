@@ -1,5 +1,7 @@
 package de.juette.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -8,7 +10,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.joda.time.DateTime;
 import org.joda.time.Years;
@@ -31,11 +35,17 @@ public class Member extends AbstractEntity {
 	@Column(name = "geburtsdatum")
 	private Date birthdate;
 
+	@OneToOne
+	private BasicMember basicMember;
+
 	@ManyToMany(cascade = CascadeType.ALL)
 	private Collection<Group> groups = new ArrayList<Group>();
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	private Collection<Category> categories = new ArrayList<Category>();
+
+	@Transient
+	private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
 	public Member() {
 
@@ -65,8 +75,11 @@ public class Member extends AbstractEntity {
 	}
 
 	public String getHtmlName() {
-		return "<div style='font-size:0.9em'><strong>" + forename + " "
-				+ surname + "</strong></div> <div style='font-size:0.8em'>Mitgliedernummer: "
+		return "<div style='font-size:0.9em'><strong>"
+				+ forename
+				+ " "
+				+ surname
+				+ "</strong></div> <div style='font-size:0.8em'>Mitgliedernummer: "
 				+ memberId + "</div>";
 	}
 
@@ -99,7 +112,10 @@ public class Member extends AbstractEntity {
 	}
 
 	public void setEntryDate(Date entryDate) {
+		Date oldDate = this.entryDate;
 		this.entryDate = entryDate;
+		changes.firePropertyChange(MemberColumn.ENTRYDATE.toString(), oldDate,
+				entryDate);
 	}
 
 	public Date getLeavingDate() {
@@ -107,7 +123,10 @@ public class Member extends AbstractEntity {
 	}
 
 	public void setLeavingDate(Date leavingDate) {
+		Date oldDate = this.leavingDate;
 		this.leavingDate = leavingDate;
+		changes.firePropertyChange(MemberColumn.LEAVINGDATE.toString(),
+				oldDate, leavingDate);
 	}
 
 	public Boolean getActive() {
@@ -115,7 +134,10 @@ public class Member extends AbstractEntity {
 	}
 
 	public void setActive(Boolean active) {
+		Boolean oldValue = this.active;
 		this.active = active;
+		changes.firePropertyChange(MemberColumn.ACTIVE.toString(), oldValue,
+				active);
 	}
 
 	public Collection<Group> getGroups() {
@@ -123,7 +145,10 @@ public class Member extends AbstractEntity {
 	}
 
 	public void setGroups(Collection<Group> groups) {
+		Collection<Group> oldGroups = this.groups;
 		this.groups = groups;
+		changes.firePropertyChange(MemberColumn.GROUP.toString(), oldGroups,
+				groups);
 	}
 
 	public Collection<Category> getCategories() {
@@ -141,10 +166,26 @@ public class Member extends AbstractEntity {
 	public void setBirthdate(Date birthdate) {
 		this.birthdate = birthdate;
 	}
-	
-	public int getAge(DateTime dueDate)
-    {
+
+	public int getAge(DateTime dueDate) {
 		Years age = Years.yearsBetween(new DateTime(birthdate), dueDate);
 		return age.getYears();
-    }
+	}
+
+	public BasicMember getBasicMember() {
+		return basicMember;
+	}
+
+	public void setBasicMember(BasicMember basicMember) {
+		this.basicMember = basicMember;
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener l) {
+		changes.addPropertyChangeListener(l);
+	}
+
+	public void removePropertyChangeListener(PropertyChangeListener l) {
+		changes.removePropertyChangeListener(l);
+	}
+
 }

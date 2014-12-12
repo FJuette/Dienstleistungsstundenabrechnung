@@ -2,8 +2,10 @@ package de.juette.views;
 
 import java.util.Collection;
 
+
 import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
+
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -29,12 +31,14 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 
+
 import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MyLeavingMemberDateFilter;
 import de.juette.dlsa.MySubjectFilter;
+import de.juette.model.BasicMember;
 import de.juette.model.Booking;
 import de.juette.model.Category;
 import de.juette.model.Group;
@@ -284,13 +288,14 @@ public class MemberView extends ComplexLayout implements View {
 			NewMemberWindow w;
 			getUI().addWindow(w = new NewMemberWindow());
 			w.addCloseListener(closeEvent -> {
-				if (w.getMember().getBean().getSurname() != null) {
-					HibernateUtil.save(w.getMember().getBean());
-					HibernateUtil.writeLogEntry(w.getMember().getBean(),
-							"Mitglied neu angelegt", SecurityUtils.getSubject()
-									.getPrincipal().toString(), DateTime.now().toDate());
-					beans.addItem(w.getMember().getBean());
-				}
+				// Save the new member
+				HibernateUtil.saveNewMember(w.getMember().getBean());
+				/* TODO
+				HibernateUtil.writeLogEntry(w.getMember().getBean(),
+						"Mitglied neu angelegt", SecurityUtils.getSubject()
+								.getPrincipal().toString(), DateTime.now().toDate());
+								*/
+				beans.addItem(w.getMember().getBean());
 			});
 		});
 

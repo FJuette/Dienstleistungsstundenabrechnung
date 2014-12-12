@@ -62,6 +62,20 @@ public class HibernateUtil {
 		session.saveOrUpdate(entity);
 		tx.commit();
 	}
+	
+	public static void saveNewMember(Member m) {
+		save(m);
+		
+		BasicMember bm = new BasicMember();
+		bm.setActive(m.getActive());
+		bm.setEntryDate(m.getEntryDate());
+		bm.setLeavingDate(m.getLeavingDate());
+		bm.setMember(m);
+		save(bm);
+		
+		m.setBasicMember(bm);
+		save(m);
+	}
 
 	/**
 	 * Save/update all in list.
@@ -358,10 +372,11 @@ public class HibernateUtil {
 		log.setEditor(editor);
 		log.setChangedMemberId(member.getId());
 		log.setReferenceDate(referenceDate);
-		log.setmLogId(writeMemberLog(member, referenceDate));
+		//log.setmLogId(writeMemberLog(member, referenceDate));
 		save(log);
 	}
 	
+	// TODO refactor
 	public static long writeMemberLog(Member member, Date referenceDate) {
 		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(new DateTime(referenceDate).getYear()), getSettings());
 		worker.setMember(member);

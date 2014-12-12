@@ -33,6 +33,22 @@ public class MemberDataTab extends MyDataTab<Member> {
 	private Date leavingDate;
 
 	public MemberDataTab(BeanItem<Member> beanItem) {
+		beanItem.getBean().addPropertyChangeListener(e -> {
+			// Normal Change, like active to passive
+			if (e.getOldValue() != null && e.getNewValue() != null && !e.getOldValue().equals(e.getNewValue())) {
+				System.out.printf("Property '%s': '%s' -> '%s'%n", 
+						e.getPropertyName(), e.getOldValue(), e.getNewValue());
+			// Change from nothing to value, e.g. leaving date
+			} else if(e.getOldValue() == null && e.getNewValue() != null) {
+				System.out.printf("Property '%s': '%s' -> '%s'%n", 
+						e.getPropertyName(), e.getOldValue(), e.getNewValue());
+			// Deleting, e.g the leaving date
+			} else if(e.getOldValue() != null && e.getNewValue() == null) {
+				System.out.printf("Property '%s': '%s' -> '%s'%n", 
+						e.getPropertyName(), e.getOldValue(), e.getNewValue());
+			}
+			
+		});
 		this.beanItem = beanItem;
 		setSizeFull();
 		setStyleName("myFormLayout");

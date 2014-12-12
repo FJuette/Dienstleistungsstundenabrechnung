@@ -232,7 +232,7 @@ public class CourseOfYearRunner {
 		m.setBirthdate(dateStringFormat.parseDateTime("27.05.1987").toDate());
 		m.setEntryDate(dateStringFormat.parseDateTime("01.01.1999").toDate());
 		
-		List<Group> groups = new ArrayList<Group>();
+		List<Group> groups =  new ArrayList<Group>();
 		m.setGroups(groups);
 		
 		worker.setMember(m);
