@@ -29,6 +29,7 @@ public class CategoryView extends EditableTable<Category> implements View {
 		
 		btnNew.setCaption("Neue Sparte");
 		initLayout("Spartenverwaltung");
+		initChangeButton();
 		initTable();
 		extendTable();
 	}

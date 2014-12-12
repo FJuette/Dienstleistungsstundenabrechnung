@@ -109,7 +109,7 @@ public class CourseOfYearWorker {
 		return debit;
 	}
 	
-	public int getFullDlsMonth(List<MemberLog> logs) {
+	public int getFullDlsMonth() {
 		// TODO: Need to implement the function to get the right count...
 		// Create a virtual member than count from 1 to 12 and put every change on the member in that month
 		// Than test if the member is liberated with a new worker...

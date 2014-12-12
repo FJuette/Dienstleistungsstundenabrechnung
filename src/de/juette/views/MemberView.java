@@ -2,10 +2,7 @@ package de.juette.views;
 
 import java.util.Collection;
 
-
-import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
-
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
@@ -31,19 +28,18 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 
-
 import de.juette.dlsa.MyBooleanFilter;
 import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.MyGroupFilter;
 import de.juette.dlsa.MyLeavingMemberDateFilter;
 import de.juette.dlsa.MySubjectFilter;
-import de.juette.model.BasicMember;
 import de.juette.model.Booking;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.MemberInfo;
 import de.juette.views.tabs.MemberDataTab;
 import de.juette.views.tabs.MemberMappingTab;
 import de.juette.views.tabs.MemberStatisticTab;
@@ -458,7 +454,11 @@ public class MemberView extends ComplexLayout implements View {
 			MemberDataTab dataTab = new MemberDataTab(beanItem);
 			tabData.addComponent(dataTab);
 			dataTab.addDataSaveListener(event -> {
-				beans.addBean((Member) event.getBeanItem().getBean());
+				Member m = (Member) event.getBeanItem().getBean();
+				beans.addBean(m);
+				MemberInfo mi = new MemberInfo(m);
+				mi.printHistory();	
+				System.out.println("Are they equal: " + mi.compareMembers(HibernateUtil.getBasicMember(m.getId())));
 				table.refreshRowCache();
 				lblContentHeader.setValue("<strong>Mitglied: </strong> "
 						+ beanItem.getBean().getFullName());

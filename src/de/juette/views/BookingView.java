@@ -21,7 +21,6 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
@@ -37,7 +36,6 @@ import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Log;
 import de.juette.model.Member;
-import de.juette.model.MemberLog;
 import de.juette.model.Year;
 import de.juette.views.windows.NewBookingWindow;
 
@@ -215,7 +213,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				
 				line += "Nein;" + worker.getAchievedDls() + ";" + worker.getSettings().getCountDls() + ";" + worker.getSettings().getCostDls() + ";" + 
 						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth(new ArrayList<MemberLog>())) + ";Keine";
+								worker.getFullDlsMonth()) + ";Keine";
 			
 			// Member has changes in the history
 			} else {
@@ -226,7 +224,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				}
 				line += worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";" +
 						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth(new ArrayList<MemberLog>()));	
+								worker.getFullDlsMonth());	
 				// TODO für morgen: getFullDlsMonth implementieren, Finalisierung hinzufügen, Überprüfen welche Modus in den Einstellungen gewählt ist
 				// Tests für getFullDlsMonth schreiben
 				// Ausgabe des Jahreslaufs als Datei

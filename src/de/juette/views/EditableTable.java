@@ -29,7 +29,7 @@ public abstract class EditableTable<T> extends VerticalLayout {
 	protected BeanItemContainer<T> beans;
 
 	protected final Button btnNew = new Button("Neu");
-	protected final Button btnChange = new Button("Bearbeiten");
+	protected Button btnChange = new Button("Bearbeiten");
 	protected final Button btnMarkAll = new Button("Alle Markieren");
 
 	private Handler actionHandler = new Handler() {
@@ -61,7 +61,6 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		return actionHandler;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void initLayout(String caption) {
 		setSpacing(true);
 		setStyleName("myMainContent");
@@ -87,6 +86,13 @@ public abstract class EditableTable<T> extends VerticalLayout {
 		btnMarkAll.setVisible(false);
 		bottomLeftLayout.addComponents(btnChange, btnMarkAll, btnNew);
 
+		btnNew.addClickListener(event -> {
+			newBeanWindow();
+		});
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected void initChangeButton() {
 		btnChange.addClickListener(event -> {
 			try {
 				if ("Bearbeiten".equals(btnChange.getCaption())) {
@@ -108,10 +114,6 @@ public abstract class EditableTable<T> extends VerticalLayout {
 				Notification.show("Fehler: " + e.getMessage(),
 						Notification.Type.ERROR_MESSAGE);
 			}
-		});
-
-		btnNew.addClickListener(event -> {
-			newBeanWindow();
 		});
 	}
 

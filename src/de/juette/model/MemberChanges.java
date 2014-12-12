@@ -18,6 +18,8 @@ public class MemberChanges extends AbstractEntity {
 	
 	@Column(name = "neuerWert")
 	private String newValue;
+	
+	private Long memberId;
 
 	public Date getRefDate() {
 		return refDate;
@@ -25,6 +27,14 @@ public class MemberChanges extends AbstractEntity {
 
 	public void setRefDate(Date refDate) {
 		this.refDate = refDate;
+	}
+
+	public String getColumn() {
+		return column;
+	}
+
+	public void setColumn(String column) {
+		this.column = column;
 	}
 
 	public String getOldValue() {
@@ -43,11 +53,11 @@ public class MemberChanges extends AbstractEntity {
 		this.newValue = newValue;
 	}
 
-	public String getColumn() {
-		return column;
+	public Long getMemberId() {
+		return memberId;
 	}
 
-	public void setColumn(String column) {
-		this.column = column;
+	public void setMemberId(Long memberId) {
+		this.memberId = memberId;
 	}
 }

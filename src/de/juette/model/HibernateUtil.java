@@ -1,5 +1,6 @@
 package de.juette.model;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -117,6 +118,30 @@ public class HibernateUtil {
 
 		AbstractEntity entity = (AbstractEntity) session.createQuery(
 				"from " + dataClass.getSimpleName() + whereHQL).uniqueResult();
+
+		tx.commit();
+
+		return entity;
+	}
+	
+	public static BasicMember getBasicMember(Long id) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		BasicMember entity = (BasicMember) session.createQuery(
+				"from BasicMember as bm where bm.member.id = " + id).uniqueResult();
+
+		tx.commit();
+
+		return entity;
+	}
+	
+	public static BasicGroup getBasicGroup(Long id) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		BasicGroup entity = (BasicGroup) session.createQuery(
+				"from BasicGroup as b where b.group.id = " + id).uniqueResult();
 
 		tx.commit();
 
@@ -314,6 +339,56 @@ public class HibernateUtil {
 			throw new NoCOYAvailableException();
 	}
 
+	@SuppressWarnings("unchecked")
+	public static Collection<MemberChanges> getMemberChanges(Long memberId) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<?> list = session.createQuery("from MemberChanges where memberId = " + memberId + " order by refDate").list();
+
+		tx.commit();
+		return (List<MemberChanges>)list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<GroupChanges> getGroupChanges(Long groupId) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<?> list = session.createQuery("from GroupChanges where groupId = " + groupId + " order by refDate").list();
+
+		tx.commit();
+		return (List<GroupChanges>)list;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Collection<GroupChanges> getGroupChangesUntilDate(Long groupId, Date date) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		
+		Query q = session.createQuery(
+				"from GroupChanges where groupId = " + groupId + " and refDate <= :date order by refDate");
+		q.setDate("date", date);
+		List<GroupChanges> logs = q.list();
+		tx.commit();
+		return logs;
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public static Collection<MemberChanges> getMemberChangesUntilDate(Long memberId, Date date) {
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+		
+		Query q = session.createQuery(
+				"from MemberChanges where memberId = " + memberId + " and refDate <= :date order by refDate");
+		q.setDate("date", date);
+		List<MemberChanges> logs = q.list();
+		tx.commit();
+		return logs;
+	}
+	
+
 	/**
 	 * Delete item by id.
 	 * 
@@ -374,18 +449,5 @@ public class HibernateUtil {
 		log.setReferenceDate(referenceDate);
 		//log.setmLogId(writeMemberLog(member, referenceDate));
 		save(log);
-	}
-	
-	// TODO refactor
-	public static long writeMemberLog(Member member, Date referenceDate) {
-		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(new DateTime(referenceDate).getYear()), getSettings());
-		worker.setMember(member);
-		
-		MemberLog ml = new MemberLog();
-		ml.setRefMemberId(member.getId());
-		ml.setRefDate(referenceDate);
-		ml.setLiberated(worker.isMemberLiberated());
-		save(ml);
-		return ml.getId();
 	}
 }

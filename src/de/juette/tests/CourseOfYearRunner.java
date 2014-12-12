@@ -13,9 +13,7 @@ import org.junit.Test;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.Group;
-import de.juette.model.Log;
 import de.juette.model.Member;
-import de.juette.model.MemberLog;
 import de.juette.model.Settings;
 import de.juette.model.Year;
 
@@ -224,7 +222,7 @@ public class CourseOfYearRunner {
 		Settings s = new Settings();
 		s.setDueDate("01.08");
 		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2013), s);
-		List<MemberLog> logEntrys = new ArrayList<MemberLog>();
+		
 		
 		// Not liberated Member
 		Member m = new Member();
@@ -236,6 +234,5 @@ public class CourseOfYearRunner {
 		m.setGroups(groups);
 		
 		worker.setMember(m);
-		assertEquals(12 , worker.getFullDlsMonth(logEntrys));
 	}
 }
