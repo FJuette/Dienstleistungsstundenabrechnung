@@ -30,11 +30,9 @@ import com.vaadin.ui.Upload.SucceededListener;
 
 import de.juette.model.Category;
 import de.juette.model.ColumnMapping;
-import de.juette.model.CourseOfYear;
 import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
-import de.juette.model.Year;
 
 @SuppressWarnings("serial")
 public class FileHandler implements Receiver, SucceededListener {
@@ -243,7 +241,7 @@ public class FileHandler implements Receiver, SucceededListener {
 		}
 	}
 	
-	public File writeCsvFile(Date date, List<String> lines, Boolean finalize, Year year, Date dueDate) {
+	public File writeCsvFile(Date date, List<String> lines) {
 		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf.csv";
 		String filepath = basepath + filename;
 		try {
@@ -264,12 +262,6 @@ public class FileHandler implements Receiver, SucceededListener {
 			fileInputStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		if (finalize) {
-			CourseOfYear coy = new CourseOfYear(bFile, new Date(),
-					"Jahreslauf vom " + new SimpleDateFormat("dd.MM.yyyy").format(date),
-					filename + ".csv", dueDate);
-			HibernateUtil.save(coy);
 		}
 		return file;
 	}

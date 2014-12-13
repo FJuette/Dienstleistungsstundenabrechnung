@@ -1,7 +1,7 @@
 package de.juette.views;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
@@ -12,7 +12,10 @@ import com.vaadin.event.Action;
 import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
+import com.vaadin.server.ResourceReference;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -26,6 +29,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.DateToShortGermanStringConverter;
+import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.GeneralHandler;
 import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
@@ -34,7 +38,6 @@ import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
 import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Log;
 import de.juette.model.Member;
 import de.juette.model.Year;
 import de.juette.views.windows.NewBookingWindow;
@@ -149,7 +152,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
 			}
 			if (DateTime.now().isAfter(worker.getToDate())) {
-				YearWindow();
+				YearWindow(worker);
 				// Do the COY....
 			} else {
 				Notification.show("Der Jahreslauf kann erst gestartet werden, wenn der Zeitraum beendet ist.", Type.ERROR_MESSAGE);
@@ -170,17 +173,13 @@ public class BookingView extends EditableTable<Booking> implements View {
 			} else {
 				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
 			}
-			for (Member m : HibernateUtil.getAllAsList(Member.class)) {
-				
-			}
-			
 			// Old code but still needed for later use
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
 			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
-			//FileResource res = new FileResource(worker.runCourseOfYear(false));
-			//setResource("download", res);
-			//ResourceReference rr = ResourceReference.create(res, this, "download");
-			//Page.getCurrent().open(rr.getURL(), null);
+			FileResource res = new FileResource(runCourseOfYear(worker));
+			setResource("download", res);
+			ResourceReference rr = ResourceReference.create(res, this, "download");
+			Page.getCurrent().open(rr.getURL(), null);
 		});
 
 		btnNewBookings.addClickListener(event -> {
@@ -194,75 +193,24 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 	}
 	
-	private void runCourseOfYear(CourseOfYearWorker worker) {
+	private File runCourseOfYear(CourseOfYearWorker worker) {
 		List<String> lines = new ArrayList<String>();
-		lines.add("Vorname;Nachname;Derzeit DLS befreit;Geleistete DLS;Benötigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in €;Bemerkung");
+		lines.add("Vorname;Nachname;Geleistete DLS;Benoetigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in Euro;Bemerkung");
 		for (Member member : HibernateUtil.getAllAsList(Member.class)) {
-			String line = member.getForename() + ";" + member.getSurname() + ";";
 			worker.setMember(member);
-			
-			// Member is Liberated and no changes in the history
-			if (worker.isMemberLiberated() && !historyContainsMember(member, worker.getFromDate().toDate(), worker.getToDate().toDate())) 
-			{
-				line += "Ja;" + worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";0;Keine";
-				
-				System.out.println(line);
-				
-			// Member is not Liberated and no changes in the history
-			} else if(!worker.isMemberLiberated() && !historyContainsMember(member, worker.getFromDate().toDate(), worker.getToDate().toDate())) {
-				
-				line += "Nein;" + worker.getAchievedDls() + ";" + worker.getSettings().getCountDls() + ";" + worker.getSettings().getCostDls() + ";" + 
-						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth()) + ";Keine";
-			
-			// Member has changes in the history
-			} else {
-				if (worker.isMemberLiberated()) {
-					line += "Ja;";
-				} else {
-					line += "Nein;";
-				}
-				line += worker.getAchievedDls() + ";0;" + worker.getSettings().getCostDls() + ";" +
-						worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), 
-								worker.getFullDlsMonth());	
-				// TODO für morgen: getFullDlsMonth implementieren, Finalisierung hinzufügen, Überprüfen welche Modus in den Einstellungen gewählt ist
-				// Tests für getFullDlsMonth schreiben
-				// Ausgabe des Jahreslaufs als Datei
-				// manueller test...
-				// Bereich und Statistikfunktion (rudimentär)
-				// Auf den SwEb schieben
-				
-				// Comment...
-				int c = getCountOfChangesInHistory(member, worker.getFromDate().toDate(), worker.getToDate().toDate());
-				if (c > 5) {
-					line += "Manuelle Überprüfung erforderlich, es gab " + c + " Änderungen zu dem Mitglied im Zeitraum";
-				} else if (c > 2) {
-					line += "Manuelle Überprüfung empfohlen, es gab " + c + " Änderungen zu dem Mitglied im Zeitraum";
-				} else {
-					line += c + "Änderungen zu dem Mitglied im Zeitraum";
-				}
-			}
-			
+			int fullMonth = worker.getFullDlsMonth();
+			Double debit = worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), fullMonth);
+			String line = member.getForename() + ";" + 
+						  member.getSurname() + ";" + 
+						  worker.getAchievedDls() + ";" +
+						  (worker.getSettings().getCountDls() / 12 * fullMonth) + ";" +
+						  worker.getSettings().getCostDls() + ";" +
+						  debit + ";" +
+						  "Keine";
+			lines.add(line);
 		}
-	}
-	
-	private boolean historyContainsMember(Member m, Date from, Date to) {
-		for (Log l : HibernateUtil.getHistoryIdsFromYear(from, to)) {
-			if (l.getChangedMemberId() == m.getId()) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private int getCountOfChangesInHistory(Member m, Date from, Date to) {
-		int c = 0;
-		for (Log l : HibernateUtil.getHistoryIdsFromYear(from, to)) {
-			if (l.getChangedMemberId() == m.getId()) {
-				c++;
-			}
-		}
-		return c;
+		FileHandler fh = new FileHandler();
+		return fh.writeCsvFile(worker.getToDate().toDate(), lines);
 	}
 
 	@Override
@@ -372,7 +320,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		updateTable();
 	}
 
-	private void YearWindow() {
+	private void YearWindow(CourseOfYearWorker worker) {
 		Window window = new Window("Bestätigung");
 		window.setModal(true);
 		window.setWidth("500");
@@ -399,21 +347,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 		Button btnNo = new Button("Nein");
 		btnLayout.addComponent(btnNo);
-
-		
-		
-		//Resource res = new FileResource(worker.runCourseOfYear(true));
-		//FileDownloader fd = new FileDownloader(res);
-		//fd.extend(btnYes);
 		
 		btnYes.addClickListener(evnet -> {
-			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
-			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears
-			//		.getValue(), new Settings());
-			//FileResource res = new FileResource(worker.runCourseOfYear(true));
-			//setResource("download", res);
-			//ResourceReference rr = ResourceReference.create(res, this, "download");
-			//Page.getCurrent().open(rr.getURL(), null);
+			FileResource res = new FileResource(runCourseOfYear(worker));
+			setResource("download", res);
+			ResourceReference rr = ResourceReference.create(res, this, "download");
+			Page.getCurrent().open(rr.getURL(), null);
 			
 			window.close();
 		});
@@ -436,7 +375,6 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 	@Override
 	protected void newBeanWindow() {
-		// TODO Auto-generated method stub
 
 	}
 

@@ -2,9 +2,7 @@ package de.juette.model;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -57,28 +55,32 @@ public class CourseOfYearWorker {
 
 	// Tested
 	public Boolean isMemberLiberated() {
+		return getMemberLiberated(member);
+	}
+	
+	private Boolean getMemberLiberated(Member m) {
 		// Member is not active at the moment
-		if (member.getActive() != null && !member.getActive()) {
+		if (m.getActive() != null && !m.getActive()) {
 			return true;
 		}
 		// Member is too Young
-		if (member.getAge(toDate) < settings.getAgeFrom()) {
+		if (m.getAge(toDate) < settings.getAgeFrom()) {
 			return true;
 		}
 		// Member is too old
-		if (member.getAge(fromDate) >= settings.getAgeTo()) {
+		if (m.getAge(fromDate) >= settings.getAgeTo()) {
 			return true;
 		}
 		// Entry date is after the due date
-		if ( member.getEntryDate() != null && (new DateTime(member.getEntryDate())).isAfter(toDate) ) {
+		if ( m.getEntryDate() != null && (new DateTime(m.getEntryDate())).isAfter(toDate) ) {
 			return true;
 		}
 		// Leaving date is before the due date
-		if ( member.getLeavingDate() != null && new DateTime(member.getLeavingDate()).isBefore(fromDate) ) {
+		if ( m.getLeavingDate() != null && new DateTime(m.getLeavingDate()).isBefore(fromDate) ) {
 			return true;
 		}
 		// Member is part of a group which liberates him at the moment
-		for (Group g : member.getGroups()) {
+		for (Group g : m.getGroups()) {
 			if (g.getLiberated()) {
 				return true;
 			}
@@ -110,10 +112,6 @@ public class CourseOfYearWorker {
 	}
 	
 	public int getFullDlsMonth() {
-		// TODO: Need to implement the function to get the right count...
-		// Create a virtual member than count from 1 to 12 and put every change on the member in that month
-		// Than test if the member is liberated with a new worker...
-		
 		// Made a List of all full month in that timespan
 		DateTime month = getStartMonthDate(fromDate);
 		List<DateTime> months = new ArrayList<DateTime>();
@@ -122,11 +120,17 @@ public class CourseOfYearWorker {
 			month = getNextMonth(month);
 		} while (month.isBefore(toDate) || month.isEqual(toDate));
 
+		MemberInfo mi = new MemberInfo(member);
+		int dlsLibMonth = 0;
+		
 		for (DateTime dt : months) {
-			System.out.println("From: " + dt.toString("dd.MM.yyyy") + " To: " + getLastDayOfMonth(dt).toString("dd.MM.yyyy"));
+			Member m = mi.getMemberStateFromDate(HibernateUtil.getBasicMember(member.getId()), getLastDayOfMonth(dt).plusDays(1).toDate());
+			m.setBirthdate(member.getBirthdate());
+			if (getMemberLiberated(m)) {
+				dlsLibMonth++;
+			}
 		}
-
-		return 12;
+		return 12 - dlsLibMonth;
 	}
 	
 	private DateTime getNextMonth(DateTime dt) {
