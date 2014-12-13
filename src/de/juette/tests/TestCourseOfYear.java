@@ -17,7 +17,7 @@ import de.juette.model.Member;
 import de.juette.model.Settings;
 import de.juette.model.Year;
 
-public class CourseOfYearRunner {
+public class TestCourseOfYear {
 	DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 
 	@Test
