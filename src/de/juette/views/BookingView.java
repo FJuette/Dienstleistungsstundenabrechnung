@@ -176,7 +176,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 			// Old code but still needed for later use
 			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
 			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
-			FileResource res = new FileResource(runCourseOfYear(worker));
+			FileResource res = new FileResource(runCourseOfYear(worker, false));
 			setResource("download", res);
 			ResourceReference rr = ResourceReference.create(res, this, "download");
 			Page.getCurrent().open(rr.getURL(), null);
@@ -193,7 +193,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 	}
 	
-	private File runCourseOfYear(CourseOfYearWorker worker) {
+	private File runCourseOfYear(CourseOfYearWorker worker, Boolean finalize) {
 		List<String> lines = new ArrayList<String>();
 		lines.add("Vorname;Nachname;Geleistete DLS;Benötigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in Euro;Bemerkung");
 		for (Member member : HibernateUtil.getAllAsList(Member.class)) {
@@ -219,7 +219,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 			lines.add(line);
 		}
 		FileHandler fh = new FileHandler();
-		return fh.writeCsvFile(worker.getToDate().toDate(), lines);
+		return fh.writeCsvFile(worker.getToDate().toDate(), lines, finalize, worker.getToDate().toDate());
 	}
 
 	@Override
@@ -358,7 +358,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnLayout.addComponent(btnNo);
 		
 		btnYes.addClickListener(evnet -> {
-			FileResource res = new FileResource(runCourseOfYear(worker));
+			FileResource res = new FileResource(runCourseOfYear(worker, true));
 			setResource("download", res);
 			ResourceReference rr = ResourceReference.create(res, this, "download");
 			Page.getCurrent().open(rr.getURL(), null);

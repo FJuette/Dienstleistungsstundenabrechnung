@@ -96,10 +96,12 @@ public class MainUI extends UI implements ViewChangeListener {
 				DataHandler.createSettings();
 			}
 			
+			/*
 			// temporary
 			if (HibernateUtil.getAllAsList(CourseOfYear.class).size() == 0) {
 				DataHandler.createDummyCycles();
 			}
+			*/
 			
 			if (false) {
 				DataHandler.createDummyGroups();

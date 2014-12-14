@@ -31,6 +31,7 @@ import com.vaadin.ui.Upload.SucceededListener;
 
 import de.juette.model.Category;
 import de.juette.model.ColumnMapping;
+import de.juette.model.CourseOfYear;
 import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -41,7 +42,7 @@ public class FileHandler implements Receiver, SucceededListener {
 	DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	private String basepath = VaadinService.getCurrent().getBaseDirectory()
 			.getAbsolutePath()
-			+ "/WEB-INF/Files/";
+			+ "/WEB-INF/Files";
 
 	public File getFile() {
 		return file;
@@ -61,7 +62,7 @@ public class FileHandler implements Receiver, SucceededListener {
 		try {
 			// Open the file for writing
 			// System.out.println(basepath + filename);
-			file = new File(basepath + filename);
+			file = new File(basepath + "/" + filename);
 			fos = new FileOutputStream(file);
 		} catch (final FileNotFoundException ex) {
 			new Notification("Datei nicht gefunden:<br/>", ex.getMessage(),
@@ -242,12 +243,16 @@ public class FileHandler implements Receiver, SucceededListener {
 		}
 	}
 	
-	public File writeCsvFile(Date date, List<String> lines) {
-		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf.csv";
-		String filepath = basepath + filename;
+	public File writeCsvFile(Date date, List<String> lines, Boolean finalize, Date dueDate) {
+		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + "_Jahreslauf.csv";
+		String filepath = basepath + "/" + filename;
+		File f = new File(basepath);
+		if (!f.exists()) {
+			f.mkdir();
+		}
 		try {
 			Writer writer = new BufferedWriter(new OutputStreamWriter(
-				    new FileOutputStream("outfilename"), "UTF-8"));
+				    new FileOutputStream(filepath), "UTF-8"));
 			for (String line : lines) {
 				writer.write(line + "\n");
 			}
@@ -264,6 +269,13 @@ public class FileHandler implements Receiver, SucceededListener {
 			fileInputStream.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		// Write the file in the database because it is the final run
+		if (finalize) {
+			CourseOfYear coy = new CourseOfYear(bFile, new Date(),
+					"Jahreslauf vom " + new SimpleDateFormat("dd.MM.yyyy").format(date),
+					filename + ".csv", dueDate);
+			HibernateUtil.save(coy);
 		}
 		return file;
 	}
