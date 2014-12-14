@@ -74,8 +74,11 @@ public class MemberInfo {
 				Collection<Group> groups = new ArrayList<Group>();
 				String[] ids = change.getNewValue().trim().split(" ");
 				for (String id : ids) {
-					if (id != null && !id.equals(""))
-						groups.add((Group) HibernateUtil.getUnique(Group.class, "id = " + id));
+					if (id != null && !id.equals("")) {
+						Group currentGroup = (Group) HibernateUtil.getUnique(Group.class, "id = " + id);
+						GroupInfo gi = new GroupInfo(currentGroup);
+						groups.add(gi.getGroupStateFromDate(HibernateUtil.getBasicGroup(currentGroup.getId()), dt));
+					}
 				}
 				m.setGroups(groups);
 			}

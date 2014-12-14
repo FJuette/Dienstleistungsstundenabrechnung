@@ -195,18 +195,27 @@ public class BookingView extends EditableTable<Booking> implements View {
 	
 	private File runCourseOfYear(CourseOfYearWorker worker) {
 		List<String> lines = new ArrayList<String>();
-		lines.add("Vorname;Nachname;Geleistete DLS;Benoetigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in Euro;Bemerkung");
+		lines.add("Vorname;Nachname;Geleistete DLS;Benötigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in Euro;Bemerkung");
 		for (Member member : HibernateUtil.getAllAsList(Member.class)) {
 			worker.setMember(member);
 			int fullMonth = worker.getFullDlsMonth();
 			Double debit = worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), fullMonth);
 			String line = member.getForename() + ";" + 
 						  member.getSurname() + ";" + 
-						  worker.getAchievedDls() + ";" +
-						  (worker.getSettings().getCountDls() / 12 * fullMonth) + ";" +
-						  worker.getSettings().getCostDls() + ";" +
-						  debit + ";" +
-						  "Keine";
+						  worker.getAchievedDls().toString().replace(".", ",") + ";" +
+						  ((Double)worker.getRequiredDls(fullMonth)).toString().replace(".", ",") + ";" +
+						  ((Double)worker.getSettings().getCostDls()).toString().replace(".", ",") + ";" +
+						  debit.toString().replace(".", ",") + ";";
+			if (fullMonth > 0 && fullMonth < 12) {
+				if (fullMonth == 1) {
+					line += "1 Monat DLS befreit";
+				} else 
+					line += 12 - fullMonth + " Monate DLS befreit";
+			} else if (fullMonth == 0) {
+				line += "Alle Monat DLS befreit";
+			} else if (fullMonth == 12) {
+				line += "Keinen Monat DLS befreit";
+			}
 			lines.add(line);
 		}
 		FileHandler fh = new FileHandler();

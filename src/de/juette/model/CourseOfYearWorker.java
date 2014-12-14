@@ -90,7 +90,7 @@ public class CourseOfYearWorker {
 	}
 		
 	// Tested
-	public double getMemberDebit(List<Booking> bookings, int month) {
+	public double getMemberDebit(List<Booking> bookings, int fullMonth) {
 		double sum = 0;
 		// Calculating the sum of all DLS
 		for (Booking b : bookings) {
@@ -102,7 +102,7 @@ public class CourseOfYearWorker {
 			}
 		}
 		achievedDls = sum;
-		sum = (settings.getCountDls() / 12) * month - sum;
+		sum = getRequiredDls(fullMonth) - sum;
 		// If the sum is lower than 0, the member has no debt
 		if (sum < 0) {
 			sum = 0;
@@ -111,8 +111,12 @@ public class CourseOfYearWorker {
 		return debit;
 	}
 	
+	public double getRequiredDls(int fullMonth) {
+		return (((double) Math.round(settings.getCountDls() / 12 * fullMonth * 10)) / 10);
+	}
+	
+	// Number of non liberated months
 	public int getFullDlsMonth() {
-		// Made a List of all full month in that timespan
 		DateTime month = getStartMonthDate(fromDate);
 		List<DateTime> months = new ArrayList<DateTime>();
 		do {

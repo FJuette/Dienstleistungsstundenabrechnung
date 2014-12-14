@@ -210,11 +210,25 @@ public class TestCourseOfYear {
 		b.setCountDls(1);
 		b.setDoneDate(dateStringFormat.parseDateTime("02.02.2013").toDate());
 		bookings.add(b);
-		assertEquals( ( (10.0 / 12.0 * 4.0) - 1.0) * 5.0, worker.getMemberDebit(bookings, 4), 0.01);
+		assertEquals( 11.5, worker.getMemberDebit(bookings, 4), 0.01);
 		
 		// No DLS and only 1 month
 		bookings = new ArrayList<Booking>();
-		assertEquals( 10.0 / 12.0 * 1.0 * 5.0, worker.getMemberDebit(bookings, 1), 0.01);
+		assertEquals( 4, worker.getMemberDebit(bookings, 1), 0.01);
+	}
+	
+	@Test
+	public void testRequiredDls() {
+		Settings s = new Settings();
+		s.setDueDate("31.12");
+		s.setCountDls(10.0);
+		s.setCostDls(5.0);
+		CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2013), s);
+		
+		assertEquals(0, worker.getRequiredDls(0), 0.01);
+		assertEquals(0.8, worker.getRequiredDls(1), 0.01);
+		assertEquals(9.2, worker.getRequiredDls(11), 0.01);
+		assertEquals(10, worker.getRequiredDls(12), 0.01);
 	}
 
 	//@Test

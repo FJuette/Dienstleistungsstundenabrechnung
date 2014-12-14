@@ -24,14 +24,15 @@ public class GroupInfo {
 		System.out.println("--------- End of changes ---------");
 	}
 	
-	public Boolean getGroupStateFromDate(BasicGroup bg, Date dt) {
-		Boolean state = bg.getLiberate();
+	public Group getGroupStateFromDate(BasicGroup bg, Date dt) {
+		Group g = new Group();
+		g.setLiberated(bg.getLiberate());
 		Collection<GroupChanges> changes = HibernateUtil
 				.getGroupChangesUntilDate(group.getId(), dt);
 		for (GroupChanges change : changes) {
-			state = change.getNewValue();
+			g.setLiberated(change.getNewValue());
 		}
-		return state;
+		return g;
 	}
 	
 	public Group getGroup() {

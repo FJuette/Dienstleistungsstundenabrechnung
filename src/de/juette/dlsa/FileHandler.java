@@ -6,10 +6,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -245,7 +246,8 @@ public class FileHandler implements Receiver, SucceededListener {
 		String filename = new SimpleDateFormat("yyyy-MM-dd").format(date) + " Jahreslauf.csv";
 		String filepath = basepath + filename;
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(filepath));
+			Writer writer = new BufferedWriter(new OutputStreamWriter(
+				    new FileOutputStream("outfilename"), "UTF-8"));
 			for (String line : lines) {
 				writer.write(line + "\n");
 			}
