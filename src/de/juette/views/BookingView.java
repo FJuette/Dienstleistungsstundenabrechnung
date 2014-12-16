@@ -44,6 +44,7 @@ import de.juette.views.windows.NewBookingWindow;
 
 public class BookingView extends EditableTable<Booking> implements View {
 
+
 	private static final long serialVersionUID = 6324354416931646341L;
 	
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
@@ -57,7 +58,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		private final Action STORNO = new Action("Stornieren");
 		private final Action[] ACTIONS = new Action[] { STORNO };
 
-		@Override
+		@Override 
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
 			if (action.getCaption().equals("Stornieren")) {
