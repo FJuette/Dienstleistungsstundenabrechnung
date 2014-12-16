@@ -2,7 +2,9 @@ package de.juette.views.windows;
 
 import java.util.List;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Upload.SucceededEvent;
@@ -22,6 +24,7 @@ public class MemberImportWindow extends Window {
 		setWidth("400");
 		setCaption("Einlesen der Mitglieder");
 		
+		
 		FormLayout layout = new FormLayout();
 		layout.setMargin(true);
 		setContent(layout);
@@ -39,6 +42,11 @@ public class MemberImportWindow extends Window {
 				close();
 			}
 		});
+		
+		if (HibernateUtil.getFilterAsList(ColumnMapping.class, "csvColumnIndex > -1").size() == 0) {
+			upload.setEnabled(false);
+			layout.addComponent(new Label("<p style=\"color:red;\">Es sind noch keine Spalten in den Einstellungen konfiguriert.</p>", ContentMode.HTML));
+		}
 		
 		layout.addComponent(upload);
 	}

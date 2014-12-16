@@ -185,9 +185,6 @@ public class BookingView extends EditableTable<Booking> implements View {
 			} else {
 				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
 			}
-			// Old code but still needed for later use
-			//CourseOfYearWorker worker = new CourseOfYearWorker((Year) cbYears.getValue(), new Settings());
-			//CourseOfYearWorker worker = new CourseOfYearWorker(new Year(2014), new Settings());
 			FileResource res = new FileResource(runCourseOfYear(worker, false));
 			setResource("download", res);
 			ResourceReference rr = ResourceReference.create(res, this, "download");
@@ -229,6 +226,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 				line += "Keinen Monat DLS befreit";
 			}
 			lines.add(line);
+			
+			// Do the extra operations from the settings
+			
 		}
 		FileHandler fh = new FileHandler();
 		return fh.writeCsvFile(worker.getToDate().toDate(), lines, finalize, worker.getToDate().toDate());

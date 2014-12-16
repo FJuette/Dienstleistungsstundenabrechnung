@@ -168,64 +168,75 @@ public class FileHandler implements Receiver, SucceededListener {
 				}
 				for (ColumnMapping mapp : mapping) {
 					if (mapp.getDbColumnName().equals("surname")) {
-						m.setSurname(entry[mapp.getCsvColumnIndex()]);
+						if (!(mapp.getCsvColumnIndex() == -1))
+							m.setSurname(entry[mapp.getCsvColumnIndex()]);
 					} else if (mapp.getDbColumnName().equals("forename")) {
-						m.setForename(entry[mapp.getCsvColumnIndex()]);
+						if (!(mapp.getCsvColumnIndex() == -1))
+							m.setForename(entry[mapp.getCsvColumnIndex()]);
 					} else if (mapp.getDbColumnName().equals("memberId")) {
-						m.setMemberId(entry[mapp.getCsvColumnIndex()]);
+						if (!(mapp.getCsvColumnIndex() == -1))
+							m.setMemberId(entry[mapp.getCsvColumnIndex()]);
 					} else if (mapp.getDbColumnName().equals("entryDate")) {
-						try {
-							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
-							if (!newMember) {
-								if (!dt.isEqual(new DateTime(m.getEntryDate()))) {
+						if (!(mapp.getCsvColumnIndex() == -1)) {
+							try {
+								DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
+								if (!newMember) {
+									if (!dt.isEqual(new DateTime(m.getEntryDate()))) {
+										m.setEntryDate(dt.toDate());
+										HibernateUtil.writeLogEntry(m.getFullName(), 
+												"Eintrittsdatum von " + getFormattedDate(m.getEntryDate()) + " nach "
+												+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
+									}
+								} else {
 									m.setEntryDate(dt.toDate());
-									HibernateUtil.writeLogEntry(m.getFullName(), 
-											"Eintrittsdatum von " + getFormattedDate(m.getEntryDate()) + " nach "
-											+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
 								}
-							} else {
-								m.setEntryDate(dt.toDate());
+							} catch (Exception e) {
+								//e.printStackTrace();
 							}
-						} catch (Exception e) {
-							//e.printStackTrace();
 						}
 					} else if (mapp.getDbColumnName().equals("leavingDate")) {
-						try {
-							DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
-							if (!newMember) {
-								if (!dt.isEqual(new DateTime(m.getLeavingDate()))) {
-									m.setLeavingDate(dt.toDate());
-									HibernateUtil.writeLogEntry(m.getFullName(), 
-											"Austrittsdatum von " + getFormattedDate(m.getLeavingDate()) + " nach "
-											+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
+						if (!(mapp.getCsvColumnIndex() == -1)) {
+							try {
+								DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
+								if (!newMember) {
+									if (!dt.isEqual(new DateTime(m.getLeavingDate()))) {
+										m.setLeavingDate(dt.toDate());
+										HibernateUtil.writeLogEntry(m.getFullName(), 
+												"Austrittsdatum von " + getFormattedDate(m.getLeavingDate()) + " nach "
+												+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
+									}
+								} else {
+									m.setEntryDate(dt.toDate());
 								}
-							} else {
-								m.setEntryDate(dt.toDate());
+							} catch (Exception e) {
+								//e.printStackTrace();
 							}
-						} catch (Exception e) {
-							//e.printStackTrace();
 						}
 					} else if (mapp.getDbColumnName().equals("birthdate")) {
-						try {
-							m.setBirthdate(new SimpleDateFormat("dd.MM.yyyy")
-									.parse(entry[mapp.getCsvColumnIndex()]));
-						} catch (ParseException e) {
-							//e.printStackTrace();
-						}
-					} else if (mapp.getDbColumnName().equals("categoryName")) {
-						List<Category> categories = HibernateUtil.getAllAsList(Category.class);
-						Category category = new Category();
-						for (Category c : categories) {
-							if (c.getCategoryName().equals(entry[mapp.getCsvColumnIndex()])) {
-								category = c;
+						if (!(mapp.getCsvColumnIndex() == -1)) {
+							try {
+								m.setBirthdate(new SimpleDateFormat("dd.MM.yyyy")
+										.parse(entry[mapp.getCsvColumnIndex()]));
+							} catch (ParseException e) {
+								//e.printStackTrace();
 							}
 						}
-						List<Category> mCategories = new ArrayList<Category>();
-						if (category.getCategoryName() == null || category.getCategoryName().equals("")) {
-							category.setCategoryName(entry[mapp.getCsvColumnIndex()]);
+					} else if (mapp.getDbColumnName().equals("categoryName")) {
+						if (!(mapp.getCsvColumnIndex() == -1)) {
+							List<Category> categories = HibernateUtil.getAllAsList(Category.class);
+							Category category = new Category();
+							for (Category c : categories) {
+								if (c.getCategoryName().equals(entry[mapp.getCsvColumnIndex()])) {
+									category = c;
+								}
+							}
+							List<Category> mCategories = new ArrayList<Category>();
+							if (category.getCategoryName() == null || category.getCategoryName().equals("")) {
+								category.setCategoryName(entry[mapp.getCsvColumnIndex()]);
+							}
+							mCategories.add(category);
+							m.setCategories(mCategories);
 						}
-						mCategories.add(category);
-						m.setCategories(mCategories);
 					}
 				}
 				HibernateUtil.saveNewMember(m);

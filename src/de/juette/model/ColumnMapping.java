@@ -9,7 +9,7 @@ import javax.persistence.Table;
 public class ColumnMapping extends AbstractEntity {
 
 	@Column(name = "csvSpaltenindex")
-	private int csvColumnIndex;
+	private int csvColumnIndex = -1;
 	@Column(name = "csvSpaltenname")
 	private String csvColumnName;
 	@Column(name = "datenbankspaltenname")
