@@ -25,10 +25,10 @@ import com.vaadin.ui.VerticalLayout;
 import de.juette.dlsa.GeneralHandler;
 import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
-import de.juette.model.Log;
 import de.juette.model.Member;
+import de.juette.model.MemberChanges;
 
-public class LogView extends EditableTable<Log> implements View {
+public class LogView extends EditableTable<MemberChanges> implements View {
 
 	private static final long serialVersionUID = -1649381071729669860L;
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
@@ -58,8 +58,8 @@ public class LogView extends EditableTable<Log> implements View {
 		innerHeadLayout.setSpacing(true);
 		filterLayout = innerHeadLayout;
 
-		beans = new BeanItemContainer<>(Log.class);
-		beans.addAll(HibernateUtil.getMaxList(Log.class,
+		beans = new BeanItemContainer<>(MemberChanges.class);
+		beans.addAll(HibernateUtil.getMaxList(MemberChanges.class,
 				Integer.parseInt(txtMaxItems.getValue()), "timestamp desc"));
 
 		initLayout("Historie");
@@ -70,7 +70,7 @@ public class LogView extends EditableTable<Log> implements View {
 
 	private void getTableData() {
 		beans.removeAllItems();
-		beans.addAll(HibernateUtil.getMaxList(Log.class,
+		beans.addAll(HibernateUtil.getMaxList(MemberChanges.class,
 				Integer.parseInt(txtMaxItems.getValue()), "timestamp desc"));
 		table.refreshRowCache();
 		updateTable();
@@ -111,27 +111,13 @@ public class LogView extends EditableTable<Log> implements View {
 		});
 		
 		cbMember.addValueChangeListener(event -> {
-			beans.removeContainerFilters("changedMember");
+			beans.removeContainerFilters("memberName");
 			if (event.getProperty().getValue() != null)
-				beans.addContainerFilter("changedMember", ((Member)event.getProperty().getValue()).getFullName(), true, false);
+				beans.addContainerFilter("memberName", ((Member)event.getProperty().getValue()).getFullName(), true, false);
 		});
 
 		Label title = new Label("<strong>Filter:</strong>", ContentMode.HTML);
 		fLayout.addComponent(title);
-
-		TextField txtFilter = new TextField();
-		txtFilter.setInputPrompt("Beschreibung");
-		txtFilter.setConverter(String.class);
-		txtFilter.setStyleName("tiny");
-		txtFilter.setNullRepresentation("");
-		fLayout.addComponent(txtFilter);
-		
-		txtFilter.addTextChangeListener(event -> {
-			beans.removeContainerFilters("description");
-			if (event.getText() != null) {
-				beans.addContainerFilter("description", event.getText(), true, false);
-			}
-		});
 
 		return fLayout;
 	}
@@ -148,14 +134,11 @@ public class LogView extends EditableTable<Log> implements View {
 	@Override
 	protected void extendTable() {
 		table.removeAllActionHandlers();
-		table.setVisibleColumns(new Object[] { "timestamp", "referenceDate", "description",
-				"changedMember", "editor" });
-		table.setColumnHeaders("Timestamp", "Bezugsdatum", "Beschreibung", "Mitglied",
-				"Bearbeiter");
-		table.setWidth("90%");
-		table.setColumnExpandRatio("timestamp", (float) 0.15);
-		table.setColumnExpandRatio("description", (float) 0.6);
-		table.setColumnExpandRatio("editor", (float) 0.2);
+		table.setVisibleColumns(new Object[] { "timestamp", "refDate", "columnName",
+				"formattedOldValue", "formattedNewValue", "memberName" });
+		table.setColumnHeaders("Timestamp", "Bezugsdatum", "Veränderter Wert", 
+				"Alter Wert", "Neuer Wert", "Mitglied");
+		table.setWidth("95%");
 	}
 
 	private HorizontalLayout initOldCourses() {

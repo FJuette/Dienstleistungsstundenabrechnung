@@ -187,7 +187,8 @@ public class FileHandler implements Receiver, SucceededListener {
 										MemberChanges mc = new MemberChanges();
 										mc.setMemberId(m.getId());
 										mc.setColumn(MemberColumn.ENTRYDATE.toString());
-										mc.setOldValue(new DateTime(m.getEntryDate()).toString("dd.MM.yyyy"));
+										if (m.getEntryDate() != null)
+											mc.setOldValue(new DateTime(m.getEntryDate()).toString("dd.MM.yyyy"));
 										mc.setNewValue(new DateTime(dt.toDate()).toString("dd.MM.yyyy"));
 										mc.setRefDate(DateTime.now().toDate());
 										HibernateUtil.save(mc);
@@ -209,7 +210,8 @@ public class FileHandler implements Receiver, SucceededListener {
 										MemberChanges mc = new MemberChanges();
 										mc.setMemberId(m.getId());
 										mc.setColumn(MemberColumn.LEAVINGDATE.toString());
-										mc.setOldValue(new DateTime(m.getLeavingDate()).toString("dd.MM.yyyy"));
+										if (m.getLeavingDate() != null)
+											mc.setOldValue(new DateTime(m.getLeavingDate()).toString("dd.MM.yyyy"));
 										mc.setNewValue(new DateTime(dt.toDate()).toString("dd.MM.yyyy"));
 										mc.setRefDate(DateTime.now().toDate());
 										HibernateUtil.save(mc);
