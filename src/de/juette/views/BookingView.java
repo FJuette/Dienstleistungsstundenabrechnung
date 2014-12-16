@@ -138,6 +138,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		addComponent(btnsYear);
 
 		btnYear.addClickListener(event -> {
+			if (cbYears.getValue() == null) {
+				Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
+						+ "Damit ein Jahr in der Auswahlliste erscheint "
+						+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
+				return;
+			}
 			DateTime lastCoyDate = null;
 			try {
 				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
@@ -160,6 +166,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 		
 		btnYearTest.addClickListener(event -> {
+			if (cbYears.getValue() == null) {
+			Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
+					+ "Damit ein Jahr in der Auswahlliste erscheint "
+					+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
+			return;
+		}
 			DateTime lastCoyDate = null;
 			try {
 				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
