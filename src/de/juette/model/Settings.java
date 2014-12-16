@@ -21,8 +21,6 @@ public class Settings extends AbstractEntity {
 	private String bookingMethod;
 	@Column(name = "ausgleichbuchungen")
 	private Boolean clearing = true;
-	@Column(name = "uebertragung")
-	private Boolean dlsTransfer = true;
 	@Column(name = "Granularität")
 	private String granularity;
 
@@ -32,7 +30,7 @@ public class Settings extends AbstractEntity {
 
 	public Settings(String dueDate, Double countDls, Double costDls,
 			Integer ageFrom, Integer ageTo, String bookingMethod,
-			Boolean clearing, Boolean dlsTransfer, String granularity) {
+			Boolean clearing, String granularity) {
 		super();
 		this.dueDate = dueDate;
 		this.countDls = countDls;
@@ -41,7 +39,6 @@ public class Settings extends AbstractEntity {
 		this.ageTo = ageTo;
 		this.bookingMethod = bookingMethod;
 		this.clearing = clearing;
-		this.dlsTransfer = dlsTransfer;
 		this.granularity = granularity;
 	}
 
@@ -91,14 +88,6 @@ public class Settings extends AbstractEntity {
 
 	public void setClearing(Boolean clearing) {
 		this.clearing = clearing;
-	}
-
-	public Boolean getDlsTransfer() {
-		return dlsTransfer;
-	}
-
-	public void setDlsTransfer(Boolean dlsTransfer) {
-		this.dlsTransfer = dlsTransfer;
 	}
 
 	public Double getCountDls() {

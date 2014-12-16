@@ -50,8 +50,6 @@ public class SettingsView extends VerticalLayout implements View {
 	private final OptionGroup groupKind = new OptionGroup();
 	private final CheckBox cbClearing = new CheckBox(
 			"Ausgleichungsbuchungen beim Jahreslauf");
-	private final CheckBox cbTransfer = new CheckBox(
-			"Übername von DLS beim Jahreswechsel");
 	private final Button btnSave = new Button("Speichern");
 	private VerticalLayout mappinglayout = new VerticalLayout();
 	private final ComboBox cbGranularity = new ComboBox("Granularität");
@@ -130,14 +128,6 @@ public class SettingsView extends VerticalLayout implements View {
 		wrap.addComponent(cbClearing);
 		form.addComponent(wrap);
 		fieldGroup.bind(cbClearing, "clearing");
-
-		wrap = new HorizontalLayout();
-		wrap.setSpacing(true);
-		wrap.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
-		wrap.setCaption("Übernahme von DLS");
-		wrap.addComponent(cbTransfer);
-		form.addComponent(wrap);
-		fieldGroup.bind(cbTransfer, "dlsTransfer");
 
 		// cbGranularity
 		cbGranularity.addItem("Keine");
