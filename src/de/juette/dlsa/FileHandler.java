@@ -35,6 +35,8 @@ import de.juette.model.CourseOfYear;
 import de.juette.model.CsvColumn;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.MemberChanges;
+import de.juette.model.MemberColumn;
 
 @SuppressWarnings("serial")
 public class FileHandler implements Receiver, SucceededListener {
@@ -182,10 +184,14 @@ public class FileHandler implements Receiver, SucceededListener {
 								DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
 								if (!newMember) {
 									if (!dt.isEqual(new DateTime(m.getEntryDate()))) {
+										MemberChanges mc = new MemberChanges();
+										mc.setMemberId(m.getId());
+										mc.setColumn(MemberColumn.ENTRYDATE.toString());
+										mc.setOldValue(new DateTime(m.getEntryDate()).toString("dd.MM.yyyy"));
+										mc.setNewValue(new DateTime(dt.toDate()).toString("dd.MM.yyyy"));
+										mc.setRefDate(DateTime.now().toDate());
+										HibernateUtil.save(mc);
 										m.setEntryDate(dt.toDate());
-										HibernateUtil.writeLogEntry(m.getFullName(), 
-												"Eintrittsdatum von " + getFormattedDate(m.getEntryDate()) + " nach "
-												+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
 									}
 								} else {
 									m.setEntryDate(dt.toDate());
@@ -200,10 +206,14 @@ public class FileHandler implements Receiver, SucceededListener {
 								DateTime dt = dateStringFormat.parseDateTime(entry[mapp.getCsvColumnIndex()]);
 								if (!newMember) {
 									if (!dt.isEqual(new DateTime(m.getLeavingDate()))) {
+										MemberChanges mc = new MemberChanges();
+										mc.setMemberId(m.getId());
+										mc.setColumn(MemberColumn.LEAVINGDATE.toString());
+										mc.setOldValue(new DateTime(m.getLeavingDate()).toString("dd.MM.yyyy"));
+										mc.setNewValue(new DateTime(dt.toDate()).toString("dd.MM.yyyy"));
+										mc.setRefDate(DateTime.now().toDate());
+										HibernateUtil.save(mc);
 										m.setLeavingDate(dt.toDate());
-										HibernateUtil.writeLogEntry(m.getFullName(), 
-												"Austrittsdatum von " + getFormattedDate(m.getLeavingDate()) + " nach "
-												+ getFormattedDate(dt.toDate()) + " geändert", "Mitgliederimport", m.getId());
 									}
 								} else {
 									m.setEntryDate(dt.toDate());
@@ -289,9 +299,5 @@ public class FileHandler implements Receiver, SucceededListener {
 			HibernateUtil.save(coy);
 		}
 		return file;
-	}
-	
-	private String getFormattedDate(Date d) {
-		return new SimpleDateFormat("dd.MM.yyyy").format(d);
 	}
 }

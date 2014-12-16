@@ -168,6 +168,9 @@ public class Member extends AbstractEntity {
 	}
 
 	public int getAge(DateTime dueDate) {
+		if (birthdate == null) {
+			return -1;
+		}
 		Years age = Years.yearsBetween(new DateTime(birthdate), dueDate);
 		return age.getYears();
 	}

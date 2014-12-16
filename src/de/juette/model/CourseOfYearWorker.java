@@ -64,11 +64,11 @@ public class CourseOfYearWorker {
 			return true;
 		}
 		// Member is too Young
-		if (m.getAge(toDate) < settings.getAgeFrom()) {
+		if (m.getAge(toDate) != -1 && m.getAge(toDate) < settings.getAgeFrom()) {
 			return true;
 		}
 		// Member is too old
-		if (m.getAge(fromDate) >= settings.getAgeTo()) {
+		if (m.getAge(fromDate) != -1 && m.getAge(fromDate) >= settings.getAgeTo()) {
 			return true;
 		}
 		// Entry date is after the due date

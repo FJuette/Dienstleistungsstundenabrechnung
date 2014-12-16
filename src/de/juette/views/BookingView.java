@@ -45,7 +45,7 @@ import de.juette.views.windows.NewBookingWindow;
 public class BookingView extends EditableTable<Booking> implements View {
 
 	private static final long serialVersionUID = 6324354416931646341L;
-
+	
 	private HorizontalLayout innerHeadLayout = new HorizontalLayout();
 	private ComboBox cbYears = new ComboBox();
 	private Button btnYear = new Button("Jahreslauf durchführen");
@@ -215,15 +215,19 @@ public class BookingView extends EditableTable<Booking> implements View {
 						  ((Double)worker.getRequiredDls(fullMonth)).toString().replace(".", ",") + ";" +
 						  ((Double)worker.getSettings().getCostDls()).toString().replace(".", ",") + ";" +
 						  debit.toString().replace(".", ",") + ";";
-			if (fullMonth > 0 && fullMonth < 12) {
+
+			if (worker.getMember().getAge(worker.getToDate()) == -1) {
+				line += "Kein Geburtsdatum vorhanden.";
+			}
+			else if (fullMonth > 0 && fullMonth < 12) {
 				if (fullMonth == 1) {
 					line += "1 Monat DLS befreit";
 				} else 
-					line += 12 - fullMonth + " Monate DLS befreit";
+					line += 12 - fullMonth + " Monate DLS befreit.";
 			} else if (fullMonth == 0) {
-				line += "Alle Monat DLS befreit";
+				line += "Alle Monat DLS befreit.";
 			} else if (fullMonth == 12) {
-				line += "Keinen Monat DLS befreit";
+				line += "Keinen Monat DLS befreit.";
 			}
 			lines.add(line);
 			
