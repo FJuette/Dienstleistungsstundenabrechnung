@@ -369,4 +369,14 @@ public class DataHandler {
 								"categoryName", "Sparte"), new ColumnMapping("birthdate", "Geburtsdatum")));
 		HibernateUtil.saveAll(entrys);
 	}
+	
+	public static ArrayList<ColumnMapping> getMappingEntrys() {
+		ArrayList<ColumnMapping> entrys = new ArrayList<ColumnMapping>(
+				Arrays.asList(new ColumnMapping("surname", "Nachname"), new ColumnMapping(
+						"forename", "Vorname"), new ColumnMapping("memberId", "Mitgliedsnummer"),
+						new ColumnMapping("entryDate", "Eintrittsdatum"), new ColumnMapping(
+								"leavingDate", "Austrittsdatum"), new ColumnMapping(
+								"categoryName", "Sparte"), new ColumnMapping("birthdate", "Geburtsdatum")));
+		return entrys;
+	}
 }
