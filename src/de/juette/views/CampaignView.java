@@ -145,7 +145,8 @@ public class CampaignView extends ComplexLayout implements View {
 
 		BeanItemContainer<Member> members = new BeanItemContainer<Member>(
 				Member.class);
-		members.addAll(HibernateUtil.getAllAsList(Member.class));
+		members.addAll(HibernateUtil.orderedWhereList(Member.class, "aikz = " + true,
+				"surname asc, forename asc, memberId asc"));
 		ComboBox cbContact = new ComboBox("Ansprechpartner");
 		cbContact.setContainerDataSource(members);
 		cbContact.setItemCaptionPropertyId("fullName");

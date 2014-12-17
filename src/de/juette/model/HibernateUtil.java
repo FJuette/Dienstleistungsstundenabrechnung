@@ -190,6 +190,27 @@ public class HibernateUtil {
 
 		return list;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends AbstractEntity> List<T> orderedWhereList(
+			Class<T> dataClass, String where, String orderByClause) {
+		String whereHQL = "";
+		if (where != null && where.trim().length() > 0)
+			whereHQL = " where " + where + " ";
+		String orderByHQL = "";
+		if (orderByClause != null && orderByClause.trim().length() > 0)
+			orderByHQL = " order by " + orderByClause;
+
+		Session session = getSession();
+		Transaction tx = session.beginTransaction();
+
+		List<T> list = session.createQuery(
+				"from " + dataClass.getSimpleName() + whereHQL + orderByHQL).list();
+
+		tx.commit();
+
+		return list;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static <T extends AbstractEntity> List<T> getAllAsList(

@@ -11,6 +11,7 @@ import com.vaadin.event.Action.Handler;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -182,9 +183,9 @@ public class MemberView extends ComplexLayout implements View {
 			} else if (action.getCaption().equals("Entfernen")) {
 				for (Member bean : (Collection<Member>) table.getValue()) {
 					try {
-						beans.removeItem(bean);
-						HibernateUtil.removeItem(Member.class, bean.getId()
-								.toString());
+						bean.setAikz(false);
+						HibernateUtil.save(bean);
+						Page.getCurrent().reload();
 					} catch (Exception e) {
 						System.out
 								.println("Dieses Mitglied kann nicht gelöscht werden.");
@@ -322,7 +323,7 @@ public class MemberView extends ComplexLayout implements View {
 
 	private void initTable() {
 		beans = new BeanItemContainer<Member>(Member.class);
-		beans.addAll(HibernateUtil.orderedList(Member.class,
+		beans.addAll(HibernateUtil.orderedWhereList(Member.class, "aikz = " + true,
 				"surname asc, forename asc, memberId asc"));
 		filterActives();
 		filterLeavingDate();

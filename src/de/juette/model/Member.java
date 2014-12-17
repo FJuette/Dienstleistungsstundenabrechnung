@@ -34,6 +34,8 @@ public class Member extends AbstractEntity {
 	private Boolean active = true;
 	@Column(name = "geburtsdatum")
 	private Date birthdate;
+	
+	private Boolean aikz = true;
 
 	@OneToOne
 	private BasicMember basicMember;
@@ -189,6 +191,14 @@ public class Member extends AbstractEntity {
 
 	public void removePropertyChangeListener(PropertyChangeListener l) {
 		changes.removePropertyChangeListener(l);
+	}
+
+	public Boolean getAikz() {
+		return aikz;
+	}
+
+	public void setAikz(Boolean aikz) {
+		this.aikz = aikz;
 	}
 
 }
