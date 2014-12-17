@@ -1,5 +1,6 @@
 package de.juette.model;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -76,6 +77,35 @@ public class HibernateUtil {
 		
 		m.setBasicMember(bm);
 		save(m);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void saveMemberChanges(Member m, PropertyChangeEvent e) {
+		MemberChanges mc = new MemberChanges();
+		mc.setMemberId(m.getId());
+		mc.setColumn(e.getPropertyName());
+		if (e.getPropertyName().equals(MemberColumn.ENTRYDATE.toString()) || 
+				e.getPropertyName().equals(MemberColumn.LEAVINGDATE.toString())) {
+			mc.setNewValue(new DateTime(e.getNewValue()).toString("dd.MM.yyyy"));
+			mc.setOldValue(new DateTime(e.getOldValue()).toString("dd.MM.yyyy"));
+		} else if (e.getPropertyName().equals(MemberColumn.GROUP.toString())) {
+			String oldValue = "";
+			for (Group g : (Collection<Group>)e.getOldValue()) {
+				oldValue += g.getId() + " ";
+			}
+			mc.setOldValue(oldValue);
+			
+			String newValue = "";
+			for (Group g : (Collection<Group>)e.getNewValue()) {
+				newValue += g.getId() + " ";
+			}
+			mc.setNewValue(newValue);
+		} else {
+			mc.setNewValue(e.getNewValue().toString());
+			mc.setOldValue(e.getOldValue().toString());
+		}
+		mc.setRefDate(DateTime.now().toDate());
+		save(mc);
 	}
 
 	/**

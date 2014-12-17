@@ -1,5 +1,7 @@
 package de.juette.views;
 
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
@@ -40,6 +42,7 @@ import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.MemberColumn;
 import de.juette.model.MemberInfo;
 import de.juette.views.tabs.MemberDataTab;
 import de.juette.views.tabs.MemberMappingTab;
@@ -47,6 +50,7 @@ import de.juette.views.tabs.MemberStatisticTab;
 import de.juette.views.windows.MemberAPWindow;
 import de.juette.views.windows.MemberImportWindow;
 import de.juette.views.windows.MemberMappingWindow;
+import de.juette.views.windows.MemberRefBookingWindow;
 import de.juette.views.windows.NewBookingWindow;
 import de.juette.views.windows.NewMemberWindow;
 
@@ -76,14 +80,18 @@ public class MemberView extends ComplexLayout implements View {
 		private final Action GROUPS_DEL = new Action("Gruppe löschen");
 		private final Action CATEGORIES_DEL = new Action("Sparte löschen");
 		private final Action ACTIVE_PASSIVE = new Action("Aktiv/Passiv buchen");
+		private final Action REF_DATE_CHANGE = new Action("Änderung zu einem Bezugsdatum");
 		private final Action REMOVE = new Action("Entfernen");
 		private final Action[] ACTIONS = new Action[] { DLS, GROUPS_ADD,
-				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, ACTIVE_PASSIVE, REMOVE };
-
+				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, ACTIVE_PASSIVE, REF_DATE_CHANGE, REMOVE };
+		
 		@SuppressWarnings("unchecked")
 		public void handleAction(final Action action, final Object sender,
 				final Object target) {
-			if (action.getCaption().equals("Gruppe hinzufügen")) {
+			if (action.getCaption().equals("Änderung zu einem Bezugsdatum")) {
+				MemberRefBookingWindow w = new MemberRefBookingWindow((Collection<Member>) table.getValue());
+				getUI().addWindow(w);
+			} else if (action.getCaption().equals("Gruppe hinzufügen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
 					getUI().addWindow(
@@ -91,11 +99,19 @@ public class MemberView extends ComplexLayout implements View {
 									"add"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getGroup() != null) {
+							Collection<Member> savedChanges = new ArrayList<Member>();
 							for (Member member : (Collection<Member>) table
 									.getValue()) {
 								if (!member.getGroups().contains(w.getGroup())) {
-									beans.getItem(member).getBean().getGroups()
-											.add(w.getGroup());
+									if (!savedChanges.contains(member)) {
+										Collection<Group> oldValue = new ArrayList<Group>();
+										oldValue.addAll(member.getGroups());
+										beans.getItem(member).getBean().getGroups()
+												.add(w.getGroup());
+										PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.GROUP.toString(), oldValue, member.getGroups());
+										HibernateUtil.saveMemberChanges(member, e);
+										savedChanges.add(member);
+									}
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -131,11 +147,19 @@ public class MemberView extends ComplexLayout implements View {
 									"remove"));
 					w.addCloseListener(closeEvent -> {
 						if (w.getGroup() != null) {
+							Collection<Member> savedChanges = new ArrayList<Member>();
 							for (Member bean : (Collection<Member>) table
 									.getValue()) {
 								if (bean.getGroups().contains(w.getGroup())) {
-									beans.getItem(bean).getBean().getGroups()
-											.remove(w.getGroup());
+									if (!savedChanges.contains(bean)) {
+										Collection<Group> oldValue = new ArrayList<Group>();
+										oldValue.addAll(bean.getGroups());
+										beans.getItem(bean).getBean().getGroups()
+										.remove(w.getGroup());
+										PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.GROUP.toString(), oldValue, bean.getGroups());
+										HibernateUtil.saveMemberChanges(bean, e);
+										savedChanges.add(bean);
+									}
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
@@ -170,10 +194,17 @@ public class MemberView extends ComplexLayout implements View {
 							w = new MemberAPWindow());
 					w.addCloseListener(closeEvent -> {
 						if (w.getChoice() != null) {
+							Collection<Member> savedChanges = new ArrayList<Member>();
 							for (Member bean : (Collection<Member>) table
 									.getValue()) {
-								beans.getItem(bean).getBean()
-										.setActive(w.getChoice());
+								if (bean.getActive() != w.getChoice() && !savedChanges.contains(bean)) {
+									PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.ACTIVE.toString(), bean.getActive(), w.getChoice());
+									HibernateUtil.saveMemberChanges(bean, e);
+									savedChanges.add(bean);
+									beans.getItem(bean).getBean()
+									.setActive(w.getChoice());
+								}
+								
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
 							table.refreshRowCache();

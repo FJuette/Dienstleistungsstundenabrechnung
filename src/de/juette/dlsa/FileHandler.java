@@ -251,7 +251,12 @@ public class FileHandler implements Receiver, SucceededListener {
 						}
 					}
 				}
-				HibernateUtil.saveNewMember(m);
+				if (newMember) {
+					HibernateUtil.saveNewMember(m);
+				} else {
+					HibernateUtil.save(m);
+				}
+				
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

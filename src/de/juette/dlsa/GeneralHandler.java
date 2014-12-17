@@ -18,7 +18,11 @@ public class GeneralHandler {
 		try {
 			dtLastCoy = new DateTime (HibernateUtil.getLastCOYDate());
 		} catch (NoCOYAvailableException ex) {  }
-		return (!dtLastCoy.equals(DateTime.now()) && dtLastCoy.isBefore(new DateTime(dfRefDate)));
+		return validateRefDate(dtLastCoy, dfRefDate);
+	}
+	
+	public static Boolean validateRefDate(DateTime dtLastCoy, Date dfRefDate) {
+		return (!dtLastCoy.equals(dfRefDate) && dtLastCoy.isBefore(new DateTime(dfRefDate)));
 	}
 	
 	public static void showNoVaildRefDateException() {

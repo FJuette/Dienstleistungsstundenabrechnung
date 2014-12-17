@@ -1,8 +1,5 @@
 package de.juette.views.tabs;
 
-import java.beans.PropertyChangeEvent;
-import java.util.Collection;
-
 import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 
@@ -16,45 +13,15 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 
 import de.juette.dlsa.GeneralHandler;
-import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
-import de.juette.model.MemberChanges;
-import de.juette.model.MemberColumn;
 
 
 public class MemberDataTab extends MyDataTab<Member> {
 
 	private static final long serialVersionUID = -4275563354183555579L;
 
-	@SuppressWarnings("unchecked")
-	private void saveMemberChanges(PropertyChangeEvent e) {
-		MemberChanges mc = new MemberChanges();
-		mc.setMemberId(this.beanItem.getBean().getId());
-		mc.setColumn(e.getPropertyName());
-		if (e.getPropertyName().equals(MemberColumn.ENTRYDATE.toString()) || 
-				e.getPropertyName().equals(MemberColumn.LEAVINGDATE.toString())) {
-			mc.setNewValue(new DateTime(e.getNewValue()).toString("dd.MM.yyyy"));
-			mc.setOldValue(new DateTime(e.getOldValue()).toString("dd.MM.yyyy"));
-		} else if (e.getPropertyName().equals(MemberColumn.GROUP.toString())) {
-			String oldValue = "";
-			for (Group g : (Collection<Group>)e.getOldValue()) {
-				oldValue += g.getId() + " ";
-			}
-			mc.setOldValue(oldValue);
-			
-			String newValue = "";
-			for (Group g : (Collection<Group>)e.getNewValue()) {
-				newValue += g.getId() + " ";
-			}
-			mc.setNewValue(newValue);
-		} else {
-			mc.setNewValue(e.getNewValue().toString());
-			mc.setOldValue(e.getOldValue().toString());
-		}
-		mc.setRefDate(DateTime.now().toDate());
-		HibernateUtil.save(mc);
-	}
+	
 
 	public MemberDataTab(BeanItem<Member> beanItem) {
 		
@@ -62,21 +29,21 @@ public class MemberDataTab extends MyDataTab<Member> {
 			// Normal Change, like active to passive
 				if (e.getOldValue() != null && e.getNewValue() != null
 						&& !e.getOldValue().equals(e.getNewValue())) {
-					saveMemberChanges(e);
+					HibernateUtil.saveMemberChanges(beanItem.getBean(), e);
 
 					System.out.printf("Property '%s': '%s' -> '%s'%n",
 							e.getPropertyName(), e.getOldValue(),
 							e.getNewValue());
 					// Change from nothing to value, e.g. leaving date
 				} else if (e.getOldValue() == null && e.getNewValue() != null) {
-					saveMemberChanges(e);
+					HibernateUtil.saveMemberChanges(beanItem.getBean(), e);
 
 					System.out.printf("Property '%s': '%s' -> '%s'%n",
 							e.getPropertyName(), e.getOldValue(),
 							e.getNewValue());
 					// Deleting, e.g the leaving date
 				} else if (e.getOldValue() != null && e.getNewValue() == null) {
-					saveMemberChanges(e);
+					HibernateUtil.saveMemberChanges(beanItem.getBean(), e);
 
 					System.out.printf("Property '%s': '%s' -> '%s'%n",
 							e.getPropertyName(), e.getOldValue(),
