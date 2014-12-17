@@ -1,7 +1,5 @@
 package de.juette.views;
 
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
@@ -42,12 +40,10 @@ import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
-import de.juette.model.MemberColumn;
 import de.juette.model.MemberInfo;
 import de.juette.views.tabs.MemberDataTab;
 import de.juette.views.tabs.MemberMappingTab;
 import de.juette.views.tabs.MemberStatisticTab;
-import de.juette.views.windows.MemberAPWindow;
 import de.juette.views.windows.MemberImportWindow;
 import de.juette.views.windows.MemberMappingWindow;
 import de.juette.views.windows.MemberRefBookingWindow;
@@ -75,15 +71,12 @@ public class MemberView extends ComplexLayout implements View {
 
 		private static final long serialVersionUID = -2704399406149413121L;
 		private final Action DLS = new Action("DLS Buchen");
-		private final Action GROUPS_ADD = new Action("Gruppe hinzufügen");
 		private final Action CATEGORIES_ADD = new Action("Sparte hinzufügen");
-		private final Action GROUPS_DEL = new Action("Gruppe löschen");
 		private final Action CATEGORIES_DEL = new Action("Sparte löschen");
-		private final Action ACTIVE_PASSIVE = new Action("Aktiv/Passiv buchen");
 		private final Action REF_DATE_CHANGE = new Action("Änderung zu einem Bezugsdatum");
 		private final Action REMOVE = new Action("Entfernen");
-		private final Action[] ACTIONS = new Action[] { DLS, GROUPS_ADD,
-				CATEGORIES_ADD, GROUPS_DEL, CATEGORIES_DEL, ACTIVE_PASSIVE, REF_DATE_CHANGE, REMOVE };
+		private final Action[] ACTIONS = new Action[] { DLS, 
+				CATEGORIES_ADD, CATEGORIES_DEL, REF_DATE_CHANGE, REMOVE };
 		
 		@SuppressWarnings("unchecked")
 		public void handleAction(final Action action, final Object sender,
@@ -91,33 +84,10 @@ public class MemberView extends ComplexLayout implements View {
 			if (action.getCaption().equals("Änderung zu einem Bezugsdatum")) {
 				MemberRefBookingWindow w = new MemberRefBookingWindow((Collection<Member>) table.getValue());
 				getUI().addWindow(w);
-			} else if (action.getCaption().equals("Gruppe hinzufügen")) {
-				if (table.getValue() != null) {
-					MemberMappingWindow w;
-					getUI().addWindow(
-							w = new MemberMappingWindow("Gruppe", "groupName",
-									"add"));
-					w.addCloseListener(closeEvent -> {
-						if (w.getGroup() != null) {
-							Collection<Member> savedChanges = new ArrayList<Member>();
-							for (Member member : (Collection<Member>) table
-									.getValue()) {
-								if (!member.getGroups().contains(w.getGroup())) {
-									if (!savedChanges.contains(member)) {
-										Collection<Group> oldValue = new ArrayList<Group>();
-										oldValue.addAll(member.getGroups());
-										beans.getItem(member).getBean().getGroups()
-												.add(w.getGroup());
-										PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.GROUP.toString(), oldValue, member.getGroups());
-										HibernateUtil.saveMemberChanges(member, e);
-										savedChanges.add(member);
-									}
-								}
-							}
-							HibernateUtil.saveAll(beans.getItemIds());
-						}
-					});
-				}
+				w.addCloseListener(closeEvent -> {
+					Page.getCurrent().reload();
+				});
+
 			} else if (action.getCaption().equals("Sparte hinzufügen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
@@ -139,34 +109,7 @@ public class MemberView extends ComplexLayout implements View {
 						}
 					});
 				}
-			} else if (action.getCaption().equals("Gruppe löschen")) {
-				if (table.getValue() != null) {
-					MemberMappingWindow w;
-					getUI().addWindow(
-							w = new MemberMappingWindow("Gruppe", "groupName",
-									"remove"));
-					w.addCloseListener(closeEvent -> {
-						if (w.getGroup() != null) {
-							Collection<Member> savedChanges = new ArrayList<Member>();
-							for (Member bean : (Collection<Member>) table
-									.getValue()) {
-								if (bean.getGroups().contains(w.getGroup())) {
-									if (!savedChanges.contains(bean)) {
-										Collection<Group> oldValue = new ArrayList<Group>();
-										oldValue.addAll(bean.getGroups());
-										beans.getItem(bean).getBean().getGroups()
-										.remove(w.getGroup());
-										PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.GROUP.toString(), oldValue, bean.getGroups());
-										HibernateUtil.saveMemberChanges(bean, e);
-										savedChanges.add(bean);
-									}
-								}
-							}
-							HibernateUtil.saveAll(beans.getItemIds());
-						}
-					});
-				}
-			} else if (action.getCaption().equals("Sparte löschen")) {
+			}  else if (action.getCaption().equals("Sparte löschen")) {
 				if (table.getValue() != null) {
 					MemberMappingWindow w;
 					getUI().addWindow(
@@ -184,30 +127,6 @@ public class MemberView extends ComplexLayout implements View {
 								}
 							}
 							HibernateUtil.saveAll(beans.getItemIds());
-						}
-					});
-				}
-			}  else if (action.getCaption().equals("Aktiv/Passiv buchen")) {
-				if (table.getValue() != null) {
-					MemberAPWindow w;
-					getUI().addWindow(
-							w = new MemberAPWindow());
-					w.addCloseListener(closeEvent -> {
-						if (w.getChoice() != null) {
-							Collection<Member> savedChanges = new ArrayList<Member>();
-							for (Member bean : (Collection<Member>) table
-									.getValue()) {
-								if (bean.getActive() != w.getChoice() && !savedChanges.contains(bean)) {
-									PropertyChangeEvent e = new PropertyChangeEvent(sender, MemberColumn.ACTIVE.toString(), bean.getActive(), w.getChoice());
-									HibernateUtil.saveMemberChanges(bean, e);
-									savedChanges.add(bean);
-									beans.getItem(bean).getBean()
-									.setActive(w.getChoice());
-								}
-								
-							}
-							HibernateUtil.saveAll(beans.getItemIds());
-							table.refreshRowCache();
 						}
 					});
 				}
@@ -260,6 +179,20 @@ public class MemberView extends ComplexLayout implements View {
 
 		groups.addAll(HibernateUtil.getAllAsList(Group.class));
 		categories.addAll(HibernateUtil.getAllAsList(Category.class));
+		registerPropertyChangeListener();
+	}
+	
+	private void registerPropertyChangeListener() {
+		for (Member m : beans.getItemIds()) {
+			m.removeAllPropertyChangeListeners();
+			m.addPropertyChangeListener(e -> {
+				HibernateUtil.saveMemberChanges(m, e);
+
+				System.out.printf("Property '%s': '%s' -> '%s'%n",
+						e.getPropertyName(), e.getOldValue(),
+						e.getNewValue());
+			});
+		}
 	}
 
 	private void extendLayout() {
@@ -324,6 +257,7 @@ public class MemberView extends ComplexLayout implements View {
 								.getPrincipal().toString(), DateTime.now().toDate());
 								*/
 				beans.addItem(w.getMember().getBean());
+				registerPropertyChangeListener();
 			});
 		});
 

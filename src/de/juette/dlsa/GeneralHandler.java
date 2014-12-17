@@ -15,6 +15,7 @@ public class GeneralHandler {
 
 	public static Boolean isRefDateValid(Date dfRefDate) {
 		DateTime dtLastCoy = new DateTime();
+		dtLastCoy = dtLastCoy.minusYears(100);
 		try {
 			dtLastCoy = new DateTime (HibernateUtil.getLastCOYDate());
 		} catch (NoCOYAvailableException ex) {  }
@@ -27,6 +28,7 @@ public class GeneralHandler {
 	
 	public static void showNoVaildRefDateException() {
 		Notification.show("Das Bezugsdatum kann nicht in oder vor einem abgeschlossenem Jahreslaufzeitraum liegen.", Type.ERROR_MESSAGE);
+		System.out.println("Das Bezugsdatum kann nicht in oder vor einem abgeschlossenem Jahreslaufzeitraum liegen.");
 	}
 	
 	public static Label getNoGuestLabel() {

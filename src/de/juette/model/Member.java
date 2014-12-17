@@ -193,6 +193,12 @@ public class Member extends AbstractEntity {
 		changes.removePropertyChangeListener(l);
 	}
 
+	public void removeAllPropertyChangeListeners() {
+		for (PropertyChangeListener l : changes.getPropertyChangeListeners()) {
+			changes.removePropertyChangeListener(l);
+		} 
+	}
+
 	public Boolean getAikz() {
 		return aikz;
 	}

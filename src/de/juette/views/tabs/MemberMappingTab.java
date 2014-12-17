@@ -1,21 +1,18 @@
 package de.juette.views.tabs;
 
 import org.apache.shiro.SecurityUtils;
-import org.joda.time.DateTime;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
 import de.juette.dlsa.ComponentHelper;
-import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
@@ -101,31 +98,15 @@ public class MemberMappingTab extends FormLayout {
 		Button btnSaveChanges = new Button("Speichern");
 		btnSaveChanges.setStyleName("friendly");
 		
-		DateField dfRefDate = new DateField("Bezugsdatum der Änderung");
-		dfRefDate.setStyleName("tiny");
-		dfRefDate.setValue(DateTime.now().toDate());
-		dfRefDate.setDateFormat("dd.MM.yyyy");
-		
-		
 		// Show these two fields not in the guest role
 		if (!SecurityUtils.getSubject().hasRole("Gast")) {
 			addComponent(btnSaveChanges);
-			if (caption.equals("Gruppen")) {
-				addComponent(dfRefDate);
-			}
 		}
 
 		btnSaveChanges.addClickListener(event -> {
 			try {
 				if (caption.equals("Gruppen")) {
 					(beanItem.getBean()).setGroups(mGroups.getItemIds());
-					
-					if (!(beanItem.getBean().getGroups().size() == mGroups.size() && beanItem.getBean().getGroups().containsAll(mGroups.getItemIds()))) {
-						HibernateUtil.writeLogEntry(beanItem.getBean(),
-								"Gruppenzugehörigkeit verändert", SecurityUtils.getSubject()
-										.getPrincipal().toString(), 
-										dfRefDate.getValue());
-					}
 				} else {
 					(beanItem.getBean()).setCategories((mCategories
 							.getItemIds()));
@@ -136,11 +117,9 @@ public class MemberMappingTab extends FormLayout {
 			if (caption.equals("Sparten")) {
 				HibernateUtil.save(beanItem.getBean());
 				Notification.show("Speichern Erfolgreich.", Type.TRAY_NOTIFICATION);
-			} else if (caption.equals("Gruppen") && GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
+			} else if (caption.equals("Gruppen")) {
 				HibernateUtil.save(beanItem.getBean());
 				Notification.show("Speichern Erfolgreich.", Type.TRAY_NOTIFICATION);
-			} else {
-				GeneralHandler.showNoVaildRefDateException();
 			}
 		});
 	}

@@ -1,5 +1,6 @@
 package de.juette.views.windows;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
@@ -15,6 +16,7 @@ import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
@@ -25,11 +27,13 @@ public class MemberRefBookingWindow extends Window {
 	private final ComboBox cbMethod = new ComboBox("Was soll verändert werden?");
 	private final VerticalLayout contentLayout = new VerticalLayout();
 	private final DateField dfRefDate = new DateField("Bezugsdatum");
+	private Collection<Member> members;
 	
 	private BeanItemContainer<Group> groups = new BeanItemContainer<Group>(
 			Group.class);
 	
 	public MemberRefBookingWindow(Collection<Member> members) {
+		this.members = members;
 		setModal(true);
 		setWidth("450");
 		setCaption("Änderung zu einem Bezugsdatum");
@@ -46,6 +50,7 @@ public class MemberRefBookingWindow extends Window {
 		cbMethod.setImmediate(true);
 		cbMethod.setNullSelectionAllowed(false);
 		cbMethod.select("Eintrittsdatum");
+		cbMethod.setWidth(80f, Unit.PERCENTAGE);
 		
 		layout.addComponent(cbMethod);
 		layout.setComponentAlignment(cbMethod, Alignment.TOP_CENTER);
@@ -85,6 +90,7 @@ public class MemberRefBookingWindow extends Window {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
 		Label lblHead = new Label("<strong>Aktiv/Passiv verändern<strong>", ContentMode.HTML);
+		lblHead.setSizeUndefined();
 		layout.addComponent(lblHead);
 		layout.setComponentAlignment(lblHead, Alignment.MIDDLE_CENTER);
 		OptionGroup single = new OptionGroup("Typ auswählen");
@@ -96,10 +102,23 @@ public class MemberRefBookingWindow extends Window {
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			if (single.getValue().toString().equals("Aktiv")) {
-				// TODO
-			} else
-				// TODO
+			if (!GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
+				GeneralHandler.showNoVaildRefDateException();
+			} else {
+				Boolean choice;
+				if (single.getValue().toString().equals("Aktiv")) {
+					choice = true;
+				} else
+					choice = false;
+				
+				for (Member member : members) {
+					if (member.getActive() != choice) {
+						member.setActive(choice);
+						HibernateUtil.save(member);
+					}
+				}
+			}
+			
 			close();
 		});
 		layout.addComponent(btnSave);
@@ -111,6 +130,7 @@ public class MemberRefBookingWindow extends Window {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
 		Label lblHead = new Label("<strong>Eintrittsdatum verändern<strong>", ContentMode.HTML);
+		lblHead.setSizeUndefined();
 		layout.addComponent(lblHead);
 		layout.setComponentAlignment(lblHead, Alignment.MIDDLE_CENTER);
 		DateField dfNewDate = new DateField("Neues Datum:");
@@ -121,7 +141,17 @@ public class MemberRefBookingWindow extends Window {
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			//TODO
+			if (!GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
+				GeneralHandler.showNoVaildRefDateException();
+			}
+			else if (dfNewDate.getValue() != null) {
+				for (Member member : members) {
+					member.setEntryDate(dfNewDate.getValue());
+					HibernateUtil.save(member);
+				}
+			} else {
+				GeneralHandler.showNoVaildRefDateException();
+			}
 			close();
 		});
 		layout.addComponent(btnSave);
@@ -133,6 +163,7 @@ public class MemberRefBookingWindow extends Window {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
 		Label lblHead = new Label("<strong>Austrittsdatum verändern<strong>", ContentMode.HTML);
+		lblHead.setSizeUndefined();
 		layout.addComponent(lblHead);
 		layout.setComponentAlignment(lblHead, Alignment.MIDDLE_CENTER);
 		DateField dfNewDate = new DateField("Neues Datum:");
@@ -143,7 +174,15 @@ public class MemberRefBookingWindow extends Window {
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			//TODO
+			if (!GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
+				GeneralHandler.showNoVaildRefDateException();
+			}
+			else if (dfNewDate.getValue() != null) {
+				for (Member member : members) {
+					member.setLeavingDate(dfNewDate.getValue());
+					HibernateUtil.save(member);
+				}
+			}
 			close();
 		});
 		layout.addComponent(btnSave);
@@ -156,6 +195,7 @@ public class MemberRefBookingWindow extends Window {
 		layout.setSpacing(true);
 		groups.addAll(HibernateUtil.getAllAsList(Group.class));
 		Label lblHead = new Label("<strong>Funktionsgruppenzugehörigkeit verändern<strong>", ContentMode.HTML);
+		lblHead.setSizeUndefined();
 		layout.addComponent(lblHead);
 		layout.setComponentAlignment(lblHead, Alignment.MIDDLE_CENTER);
 		ComboBox cbAll = new ComboBox("Gruppe wählen:");
@@ -163,6 +203,8 @@ public class MemberRefBookingWindow extends Window {
 		cbAll.setItemCaptionPropertyId("groupName");
 		cbAll.setImmediate(true);
 		cbAll.setWidth("300");
+		cbAll.setNullSelectionAllowed(false);
+		cbAll.setWidth(80f, Unit.PERCENTAGE);
 		layout.addComponent(cbAll);
 		layout.setComponentAlignment(cbAll, Alignment.MIDDLE_CENTER);
 		
@@ -175,11 +217,38 @@ public class MemberRefBookingWindow extends Window {
 		Button btnSave = new Button("Speichern");
 		btnSave.setStyleName("friendly");
 		btnSave.addClickListener(event -> {
-			if (ogAddRem.getValue().toString().equals("Hinzufügen")) {
-				// TODO
-				//group = (Group) cbAll.getValue();
-			} else if (ogAddRem.getValue().toString().equals("Entfernen"))
-				// TODO
+			if (!GeneralHandler.isRefDateValid(dfRefDate.getValue())) {
+				GeneralHandler.showNoVaildRefDateException();
+			}
+			else if (cbAll.getValue() != null) {
+				Group g = (Group) cbAll.getValue();
+				if (ogAddRem.getValue().toString().equals("Hinzufügen")) {
+					for (Member member : members) {
+						if (!member.getGroups().contains(g)) {
+							Collection<Group> groups = new ArrayList<Group>();
+							for (Group group : member.getGroups()) {
+								groups.add(group);
+							}
+							groups.add(g);
+							member.setGroups(groups);
+							HibernateUtil.save(member);
+						}
+					}
+				} else if (ogAddRem.getValue().toString().equals("Entfernen")) {
+					for (Member member : members) {
+						if (member.getGroups().contains(g)) {
+							Collection<Group> groups = new ArrayList<Group>();
+							for (Group group : member.getGroups()) {
+								if (!g.equals(group)) {
+									groups.add(group);
+								}
+							}
+							member.setGroups(groups);
+							HibernateUtil.save(member);
+						}
+					}
+				}
+			}
 			close();
 		});
 		layout.addComponent(btnSave);
