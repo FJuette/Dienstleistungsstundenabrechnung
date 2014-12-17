@@ -93,13 +93,9 @@ public class BookingView extends EditableTable<Booking> implements View {
 			return ACTIONS;
 		}
 	};
-<<<<<<< HEAD
 	// End of action handler
-=======
->>>>>>> branch 'master' of https://github.com/FJuette/Dienstleistungsstundenabrechnung.git
 	
 
-<<<<<<< HEAD
 	private DateTime lastCoyDate = null;
 	// Do not do this again eclipse!
 	private CourseOfYearWorker getWorker() {
@@ -110,16 +106,6 @@ public class BookingView extends EditableTable<Booking> implements View {
 			return null;
 		}
 		
-=======
-	private CourseOfYearWorker getWorker() {
-		if (cbYears.getValue() == null) {
-			Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
-					+ "Damit ein Jahr in der Auswahlliste erscheint "
-					+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
-			return null;
-		}
-		DateTime lastCoyDate = null;
->>>>>>> branch 'master' of https://github.com/FJuette/Dienstleistungsstundenabrechnung.git
 		try {
 			lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
 		} catch (NoCOYAvailableException e) {
@@ -183,14 +169,10 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnYear.addClickListener(event -> {
 			CourseOfYearWorker worker = getWorker();
 			if (worker != null && DateTime.now().isAfter(worker.getToDate())) {
-<<<<<<< HEAD
 				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
 					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
 				} else 
 					YearWindow(worker);
-=======
-				YearWindow(worker);
->>>>>>> branch 'master' of https://github.com/FJuette/Dienstleistungsstundenabrechnung.git
 				// Do the COY....
 			} else {
 				Notification.show("Der Jahreslauf kann erst gestartet werden, wenn der Zeitraum beendet ist.", Type.ERROR_MESSAGE);
@@ -200,14 +182,10 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnYearTest.addClickListener(event -> {
 			CourseOfYearWorker worker = getWorker();
 			if (worker != null) {
-<<<<<<< HEAD
 				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
 					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
 				} else 
 					downloadFile(worker, false);
-=======
-				downloadFile(worker, false);
->>>>>>> branch 'master' of https://github.com/FJuette/Dienstleistungsstundenabrechnung.git
 			}
 		});
 
@@ -411,11 +389,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		Label lblQuestion = new Label(
 				"Soll der Jahreslauf jetzt durchgeführt werden?<br /> "
 						+ "Ein erneuter Durchlauf für dieses Jahr ist dann <strong>nicht</strong> mehr möglich.");
-<<<<<<< HEAD
 		lblQuestion.setStyleName("center");
-=======
-		lblQuestion.setStyleName("h4 center");
->>>>>>> branch 'master' of https://github.com/FJuette/Dienstleistungsstundenabrechnung.git
 		lblQuestion.setContentMode(ContentMode.HTML);
 		layout.addComponent(lblQuestion);
 
