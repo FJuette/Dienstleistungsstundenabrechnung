@@ -17,6 +17,7 @@ public class CourseOfYearWorker {
 	private DateTime toDate;
 	private DateTime lastCOYDueDate;
 	private Double achievedDls;
+	private int monthCount;
 	
 	private final DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	
@@ -117,11 +118,13 @@ public class CourseOfYearWorker {
 	
 	// Number of non liberated months
 	public int getFullDlsMonth() {
+		monthCount = 0;
 		DateTime month = getStartMonthDate(fromDate);
 		List<DateTime> months = new ArrayList<DateTime>();
 		do {
 			months.add(month);
 			month = getNextMonth(month);
+			monthCount++;
 		} while (month.isBefore(toDate) || month.isEqual(toDate));
 
 		MemberInfo mi = new MemberInfo(member);
@@ -134,7 +137,7 @@ public class CourseOfYearWorker {
 				dlsLibMonth++;
 			}
 		}
-		return 12 - dlsLibMonth;
+		return monthCount - dlsLibMonth;
 	}
 	
 	private DateTime getNextMonth(DateTime dt) {
@@ -207,5 +210,13 @@ public class CourseOfYearWorker {
 
 	public void setAchievedDls(Double achievedDls) {
 		this.achievedDls = achievedDls;
+	}
+
+	public int getMonthCount() {
+		return monthCount;
+	}
+
+	public void setMonthCount(int monthCount) {
+		this.monthCount = monthCount;
 	}
 }

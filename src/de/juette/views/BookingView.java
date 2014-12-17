@@ -54,6 +54,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 
 	private Handler actionHandler = new Handler() {
 
+
 		private static final long serialVersionUID = 8008706058827363288L;
 		private final Action STORNO = new Action("Stornieren");
 		private final Action[] ACTIONS = new Action[] { STORNO };
@@ -92,7 +93,34 @@ public class BookingView extends EditableTable<Booking> implements View {
 			return ACTIONS;
 		}
 	};
+	// End of action handler
+	
 
+	private DateTime lastCoyDate = null;
+	// Do not do this again eclipse!
+	private CourseOfYearWorker getWorker() {
+		if (cbYears.getValue() == null) {
+			Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
+					+ "Damit ein Jahr in der Auswahlliste erscheint "
+					+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
+			return null;
+		}
+		
+		try {
+			lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
+		} catch (NoCOYAvailableException e) {
+			
+		}
+		CourseOfYearWorker worker;
+		if (lastCoyDate != null) {
+			worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), lastCoyDate.toDate());
+			
+		} else {
+			worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
+		}
+		return worker;
+	}
+	
 	public BookingView() {
 		if (SecurityUtils.getSubject().hasRole("Gast")) {
 			addComponent(GeneralHandler.getNoGuestLabel());
@@ -139,27 +167,12 @@ public class BookingView extends EditableTable<Booking> implements View {
 		addComponent(btnsYear);
 
 		btnYear.addClickListener(event -> {
-			if (cbYears.getValue() == null) {
-				Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
-						+ "Damit ein Jahr in der Auswahlliste erscheint "
-						+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
-				return;
-			}
-			DateTime lastCoyDate = null;
-			try {
-				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
-			} catch (NoCOYAvailableException e) {
-				
-			}
-			CourseOfYearWorker worker;
-			if (lastCoyDate != null) {
-				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), lastCoyDate.toDate());
-				
-			} else {
-				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
-			}
-			if (DateTime.now().isAfter(worker.getToDate())) {
-				YearWindow(worker);
+			CourseOfYearWorker worker = getWorker();
+			if (worker != null && DateTime.now().isAfter(worker.getToDate())) {
+				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
+					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
+				} else 
+					YearWindow(worker);
 				// Do the COY....
 			} else {
 				Notification.show("Der Jahreslauf kann erst gestartet werden, wenn der Zeitraum beendet ist.", Type.ERROR_MESSAGE);
@@ -167,29 +180,13 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 		
 		btnYearTest.addClickListener(event -> {
-			if (cbYears.getValue() == null) {
-			Notification.show("", "Bitte zuerst links ein Jahr auswählen. "
-					+ "Damit ein Jahr in der Auswahlliste erscheint "
-					+ "muss mindestens eine Buchung für das Jahr vorliegen und die Seite neu geladen werden.", Type.ERROR_MESSAGE);
-			return;
-		}
-			DateTime lastCoyDate = null;
-			try {
-				lastCoyDate = new DateTime(HibernateUtil.getLastCOYDate());
-			} catch (NoCOYAvailableException e) {
-				
+			CourseOfYearWorker worker = getWorker();
+			if (worker != null) {
+				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
+					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
+				} else 
+					downloadFile(worker, false);
 			}
-			CourseOfYearWorker worker;
-			if (lastCoyDate != null) {
-				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings(), lastCoyDate.toDate());
-				
-			} else {
-				worker = new CourseOfYearWorker((Year)cbYears.getValue(), HibernateUtil.getSettings());
-			}
-			FileResource res = new FileResource(runCourseOfYear(worker, false));
-			setResource("download", res);
-			ResourceReference rr = ResourceReference.create(res, this, "download");
-			Page.getCurrent().open(rr.getURL(), null);
 		});
 
 		btnNewBookings.addClickListener(event -> {
@@ -206,16 +203,55 @@ public class BookingView extends EditableTable<Booking> implements View {
 	private File runCourseOfYear(CourseOfYearWorker worker, Boolean finalize) {
 		List<String> lines = new ArrayList<String>();
 		lines.add("Vorname;Nachname;Geleistete DLS;Benötigte DLS;Kosten Pro nicht geleisteter DLS;Zu Zahlen in Euro;Bemerkung");
-		for (Member member : HibernateUtil.getAllAsList(Member.class)) {
+		for (Member member : HibernateUtil.orderedWhereList(Member.class, "aikz = " + true,
+				"surname asc, forename asc, memberId asc")) {
 			worker.setMember(member);
 			int fullMonth = worker.getFullDlsMonth();
+			Double requieredDls = worker.getRequiredDls(fullMonth);
 			Double debit = worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), fullMonth);
+			Double achievedDls = worker.getAchievedDls();
+			
 			String line = member.getForename() + ";" + 
 						  member.getSurname() + ";" + 
-						  worker.getAchievedDls().toString().replace(".", ",") + ";" +
-						  ((Double)worker.getRequiredDls(fullMonth)).toString().replace(".", ",") + ";" +
+						  achievedDls.toString().replace(".", ",") + ";";
+			
+			if (worker.getSettings().getBookingMethod().equals("Anteilig bis zum Stichtag")) {
+				line +=  requieredDls.toString().replace(".", ",") + ";" +
 						  ((Double)worker.getSettings().getCostDls()).toString().replace(".", ",") + ";" +
 						  debit.toString().replace(".", ",") + ";";
+			} else { // Full or nothing
+				if (fullMonth >= 1) {
+					line += worker.getSettings().getCountDls().toString().replace(".", ",") + ";";
+					debit = worker.getMemberDebit(HibernateUtil.getBookingsFromYear(member, worker.getFromDate().toDate(), worker.getToDate().toDate()), worker.getMonthCount());
+					requieredDls = worker.getSettings().getCountDls();
+				} else {
+					line += "0,0;";
+					debit = 0.0;
+					requieredDls = 0.0;
+				}
+				line += ((Double)worker.getSettings().getCostDls()).toString().replace(".", ",") + ";";
+				line += debit.toString().replace(".", ",") + ";";
+			}
+			
+			if (finalize) {
+				Booking b = new Booking();
+				b.setComment("Buchung der benötigten DLS");
+				b.setCountDls(-requieredDls);
+				b.setDoneDate(new DateTime(worker.getToDate()).toDate());
+				b.setMember(member);
+				HibernateUtil.save(b);
+			}
+			
+			// Set the booking state from the member to 0
+			if (finalize && worker.getSettings().getClearing()) {
+				Double diff = requieredDls - achievedDls;
+				Booking b = new Booking();
+				b.setComment("Ausgleibuchung Jahreslauf " + new DateTime(worker.getToDate()).toString("dd.MM.yyyy"));
+				b.setCountDls(diff);
+				b.setDoneDate(new DateTime(worker.getToDate()).toDate());
+				b.setMember(member);
+				HibernateUtil.save(b);
+			}
 
 			if (worker.getMember().getAge(worker.getToDate()) == -1) {
 				line += "Kein Geburtsdatum vorhanden.";
@@ -272,12 +308,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		cbYears.setItemCaptionPropertyId("year");
 		cbYears.setContainerDataSource(years);
 		cbYears.setNullSelectionAllowed(false);
-		//fLayout.addComponent(cbYears);
 		cbYears.addValueChangeListener(event -> {
-			//beans.removeContainerFilters("doneDate");
-			//beans.addContainerFilter(new MyYearFilter("doneDate", ((Year) event
-			//		.getProperty().getValue()).getYear()));
-			//updateTable();
 			btnYear.setCaption("Jahreslauf "
 					+ ((Year) event.getProperty().getValue()).getYear()
 					+ " durchführen");
@@ -358,9 +389,8 @@ public class BookingView extends EditableTable<Booking> implements View {
 		Label lblQuestion = new Label(
 				"Soll der Jahreslauf jetzt durchgeführt werden?<br /> "
 						+ "Ein erneuter Durchlauf für dieses Jahr ist dann <strong>nicht</strong> mehr möglich.");
-		lblQuestion.setStyleName("h4");
-		lblQuestion.setContentMode(ContentMode.HTML);
 		lblQuestion.setStyleName("center");
+		lblQuestion.setContentMode(ContentMode.HTML);
 		layout.addComponent(lblQuestion);
 
 		HorizontalLayout btnLayout = new HorizontalLayout();
@@ -375,11 +405,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 		btnLayout.addComponent(btnNo);
 		
 		btnYes.addClickListener(evnet -> {
-			FileResource res = new FileResource(runCourseOfYear(worker, true));
-			setResource("download", res);
-			ResourceReference rr = ResourceReference.create(res, this, "download");
-			Page.getCurrent().open(rr.getURL(), null);
-			
+			downloadFile(worker, true);
 			window.close();
 		});
 		
@@ -389,6 +415,13 @@ public class BookingView extends EditableTable<Booking> implements View {
 		});
 
 		getUI().addWindow(window);
+	}
+	
+	private void downloadFile(CourseOfYearWorker worker, Boolean finalize) {
+		FileResource res = new FileResource(runCourseOfYear(worker, finalize));
+		setResource("download", res);
+		ResourceReference rr = ResourceReference.create(res, this, "download");
+		Page.getCurrent().open(rr.getURL(), null);
 	}
 
 	private Handler getActionHandler() {

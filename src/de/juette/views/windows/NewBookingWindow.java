@@ -51,7 +51,8 @@ public class NewBookingWindow extends Window {
 		if (single) {
 			BeanItemContainer<Member> members = new BeanItemContainer<Member>(
 					Member.class);
-			members.addAll(HibernateUtil.getAllAsList(Member.class));
+			members.addAll(HibernateUtil.orderedWhereList(Member.class, "aikz = " + true,
+					"surname asc, forename asc, memberId asc"));
 
 			cbMembers.setWidth("100%");
 			cbMembers.setImmediate(true);

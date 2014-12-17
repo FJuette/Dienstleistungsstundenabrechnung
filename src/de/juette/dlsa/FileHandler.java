@@ -161,7 +161,7 @@ public class FileHandler implements Receiver, SucceededListener {
 					}
 				}
 				Member m = (Member) HibernateUtil.getUnique(Member.class,
-						"memberId = '" + id + "'");
+						"memberId = '" + id + "' and aikz = " + true);
 				Boolean newMember = true;
 				if (m == null) {
 					m = new Member();
@@ -218,7 +218,7 @@ public class FileHandler implements Receiver, SucceededListener {
 										m.setLeavingDate(dt.toDate());
 									}
 								} else {
-									m.setEntryDate(dt.toDate());
+									m.setLeavingDate(dt.toDate());
 								}
 							} catch (Exception e) {
 								//e.printStackTrace();
