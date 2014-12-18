@@ -54,7 +54,7 @@ public class MemberInfo {
 		m.setEntryDate(bm.getEntryDate());
 		m.setLeavingDate(bm.getLeavingDate());
 		Collection<MemberChanges> changes = HibernateUtil
-				.getMemberChangesUntilDate(member.getId(), dt);
+				.getMemberChanges(member.getId(), dt);
 		for (MemberChanges change : changes) {
 			
 			if (change.getColumn().equals(MemberColumn.ACTIVE.toString())) {
@@ -84,6 +84,41 @@ public class MemberInfo {
 			}
 		}
 		return m;
+	}
+	
+	public void updateMember(Member m) {
+		m.removeAllPropertyChangeListeners();
+		Collection<MemberChanges> changes = HibernateUtil
+				.getMemberChanges(member.getId());
+		for (MemberChanges change : changes) {
+			
+			if (change.getColumn().equals(MemberColumn.ACTIVE.toString())) {
+				m.setActive(Boolean.parseBoolean(change.getNewValue()));
+				
+			} else if (change.getColumn().equals(
+					MemberColumn.ENTRYDATE.toString())) {
+				m.setEntryDate(dateStringFormat.parseDateTime(
+						change.getNewValue()).toDate());
+				
+			} else if (change.getColumn().equals(
+					MemberColumn.LEAVINGDATE.toString())) {
+				m.setLeavingDate(dateStringFormat.parseDateTime(
+						change.getNewValue()).toDate());
+			} else if (change.getColumn().equals(
+					MemberColumn.GROUP.toString())) {
+				Collection<Group> groups = new ArrayList<Group>();
+				String[] ids = change.getNewValue().trim().split(" ");
+				for (String id : ids) {
+					if (id != null && !id.equals("")) {
+						Group currentGroup = (Group) HibernateUtil.getUnique(Group.class, "id = " + id);
+						GroupInfo gi = new GroupInfo(currentGroup);
+						groups.add(gi.getGroupStateFromDate(HibernateUtil.getBasicGroup(currentGroup.getId()), DateTime.now().toDate()));
+					}
+				}
+				m.setGroups(groups);
+			}
+		}
+		HibernateUtil.save(m);
 	}
 
 	public Member getMember() {

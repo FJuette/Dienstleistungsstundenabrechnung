@@ -1,6 +1,6 @@
 package de.juette.views.windows;
 
-import java.util.ArrayList;
+import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
@@ -20,6 +20,7 @@ import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
+import de.juette.model.MemberColumn;
 
 public class MemberRefBookingWindow extends Window {
 
@@ -112,10 +113,8 @@ public class MemberRefBookingWindow extends Window {
 					choice = false;
 				
 				for (Member member : members) {
-					if (member.getActive() != choice) {
-						member.setActive(choice);
-						HibernateUtil.save(member);
-					}
+					PropertyChangeEvent e = new PropertyChangeEvent(this, MemberColumn.ACTIVE.toString(), null, choice);
+					HibernateUtil.saveMemberChanges(member, e, dfRefDate.getValue());
 				}
 			}
 			
@@ -146,11 +145,9 @@ public class MemberRefBookingWindow extends Window {
 			}
 			else if (dfNewDate.getValue() != null) {
 				for (Member member : members) {
-					member.setEntryDate(dfNewDate.getValue());
-					HibernateUtil.save(member);
+					PropertyChangeEvent e = new PropertyChangeEvent(this, MemberColumn.ENTRYDATE.toString(), null, dfNewDate.getValue());
+					HibernateUtil.saveMemberChanges(member, e, dfRefDate.getValue());
 				}
-			} else {
-				GeneralHandler.showNoVaildRefDateException();
 			}
 			close();
 		});
@@ -179,8 +176,8 @@ public class MemberRefBookingWindow extends Window {
 			}
 			else if (dfNewDate.getValue() != null) {
 				for (Member member : members) {
-					member.setLeavingDate(dfNewDate.getValue());
-					HibernateUtil.save(member);
+					PropertyChangeEvent e = new PropertyChangeEvent(this, MemberColumn.LEAVINGDATE.toString(), null, dfNewDate.getValue());
+					HibernateUtil.saveMemberChanges(member, e, dfRefDate.getValue());
 				}
 			}
 			close();
@@ -224,28 +221,13 @@ public class MemberRefBookingWindow extends Window {
 				Group g = (Group) cbAll.getValue();
 				if (ogAddRem.getValue().toString().equals("Hinzufügen")) {
 					for (Member member : members) {
-						if (!member.getGroups().contains(g)) {
-							Collection<Group> groups = new ArrayList<Group>();
-							for (Group group : member.getGroups()) {
-								groups.add(group);
-							}
-							groups.add(g);
-							member.setGroups(groups);
-							HibernateUtil.save(member);
-						}
+						PropertyChangeEvent e = new PropertyChangeEvent(this, MemberColumn.GROUP.toString(), null, g);
+						HibernateUtil.saveMemberChanges(member, e, dfRefDate.getValue());
 					}
 				} else if (ogAddRem.getValue().toString().equals("Entfernen")) {
 					for (Member member : members) {
-						if (member.getGroups().contains(g)) {
-							Collection<Group> groups = new ArrayList<Group>();
-							for (Group group : member.getGroups()) {
-								if (!g.equals(group)) {
-									groups.add(group);
-								}
-							}
-							member.setGroups(groups);
-							HibernateUtil.save(member);
-						}
+						PropertyChangeEvent e = new PropertyChangeEvent(this, MemberColumn.GROUP.toString(), null, g);
+						HibernateUtil.saveMemberChanges(member, e, dfRefDate.getValue());
 					}
 				}
 			}

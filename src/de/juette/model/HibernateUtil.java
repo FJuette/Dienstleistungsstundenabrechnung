@@ -79,8 +79,39 @@ public class HibernateUtil {
 		save(m);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void saveMemberChanges(Member m, PropertyChangeEvent e) {
+		_saveMemberChanges_(m, e, DateTime.now().toDate());
+	}
+	
+	public static void saveMemberChanges(Member m, PropertyChangeEvent e, Date d) {
+		BasicMember bm = getBasicMember(m.getId());
+		MemberInfo mi = new MemberInfo(m);
+		Member stateMember = mi.getMemberStateFromDate(bm, d);
+		Object oldValue = null;
+		if (e.getPropertyName().equals(MemberColumn.ENTRYDATE.toString())) {
+			oldValue = stateMember.getEntryDate();
+		} else if (e.getPropertyName().equals(MemberColumn.LEAVINGDATE.toString())) {
+			oldValue = stateMember.getLeavingDate();
+		} else if (e.getPropertyName().equals(MemberColumn.ACTIVE.toString())) {
+			oldValue = stateMember.getActive();
+		} else if (e.getPropertyName().equals(MemberColumn.GROUP.toString())) {
+			oldValue = stateMember.getGroups();
+		}
+		PropertyChangeEvent eve = new PropertyChangeEvent(e, e.getPropertyName(), oldValue, e.getNewValue());
+		_saveMemberChanges_(m, eve, d);
+		mi.updateMember(m);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static String getGroupSaveString(Object value) {
+		String result = "";
+		for (Group g : (Collection<Group>)value) {
+			result += g.getId() + " ";
+		}
+		return result;
+	}
+	
+	private static void _saveMemberChanges_(Member m, PropertyChangeEvent e, Date d) {
 		MemberChanges mc = new MemberChanges();
 		mc.setMemberId(m.getId());
 		mc.setColumn(e.getPropertyName());
@@ -89,22 +120,13 @@ public class HibernateUtil {
 			mc.setNewValue(new DateTime(e.getNewValue()).toString("dd.MM.yyyy"));
 			mc.setOldValue(new DateTime(e.getOldValue()).toString("dd.MM.yyyy"));
 		} else if (e.getPropertyName().equals(MemberColumn.GROUP.toString())) {
-			String oldValue = "";
-			for (Group g : (Collection<Group>)e.getOldValue()) {
-				oldValue += g.getId() + " ";
-			}
-			mc.setOldValue(oldValue);
-			
-			String newValue = "";
-			for (Group g : (Collection<Group>)e.getNewValue()) {
-				newValue += g.getId() + " ";
-			}
-			mc.setNewValue(newValue);
+			mc.setOldValue(getGroupSaveString(e.getOldValue()));
+			mc.setNewValue(getGroupSaveString(e.getNewValue()));
 		} else {
 			mc.setNewValue(e.getNewValue().toString());
 			mc.setOldValue(e.getOldValue().toString());
 		}
-		mc.setRefDate(DateTime.now().toDate());
+		mc.setRefDate(d);
 		save(mc);
 	}
 
@@ -427,7 +449,7 @@ public class HibernateUtil {
 
 
 	@SuppressWarnings("unchecked")
-	public static Collection<MemberChanges> getMemberChangesUntilDate(Long memberId, Date date) {
+	public static Collection<MemberChanges> getMemberChanges(Long memberId, Date date) {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
 		
