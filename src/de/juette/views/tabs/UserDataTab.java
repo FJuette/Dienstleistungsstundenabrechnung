@@ -16,11 +16,12 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.layout.DataTabLayout;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.User;
 
-public class UserDataTab extends MyDataTab<User> {
+public class UserDataTab extends DataTabLayout<User> {
 
 	private static final long serialVersionUID = -6957587750236729225L;
 	private FieldGroup fieldGroup = new BeanFieldGroup<User>(User.class);

@@ -1,4 +1,4 @@
-package de.juette.views;
+package de.juette.dlsa.layout;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;

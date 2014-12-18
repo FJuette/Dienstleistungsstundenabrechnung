@@ -1,4 +1,4 @@
-package de.juette.dlsa;
+package de.juette.dlsa.filter;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;

@@ -8,10 +8,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.layout.DataTabLayout;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Sector;
 
-public class SectorDataTab extends MyDataTab<Sector>{
+public class SectorDataTab extends DataTabLayout<Sector>{
 
 	private static final long serialVersionUID = -2227095821508190725L;
 	private FieldGroup fieldGroup = new BeanFieldGroup<Sector>(Sector.class);

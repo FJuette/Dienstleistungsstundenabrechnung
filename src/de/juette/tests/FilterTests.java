@@ -10,8 +10,8 @@ import org.junit.rules.ExpectedException;
 
 import com.vaadin.data.Validator.InvalidValueException;
 
-import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
+import de.juette.dlsa.filter.MyDateRangeFilter;
 
 public class FilterTests {
 	@Rule

@@ -19,13 +19,12 @@
         <property name="format_sql">true</property>
         
         <!-- create (Always create the DB new), update (Only if newer) -->
-        <property name="hbm2ddl.auto">update</property>
+        <property name="hbm2ddl.auto">create</property>
         
         <mapping class="de.juette.model.Campaign"></mapping>
         <mapping class="de.juette.model.Booking"></mapping>
         <mapping class="de.juette.model.ColumnMapping"></mapping>
         <mapping class="de.juette.model.CourseOfYear"></mapping>
-        <mapping class="de.juette.model.Log"></mapping>
         <mapping class="de.juette.model.Role"></mapping>
         <mapping class="de.juette.model.User"></mapping>
         <mapping class="de.juette.model.Settings"></mapping>

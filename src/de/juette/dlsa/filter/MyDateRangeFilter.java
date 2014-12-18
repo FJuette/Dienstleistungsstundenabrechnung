@@ -1,4 +1,4 @@
-package de.juette.dlsa;
+package de.juette.dlsa.filter;
 
 import java.util.Date;
 
@@ -10,6 +10,8 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
+
+import de.juette.dlsa.MyDateRangeValidator;
 
 public class MyDateRangeFilter implements Container.Filter {
 

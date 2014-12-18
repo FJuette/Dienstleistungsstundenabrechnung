@@ -1,4 +1,4 @@
-package de.juette.views.tabs;
+package de.juette.dlsa.layout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,11 +7,11 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.FormLayout;
 
+import de.juette.dlsa.DataSaveEvent;
+import de.juette.dlsa.DataSaveListener;
 import de.juette.model.AbstractEntity;
-import de.juette.views.DataSaveEvent;
-import de.juette.views.DataSaveListener;
 
-public abstract class MyDataTab<T extends AbstractEntity> extends FormLayout {
+public abstract class DataTabLayout<T extends AbstractEntity> extends FormLayout {
 
 	private static final long serialVersionUID = 4724189679115180836L;
 	protected BeanItem<T> beanItem;

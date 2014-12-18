@@ -1,22 +1,21 @@
-package de.juette.dlsa;
+package de.juette.dlsa.filter;
 
+import java.util.Calendar;
 import java.util.Date;
-
-import org.joda.time.DateTime;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 
-public class MyLeavingMemberDateFilter implements Container.Filter {
+public class MyYearFilter implements Container.Filter {
 
-	private static final long serialVersionUID = -6426216791811615941L;
+	private static final long serialVersionUID = -505914895668804706L;
 	protected String propertyId;
-	protected Date date;
+	protected int year;
 	
-	public MyLeavingMemberDateFilter(String propertyId, Date date) {
+	public MyYearFilter(String propertyId, int year) {
 		this.propertyId = propertyId;
-		this.date = date;
+		this.year = year;
 	}
 
 	@Override
@@ -24,11 +23,14 @@ public class MyLeavingMemberDateFilter implements Container.Filter {
 			throws UnsupportedOperationException {
 		@SuppressWarnings("unchecked")
 		Property<Date> p = item.getItemProperty(propertyId);
+		Calendar c = Calendar.getInstance();
+		
 		// Should always check validity
 		if (p == null || !p.getType().equals(Date.class))
-			return true;
+			return false;
 		else {
-			if (new DateTime(p.getValue()).isAfter(new DateTime(date))) {
+			c.setTime(p.getValue());
+			if (c.get(Calendar.YEAR) == year) {
 				return true;
 			} else 
 				return false;

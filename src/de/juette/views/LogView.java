@@ -23,6 +23,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.layout.EditableTable;
 import de.juette.model.CourseOfYear;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;

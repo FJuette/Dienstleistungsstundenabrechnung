@@ -12,15 +12,15 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Notification.Type;
 
+import de.juette.dlsa.layout.DataTabLayout;
 import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
-public class CampaignDataTab extends MyDataTab<Campaign> {
+public class CampaignDataTab extends DataTabLayout<Campaign> {
 
 	private static final long serialVersionUID = -5078471603960939464L;
 
-	@SuppressWarnings("unchecked")
 	public CampaignDataTab(BeanItem<Campaign> beanItem) {
 		this.beanItem = beanItem;
 		setSizeFull();

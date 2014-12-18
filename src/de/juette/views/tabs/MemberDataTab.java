@@ -11,11 +11,12 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 
+import de.juette.dlsa.layout.DataTabLayout;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 
 
-public class MemberDataTab extends MyDataTab<Member> {
+public class MemberDataTab extends DataTabLayout<Member> {
 
 	private static final long serialVersionUID = -4275563354183555579L;
 
