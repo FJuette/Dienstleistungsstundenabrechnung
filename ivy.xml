@@ -72,6 +72,5 @@
 		
 		<!-- Joda Time for better handling with dates --> 
 		<dependency org="joda-time" name="joda-time" rev="2.3"/> 
-		
 	</dependencies>
 </ivy-module>

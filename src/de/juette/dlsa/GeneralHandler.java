@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Notification.Type;
 
 import de.juette.model.HibernateUtil;
@@ -33,5 +34,14 @@ public class GeneralHandler {
 	
 	public static Label getNoGuestLabel() {
 		return new Label("<strong>Diese Funktion ist nicht für Ihre freigeschaltet</strong>", ContentMode.HTML);
+	}
+	
+	public static void setTableSize(Table tbl) {
+		if (tbl.size() > 15) {
+			tbl.setPageLength(15);
+		} else {
+			tbl.setPageLength(tbl.size() + 1);
+		}
+		tbl.markAsDirtyRecursive();
 	}
 }

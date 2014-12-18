@@ -12,7 +12,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
-import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Category;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
@@ -64,7 +64,7 @@ public class MemberMappingTab extends FormLayout {
 		tblMemberElements.setWidth("350");
 		tblMemberElements.setSelectable(true);
 		tblMemberElements.addStyleName("no-stripes");
-		ComponentHelper.setTableSize(tblMemberElements);
+		GeneralHandler.setTableSize(tblMemberElements);
 
 		addComponent(tblMemberElements);
 
@@ -82,7 +82,7 @@ public class MemberMappingTab extends FormLayout {
 					mCategories.addItem(cbAll.getValue());
 				}
 			}
-			ComponentHelper.setTableSize(tblMemberElements);
+			GeneralHandler.setTableSize(tblMemberElements);
 		});
 
 		Button btnRemove = new Button(FontAwesome.MINUS);
@@ -90,7 +90,7 @@ public class MemberMappingTab extends FormLayout {
 			if (tblMemberElements.getValue() != null) {
 				tblMemberElements.removeItem(tblMemberElements.getValue());
 			}
-			ComponentHelper.setTableSize(tblMemberElements);
+			GeneralHandler.setTableSize(tblMemberElements);
 		});
 
 		addComponent(btnRemove);

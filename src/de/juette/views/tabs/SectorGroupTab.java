@@ -10,7 +10,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
-import de.juette.dlsa.ComponentHelper;
+import de.juette.dlsa.GeneralHandler;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Sector;
@@ -50,7 +50,7 @@ public class SectorGroupTab extends MyDataTab<Sector> {
 		tblEntrys.setSelectable(true);
 		tblEntrys.addStyleName("no-stripes");
 		tblEntrys.setColumnHeaders("Gruppenname");
-		ComponentHelper.setTableSize(tblEntrys);
+		GeneralHandler.setTableSize(tblEntrys);
 		addComponent(tblEntrys);
 		
 		btnAdd.addClickListener(event -> {
@@ -58,7 +58,7 @@ public class SectorGroupTab extends MyDataTab<Sector> {
 					&& !sectorGroups.containsId(cbAll.getValue())) {
 				sectorGroups.addItem(cbAll.getValue());
 			}
-			ComponentHelper.setTableSize(tblEntrys);
+			GeneralHandler.setTableSize(tblEntrys);
 		});
 		
 		Button btnRemove = new Button(FontAwesome.MINUS);
@@ -66,7 +66,7 @@ public class SectorGroupTab extends MyDataTab<Sector> {
 			if (tblEntrys.getValue() != null) {
 				tblEntrys.removeItem(tblEntrys.getValue());
 			}
-			ComponentHelper.setTableSize(tblEntrys);
+			GeneralHandler.setTableSize(tblEntrys);
 		});
 		addComponent(btnRemove);
 		

@@ -1,8 +1,6 @@
 package de.juette.dlsa;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
@@ -37,11 +35,8 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import de.juette.model.CourseOfYear;
-import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
-import de.juette.model.Sector;
 import de.juette.model.Settings;
 import de.juette.model.User;
 import de.juette.views.BookingView;
@@ -81,7 +76,6 @@ public class MainUI extends UI implements ViewChangeListener {
 			HibernateUtil.closeSession();
 		}
 
-		@SuppressWarnings("unused")
 		@Override
 		public void sessionInit(SessionInitEvent event) throws ServiceException {
 			HibernateUtil.getSessionFactory();
@@ -94,37 +88,6 @@ public class MainUI extends UI implements ViewChangeListener {
 			}
 			if (HibernateUtil.getAllAsList(Settings.class).size() == 0) {
 				DataHandler.createSettings();
-			}
-			
-			/*
-			// temporary
-			if (HibernateUtil.getAllAsList(CourseOfYear.class).size() == 0) {
-				DataHandler.createDummyCycles();
-			}
-			*/
-			
-			if (false) {
-				DataHandler.createDummyGroups();
-				Sector s = new Sector();
-				s.setSectorname("Test Bereich");
-				List<Group> gps = new ArrayList<Group>();
-				gps.add(HibernateUtil.getAllAsList(Group.class).get(0));
-				s.setGroups(gps);
-				HibernateUtil.save(s);
-			}
-			
-			// Creates Example data, for fresh Database and to show and test the functionality
-			if (false) {
-				DataHandler.createDummySubjects();
-				DataHandler.createDummyMember();
-				DataHandler.createDummyActivities();
-				DataHandler.createDummyBookings();
-				
-				DataHandler.createDummyUsers();
-				DataHandler.createDummyCycles();
-				DataHandler.createSettings();
-				// Must be created once
-				DataHandler.createMappingEntrys();
 			}
 		}
 	}

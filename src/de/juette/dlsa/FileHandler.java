@@ -38,11 +38,16 @@ import de.juette.model.Member;
 import de.juette.model.MemberChanges;
 import de.juette.model.MemberColumn;
 
-@SuppressWarnings("serial")
+/**
+ * This class handles all operations with files on the system
+ * @author Fabian Juette
+ */
 public class FileHandler implements Receiver, SucceededListener {
+	
+	private static final long serialVersionUID = -7755862096764130729L;
 	protected File file;
-	DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
-	private String basepath = VaadinService.getCurrent().getBaseDirectory()
+	private final DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
+	private static final String basepath = VaadinService.getCurrent().getBaseDirectory()
 			.getAbsolutePath()
 			+ "/WEB-INF/Files";
 
@@ -50,20 +55,18 @@ public class FileHandler implements Receiver, SucceededListener {
 		return file;
 	}
 
+	/**
+	 * Add your own event listener for the upload to do further actions
+	 * Needed here if the event do not get overwritten
+	 */
 	@Override
 	public void uploadSucceeded(SucceededEvent event) {
-		Notification.show("Datei " + file.getName()
-				+ " erfolgreich hochgeladen",
-				Notification.Type.TRAY_NOTIFICATION);
 	}
 
 	@Override
 	public OutputStream receiveUpload(String filename, String mimeType) {
-		// Create upload stream
-		FileOutputStream fos = null; // Stream to write to
+		FileOutputStream fos = null;
 		try {
-			// Open the file for writing
-			// System.out.println(basepath + filename);
 			file = new File(basepath + "/" + filename);
 			fos = new FileOutputStream(file);
 		} catch (final FileNotFoundException ex) {
@@ -79,7 +82,7 @@ public class FileHandler implements Receiver, SucceededListener {
 	}
 
 	private String getCharset() {
-		String charset = "UTF-8"; // Default chartset
+		String charset = "UTF-8"; // Default encoding
 		byte[] fileContent = null;
 		if (file != null) {
 			try {
@@ -87,14 +90,13 @@ public class FileHandler implements Receiver, SucceededListener {
 				fileContent = new byte[(int) file.length()];
 				fin.read(fileContent);
 				fin.close();
+				// Detect the encoding form the file, if not possible use the default
 				CharsetDetector detector = new CharsetDetector();
 				detector.setText(fileContent);
 				CharsetMatch cm = detector.detect();
 
 				if (cm != null) {
 					int confidence = cm.getConfidence();
-					System.out.println("Encoding: " + cm.getName()
-							+ " - Confidence: " + confidence + "%");
 					if (confidence > 30) {
 						charset = cm.getName();
 					}
@@ -107,6 +109,10 @@ public class FileHandler implements Receiver, SucceededListener {
 		return charset;
 	}
 
+	/**
+	 * Get all column names from a CSV file
+	 * @return List of all column names
+	 */
 	public List<CsvColumn> getColumnNames() {
 		BufferedReader br = null;
 		String cvsSplitBy = ";";

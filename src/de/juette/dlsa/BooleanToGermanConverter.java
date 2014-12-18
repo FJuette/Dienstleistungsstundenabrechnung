@@ -4,8 +4,14 @@ import java.util.Locale;
 
 import com.vaadin.data.util.converter.Converter;
 
-@SuppressWarnings("serial")
+/**
+ * Converts boolean values to the German equivalent (true = Ja; false = Nein)
+ * @author Fabian Juette
+ *
+ */
 public class BooleanToGermanConverter implements Converter<String, Boolean> {
+
+	private static final long serialVersionUID = -7772882419336005681L;
 
 	@Override
 	public Boolean convertToModel(String value,
