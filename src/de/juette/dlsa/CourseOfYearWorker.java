@@ -1,4 +1,4 @@
-package de.juette.model;
+package de.juette.dlsa;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +7,13 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import de.juette.model.Booking;
+import de.juette.model.Group;
+import de.juette.model.HibernateUtil;
+import de.juette.model.Member;
+import de.juette.model.Settings;
+import de.juette.model.Year;
 
 public class CourseOfYearWorker {
 	private Settings settings;

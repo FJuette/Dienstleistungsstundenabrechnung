@@ -35,6 +35,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import de.juette.dlsa.layout.ValoMenuLayout;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
 import de.juette.model.Settings;
@@ -189,16 +190,6 @@ public class MainUI extends UI implements ViewChangeListener {
 		final MenuBar settings = new MenuBar();
 		settings.addStyleName("user-menu");
 
-		/*
-		 * final MenuItem settingsItem = settings.addItem("Fabian Juette", new
-		 * ThemeResource("../valomenutest/img/profile-pic-300px.jpg"), null);
-		 * 
-		 * settingsItem.addItem("Edit Profile", null);
-		 * settingsItem.addItem("Preferences", null);
-		 * settingsItem.addSeparator(); settingsItem.addItem("Sign Out", null);
-		 * menu.addComponent(settings);
-		 */
-
 		menuItemsLayout.setPrimaryStyleName("valo-menuitems");
 		menu.addComponent(menuItemsLayout);
 
@@ -251,7 +242,7 @@ public class MainUI extends UI implements ViewChangeListener {
 		boolean isAuthenticated = SecurityUtils.getSubject().isAuthenticated();
 		// User is logged in but tries to access the LoginView, navigating him to the journal
 		if (isAuthenticated && "".equals(event.getViewName())) {
-			getNavigator().navigateTo("booking");
+			getNavigator().navigateTo("member");
 			return false;
 		}
 		// User is not authenticated and tries to access something else than the login view

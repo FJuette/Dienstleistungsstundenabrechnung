@@ -1,9 +1,10 @@
-package de.juette.dlsa;
+package de.juette.dlsa.layout;
 
 import com.vaadin.ui.*;
 
-@SuppressWarnings("serial")
 public class ValoMenuLayout extends HorizontalLayout {
+
+	private static final long serialVersionUID = 1983074862397171634L;
 	CssLayout contentArea = new CssLayout();
 	CssLayout menuArea = new CssLayout();
 

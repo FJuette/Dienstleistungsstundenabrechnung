@@ -1,4 +1,4 @@
-package de.juette.dlsa;
+package de.juette.dlsa.filter;
 
 import java.util.Collection;
 
@@ -10,9 +10,9 @@ import com.vaadin.data.Property;
 
 import de.juette.model.Category;
 
-@SuppressWarnings("serial")
 public class MySubjectFilter implements Container.Filter {
 
+	private static final long serialVersionUID = -8357981881695463602L;
 	protected String propertyId;
 	protected Category subject;
 	

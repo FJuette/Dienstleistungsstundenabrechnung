@@ -13,11 +13,13 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.layout.EditableTable;
 import de.juette.model.Category;
 import de.juette.model.HibernateUtil;
 
-@SuppressWarnings("serial")
 public class CategoryView extends EditableTable<Category> implements View {
+
+	private static final long serialVersionUID = -3968476438538518656L;
 
 	public CategoryView() {
 		if (SecurityUtils.getSubject().hasRole("Gast")) {

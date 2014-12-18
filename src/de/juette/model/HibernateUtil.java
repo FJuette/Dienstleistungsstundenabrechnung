@@ -14,6 +14,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.joda.time.DateTime;
 
+import de.juette.dlsa.MemberInfo;
 import de.juette.dlsa.NoCOYAvailableException;
 
 public class HibernateUtil {
@@ -52,10 +53,8 @@ public class HibernateUtil {
 	}
 
 	/**
-	 * Save/update entity.
-	 * 
+	 * Save or update an entity.
 	 * @param entity
-	 *            Entity to save
 	 */
 	public static void save(AbstractEntity entity) {
 		Session session = getSession();
@@ -131,10 +130,8 @@ public class HibernateUtil {
 	}
 
 	/**
-	 * Save/update all in list.
-	 * 
+	 * Save or update all list items
 	 * @param list
-	 *            List of entities to save
 	 */
 	public static void saveAll(List<? extends AbstractEntity> list) {
 		if (list == null || list.isEmpty()) {
@@ -342,37 +339,6 @@ public class HibernateUtil {
 		return list;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static List<Log> getHistoryIdsFromYear(Date from, Date to) {
-		Session session = getSession();
-		Transaction tx = session.beginTransaction();
-
-		Query q = session.createQuery(
-				"from Log where timestamp > :from and timestamp <= :to order by timestamp desc");
-		q.setDate("from", from);
-		q.setDate("to", to);
-		List<Log> logs = q.list();
-		tx.commit();
-		
-		return logs;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static List<Log> getLogsFromMemberInYear(Date from, Date to, Long mId) {
-		Session session = getSession();
-		Transaction tx = session.beginTransaction();
-
-		Query q = session.createQuery(
-				"from Log where timestamp > :from and timestamp <= :to and changedMemberId = :mId order by timestamp desc");
-		q.setDate("from", from);
-		q.setDate("to", to);
-		q.setLong("mId", mId);
-		List<Log> logs = q.list();
-		tx.commit();
-		
-		return logs;
-	}
-
 	public static Settings getSettings() {
 		Session session = getSession();
 		Transaction tx = session.beginTransaction();
@@ -498,29 +464,5 @@ public class HibernateUtil {
 		query.executeUpdate();
 
 		tx.commit();
-	}
-
-	public static void writeLogEntry(String member, String description,
-			String editor, long id) {
-		Log log = new Log();
-		log.setChangedMember(member);
-		log.setDescription(description);
-		log.setEditor(editor);
-		log.setChangedMemberId(id);
-		log.setReferenceDate(DateTime.now().toDate());
-		save(log);
-	}
-
-	public static void writeLogEntry(Member member, String description,
-			String editor, Date referenceDate) {
-		
-		Log log = new Log();
-		log.setChangedMember(member.getFullName());
-		log.setDescription(description);
-		log.setEditor(editor);
-		log.setChangedMemberId(member.getId());
-		log.setReferenceDate(referenceDate);
-		//log.setmLogId(writeMemberLog(member, referenceDate));
-		save(log);
 	}
 }

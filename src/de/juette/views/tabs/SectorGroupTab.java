@@ -11,11 +11,12 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.layout.DataTabLayout;
 import de.juette.model.Group;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Sector;
 
-public class SectorGroupTab extends MyDataTab<Sector> {
+public class SectorGroupTab extends DataTabLayout<Sector> {
 
 	private static final long serialVersionUID = 4064120897573084508L;
 	private BeanItemContainer<Group> sectorGroups = new BeanItemContainer<Group>(Group.class);

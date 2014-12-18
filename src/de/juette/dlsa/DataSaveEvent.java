@@ -1,4 +1,4 @@
-package de.juette.views;
+package de.juette.dlsa;
 
 import com.vaadin.data.util.BeanItem;
 

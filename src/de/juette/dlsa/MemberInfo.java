@@ -1,4 +1,4 @@
-package de.juette.model;
+package de.juette.dlsa;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +7,14 @@ import java.util.Date;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import de.juette.model.BasicMember;
+import de.juette.model.Group;
+import de.juette.model.GroupInfo;
+import de.juette.model.HibernateUtil;
+import de.juette.model.Member;
+import de.juette.model.MemberChanges;
+import de.juette.model.MemberColumn;
 
 public class MemberInfo {
 

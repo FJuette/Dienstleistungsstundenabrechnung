@@ -20,6 +20,7 @@ import com.vaadin.ui.Window;
 
 import de.juette.dlsa.BooleanToGermanConverter;
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.layout.EditableTable;
 import de.juette.model.BasicGroup;
 import de.juette.model.Group;
 import de.juette.model.GroupChanges;

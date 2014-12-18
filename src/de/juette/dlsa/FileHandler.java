@@ -25,6 +25,7 @@ import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
@@ -81,6 +82,10 @@ public class FileHandler implements Receiver, SucceededListener {
 		return fos;
 	}
 
+	/**
+	 * Tries to get the encoding from a text file
+	 * @return Encoding as String
+	 */
 	private String getCharset() {
 		String charset = "UTF-8"; // Default encoding
 		byte[] fileContent = null;
@@ -97,6 +102,7 @@ public class FileHandler implements Receiver, SucceededListener {
 
 				if (cm != null) {
 					int confidence = cm.getConfidence();
+					// Change the confidence if it should be more accurate
 					if (confidence > 30) {
 						charset = cm.getName();
 					}
@@ -144,6 +150,10 @@ public class FileHandler implements Receiver, SucceededListener {
 		return new ArrayList<CsvColumn>();
 	}
 
+	/**
+	 * Uploads every member from the text file in the database
+	 * @param mapping entries from the database
+	 */
 	public void uploadMembers(List<ColumnMapping> mapping) {
 		BufferedReader br = null;
 		String cvsSplitBy = ";";
@@ -292,7 +302,7 @@ public class FileHandler implements Receiver, SucceededListener {
 			}
 			writer.close();
 		} catch (IOException e) {
-			// TODO: handle exception
+			Notification.show("", e.getMessage(), Type.ERROR_MESSAGE);
 		}
 		File file = new File(filepath);
 		byte[] bFile = new byte[(int) file.length()];

@@ -1,4 +1,4 @@
-package de.juette.dlsa;
+package de.juette.dlsa.filter;
 
 import java.util.Collection;
 
@@ -10,9 +10,9 @@ import com.vaadin.data.Property;
 
 import de.juette.model.Group;
 
-@SuppressWarnings("serial")
 public class MyGroupFilter implements Container.Filter {
 
+	private static final long serialVersionUID = 2997422335009722124L;
 	protected String propertyId;
 	protected Group group;
 

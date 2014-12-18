@@ -28,15 +28,16 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+import de.juette.dlsa.CourseOfYearWorker;
 import de.juette.dlsa.DateToShortGermanStringConverter;
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.GeneralHandler;
-import de.juette.dlsa.MyDateRangeFilter;
 import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.NoCOYAvailableException;
+import de.juette.dlsa.filter.MyDateRangeFilter;
+import de.juette.dlsa.layout.EditableTable;
 import de.juette.model.AbstractEntity;
 import de.juette.model.Booking;
-import de.juette.model.CourseOfYearWorker;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;
 import de.juette.model.Year;
@@ -170,7 +171,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 			CourseOfYearWorker worker = getWorker();
 			if (worker != null && DateTime.now().isAfter(worker.getToDate())) {
 				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
-					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
+					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf, bitte das Ergebnis in der Historie verwenden..", Type.ERROR_MESSAGE);
 				} else 
 					YearWindow(worker);
 				// Do the COY....
@@ -183,7 +184,7 @@ public class BookingView extends EditableTable<Booking> implements View {
 			CourseOfYearWorker worker = getWorker();
 			if (worker != null) {
 				if (lastCoyDate != null && (worker.getToDate().isBefore(lastCoyDate) || worker.getToDate().isEqual(lastCoyDate))) {
-					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf.", Type.ERROR_MESSAGE);
+					Notification.show("", "Der angegebene Zeitraum liegt vor oder in einem abgeschlossenem Jahreslauf, bitte das Ergebnis in der Historie verwenden.", Type.ERROR_MESSAGE);
 				} else 
 					downloadFile(worker, false);
 			}

@@ -29,7 +29,6 @@ public class GeneralHandler {
 	
 	public static void showNoVaildRefDateException() {
 		Notification.show("Das Bezugsdatum kann nicht in oder vor einem abgeschlossenem Jahreslaufzeitraum liegen.", Type.ERROR_MESSAGE);
-		System.out.println("Das Bezugsdatum kann nicht in oder vor einem abgeschlossenem Jahreslaufzeitraum liegen.");
 	}
 	
 	public static Label getNoGuestLabel() {

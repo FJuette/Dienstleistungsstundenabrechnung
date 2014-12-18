@@ -1,4 +1,4 @@
-package de.juette.views;
+package de.juette.dlsa.layout;
 
 import java.util.List;
 

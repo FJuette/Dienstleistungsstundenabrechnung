@@ -27,6 +27,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.layout.ComplexLayout;
 import de.juette.model.Campaign;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Member;

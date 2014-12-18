@@ -10,8 +10,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 
+import de.juette.dlsa.CourseOfYearWorker;
 import de.juette.model.Booking;
-import de.juette.model.CourseOfYearWorker;
 import de.juette.model.Group;
 import de.juette.model.Member;
 import de.juette.model.Settings;
