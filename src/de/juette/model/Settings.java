@@ -50,7 +50,7 @@ public class Settings extends AbstractEntity {
 		this.dueDate = dueDate;
 	}
 
-	public double getCostDls() {
+	public Double getCostDls() {
 		return costDls;
 	}
 

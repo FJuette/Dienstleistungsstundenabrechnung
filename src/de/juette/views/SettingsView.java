@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.validator.DoubleRangeValidator;
+import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
@@ -18,6 +21,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
@@ -29,6 +33,7 @@ import com.vaadin.ui.Window.CloseListener;
 
 import de.juette.dlsa.FileHandler;
 import de.juette.dlsa.GeneralHandler;
+import de.juette.dlsa.MyDueDateValidator;
 import de.juette.model.ColumnMapping;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Settings;
@@ -41,7 +46,7 @@ public class SettingsView extends VerticalLayout implements View {
 			"Stichtag (Enddatum eines Monats)");
 	private final TextField txtCountDls = new TextField(
 			"Anzahl der Dienstleistungsstunden pro Jahr");
-	private final TextField txtCostDls = new TextField(
+	private final TextField txtCostPerDls = new TextField(
 			"Kosten pro Dienstleistungsstunde");
 	private final TextField txtDlsFromYear = new TextField(
 			"Alter ab wann Dienstleistungsstunden geleistet werden müssen");
@@ -53,6 +58,7 @@ public class SettingsView extends VerticalLayout implements View {
 	private final Button btnSave = new Button("Speichern");
 	private VerticalLayout mappinglayout = new VerticalLayout();
 	private final ComboBox cbGranularity = new ComboBox("Granularität");
+	private BeanItem<Settings> beanItem;
 
 	private VerticalLayout layoutMapping = new VerticalLayout();
 
@@ -61,7 +67,7 @@ public class SettingsView extends VerticalLayout implements View {
 			addComponent(GeneralHandler.getNoGuestLabel());
 			return;
 		}
-		BeanItem<Settings> beanItem = new BeanItem<Settings>(new Settings());
+		beanItem = new BeanItem<Settings>(new Settings());
 		List<Settings> settings = HibernateUtil.getAllAsList(Settings.class);
 		for (Settings s : settings) {
 			beanItem = new BeanItem<Settings>(s);
@@ -71,6 +77,9 @@ public class SettingsView extends VerticalLayout implements View {
 		BeanFieldGroup<Settings> fieldGroup = new BeanFieldGroup<Settings>(
 				Settings.class);
 		fieldGroup.setItemDataSource(beanItem);
+		fieldGroup.setReadOnly(false);
+		fieldGroup.setEnabled(true);
+		fieldGroup.setBuffered(false);
 
 		setSpacing(true);
 		setMargin(true);
@@ -88,21 +97,46 @@ public class SettingsView extends VerticalLayout implements View {
 		section.addStyleName("h2 colored");
 		form.addComponent(section);
 		form.addComponent(txtDueDate);
+		txtDueDate.addValidator(new MyDueDateValidator());
 		fieldGroup.bind(txtDueDate, "dueDate");
 
-		txtCostDls.setWidth("15%");
-		form.addComponent(txtCostDls);
-		fieldGroup.bind(txtCostDls, "costDls");
-
 		txtCountDls.setWidth("12%");
+		txtCountDls.setConverter(Double.class);
+		txtCountDls.setConversionError("Bitte nur eine Zahl eingeben.");
+		txtCountDls.addValidator(new DoubleRangeValidator("Bitte eine Zahl größer 0 und kleiner 1000 eingeben.", 0.0, 1000.0));
 		form.addComponent(txtCountDls);
 		fieldGroup.bind(txtCountDls, "countDls");
 
+		txtCostPerDls.setWidth("12%");
+		txtCostPerDls.setConverter(Double.class);
+		txtCostPerDls.setConversionError("Bitte nur eine Zahl eingeben.");
+		txtCostPerDls.addValidator(new DoubleRangeValidator("Bitte eine Zahl größer 0 und kleiner 1000 eingeben.", 0.0, 1000.0));
+		form.addComponent(txtCostPerDls);
+		//fieldGroup.bind(txtCostPerDls, "costDls");
+		txtCostPerDls.setValue(beanItem.getBean().getCostDls().toString());
+		// The bin operation always sets this field on readonly, this is just a hack to avoid this
+		txtCostPerDls.addBlurListener(event -> {
+			if (txtCostPerDls.getValue() != null) {
+				try {
+					beanItem.getBean().setCostDls(Double.parseDouble(txtCostPerDls.getValue()));
+				} catch (Exception e) {
+					
+				}
+				
+			}
+		});
+
 		txtDlsFromYear.setWidth("12%");
+		txtDlsFromYear.setConverter(Integer.class);
+		txtDlsFromYear.setConversionError("Bitte nur eine Ganzzahl eingeben.");
+		txtDlsFromYear.addValidator(new IntegerRangeValidator("Bitte eine Zahl größer 0 und kleiner 150 eingeben.", 0, 150));
 		form.addComponent(txtDlsFromYear);
 		fieldGroup.bind(txtDlsFromYear, "ageFrom");
 
 		txtDlsToYear.setWidth("12%");
+		txtDlsToYear.setConverter(Integer.class);
+		txtDlsToYear.setConversionError("Bitte nur eine Ganzzahl eingeben.");
+		txtDlsToYear.addValidator(new IntegerRangeValidator("Bitte eine Zahl größer 0 und kleiner 150 eingeben.", 0, 150));
 		form.addComponent(txtDlsToYear);
 		fieldGroup.bind(txtDlsToYear, "ageTo");
 
@@ -149,13 +183,16 @@ public class SettingsView extends VerticalLayout implements View {
 		btnSave.addClickListener(event -> {
 			try {
 				fieldGroup.commit();
-				HibernateUtil.save(fieldGroup.getItemDataSource().getBean());
+				if (fieldGroup.isValid() && txtCostPerDls.isValid()) {
+					HibernateUtil.save(fieldGroup.getItemDataSource().getBean());
+					Notification.show("Speichern erfolgreich.",
+							Notification.Type.TRAY_NOTIFICATION);
+				}
+			} catch (InvalidValueException ie) { 
+				Notification.show("", "Fehler beim validieren eines Feldes.", Type.ERROR_MESSAGE);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Notification.show("", "Leider ist ein Fehler aufgetreten, bitte überprüfen Sie alle eingegebenen Werte.", Type.ERROR_MESSAGE);
 			}
-
-			Notification.show("Speichern erfolgreich.",
-					Notification.Type.TRAY_NOTIFICATION);
 		});
 
 		FileHandler reciever = new FileHandler();
@@ -189,8 +226,6 @@ public class SettingsView extends VerticalLayout implements View {
 		mappinglayout.addComponent(layoutMapping);
 		mappinglayout.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 		addComponent(mappinglayout);
-		
-		form.setReadOnly(false);
 	}
 
 	private void createMappingLayout() {
