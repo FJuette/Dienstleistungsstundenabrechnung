@@ -16,7 +16,7 @@ public class MyDlsValidator implements Validator {
 		if (!tryParseDouble((String)value) ) {
     		throw new InvalidValueException("Die Anzahl der DLS muss eine Zahl sein.");
     	}
-		if (!checkGranularity(Double.parseDouble((String) value))) {
+		if (!checkGranularity(Double.parseDouble((String) value.toString().replace(",", ".")))) {
 			throw new InvalidValueException("Die Granularität muss dem Typ " + granularity + " sein.");
 		}
 	}
