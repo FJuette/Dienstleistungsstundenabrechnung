@@ -13,10 +13,10 @@ public class MyDlsValidator implements Validator {
 
 	@Override
 	public void validate(Object value) throws InvalidValueException {
-		if (!tryParseDouble((String)value) ) {
+		if (!tryParseDouble(value.toString().replace(",", "."))) {
     		throw new InvalidValueException("Die Anzahl der DLS muss eine Zahl sein.");
     	}
-		if (!checkGranularity(Double.parseDouble((String) value))) {
+		if (!checkGranularity(Double.parseDouble(value.toString().replace(",", ".")))) {
 			throw new InvalidValueException("Die Granularität muss dem Typ " + granularity + " sein.");
 		}
 	}
