@@ -87,6 +87,7 @@ public class MemberView extends ComplexLayout implements View {
 				getUI().addWindow(w);
 				w.addCloseListener(closeEvent -> {
 					Page.getCurrent().reload();
+					System.out.println("Bezugsänderung durchgeführt");
 				});
 
 			} else if (action.getCaption().equals("Sparte hinzufügen")) {
@@ -137,6 +138,7 @@ public class MemberView extends ComplexLayout implements View {
 						bean.setAikz(false);
 						HibernateUtil.save(bean);
 						Page.getCurrent().reload();
+						System.out.println("Benutzer entfernt");
 					} catch (Exception e) {
 						System.out
 								.println("Dieses Mitglied kann nicht gelöscht werden.");
@@ -160,6 +162,7 @@ public class MemberView extends ComplexLayout implements View {
 						}
 						HibernateUtil.saveAll(beans.getItemIds());
 						Notification.show("Speichern erfolgreich", Type.TRAY_NOTIFICATION);
+						System.out.println("Massenbuchung durchgeführt");
 					}
 				});
 			}

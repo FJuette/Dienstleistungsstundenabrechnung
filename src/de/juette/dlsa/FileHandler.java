@@ -105,6 +105,7 @@ public class FileHandler implements Receiver, SucceededListener {
 					// Change the confidence if it should be more accurate
 					if (confidence > 30) {
 						charset = cm.getName();
+						System.out.println("Erkanntes Charset: " + charset);
 					}
 				}
 
@@ -112,6 +113,7 @@ public class FileHandler implements Receiver, SucceededListener {
 				e1.printStackTrace();
 			}
 		}
+		System.out.println("Charset der Datei: " + charset);
 		return charset;
 	}
 
@@ -285,6 +287,7 @@ public class FileHandler implements Receiver, SucceededListener {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Mitglieder aus der CSV Datei eingespielt");
 	}
 	
 	public File writeCsvFile(Date date, List<String> lines, Boolean finalize, Date dueDate) {
@@ -321,6 +324,7 @@ public class FileHandler implements Receiver, SucceededListener {
 					filename + ".csv", dueDate);
 			HibernateUtil.save(coy);
 		}
+		System.out.println("Jahreslaufdatei geschrieben");
 		return file;
 	}
 }

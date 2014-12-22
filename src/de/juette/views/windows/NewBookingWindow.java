@@ -7,6 +7,7 @@ import java.util.List;
 
 
 
+
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -130,6 +131,7 @@ public class NewBookingWindow extends Window {
 					cbCampaigns.setValue(null);
 					dfDate.focus();
 					Notification.show("Speichern erfolgreich", Type.TRAY_NOTIFICATION);
+					System.out.println("Einfache Buchung durchgeführt");
 				} else
 					close();
 			}
