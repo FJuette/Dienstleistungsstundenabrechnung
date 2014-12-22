@@ -159,6 +159,7 @@ public class MemberView extends ComplexLayout implements View {
 							HibernateUtil.save(b);
 						}
 						HibernateUtil.saveAll(beans.getItemIds());
+						Notification.show("Speichern erfolgreich", Type.TRAY_NOTIFICATION);
 					}
 				});
 			}

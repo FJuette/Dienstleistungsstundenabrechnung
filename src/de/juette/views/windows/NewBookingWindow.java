@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
+
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -12,9 +14,13 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
+
+
+import com.vaadin.ui.Notification.Type;
 
 import de.juette.dlsa.MyDlsValidator;
 import de.juette.model.Booking;
@@ -123,6 +129,7 @@ public class NewBookingWindow extends Window {
 					txtComment.setValue("");
 					cbCampaigns.setValue(null);
 					dfDate.focus();
+					Notification.show("Speichern erfolgreich", Type.TRAY_NOTIFICATION);
 				} else
 					close();
 			}
