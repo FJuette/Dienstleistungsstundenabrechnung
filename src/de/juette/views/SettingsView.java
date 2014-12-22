@@ -108,12 +108,12 @@ public class SettingsView extends VerticalLayout implements View {
 		fieldGroup.bind(txtCountDls, "countDls");
 
 		txtCostPerDls.setWidth("12%");
-		txtCostPerDls.setConverter(Double.class);
+		txtCostPerDls.setConverter(Integer.class);
 		txtCostPerDls.setConversionError("Bitte nur eine Zahl eingeben.");
-		txtCostPerDls.addValidator(new DoubleRangeValidator("Bitte eine Zahl größer 0 und kleiner 1000 eingeben.", 0.0, 1000.0));
+		txtCostPerDls.addValidator(new IntegerRangeValidator("Bitte eine Zahl größer 0 und kleiner 1000 eingeben.", 0, 1000));
 		form.addComponent(txtCostPerDls);
 		//fieldGroup.bind(txtCostPerDls, "costDls");
-		txtCostPerDls.setValue(beanItem.getBean().getCostDls().toString());
+		txtCostPerDls.setValue(String.valueOf(beanItem.getBean().getCostDls().intValue()));
 		// The bin operation always sets this field on readonly, this is just a hack to avoid this
 		txtCostPerDls.addBlurListener(event -> {
 			if (txtCostPerDls.getValue() != null) {
