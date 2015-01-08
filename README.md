@@ -16,7 +16,8 @@ Weiteres dazu im [Wiki](https://github.com/FJuette/Dienstleistungsstundenabrechn
 Ich gebe gerne Unterstützung bei der Einrichtung der Anwendung, die Weiterentwicklung um neue Features werde ich nur bei Bedarf fortführen. 
 
 ## Screenshots
-![Anmeldemaske](http://picload.org/thumbnail/ccowgid/login.jpg)
+![Anmeldemaske](<a href="http://picload.org/view/ccowgid/login.jpg.html" target="_blank"><img src="http://picload.org/thumbnail/ccowgid/login.jpg" /></a>
+)
 
 ## Welche Lizenz?
 Das Projekt ist unter der Apache-Lizenz 2.0 lizensiert 
