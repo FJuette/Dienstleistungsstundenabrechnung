@@ -17,6 +17,7 @@ Ich gebe gerne Unterstützung bei der Einrichtung der Anwendung, die Weiterentwi
 
 ## Screenshots
 ![Anmeldemaske](http://picload.org/image/ccowgip/login.jpg)
+![Migliederverwaltung](http://picload.org/view/ccowgwo/mitglieder.jpg.htm =250x)
 
 ## Welche Lizenz?
 Das Projekt ist unter der Apache-Lizenz 2.0 lizensiert 
