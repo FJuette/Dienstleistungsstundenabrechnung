@@ -9,7 +9,7 @@ Weiteres dazu im [Wiki](https://github.com/FJuette/Dienstleistungsstundenabrechn
 * Zum installieren der Anwendung bitte [hier](https://github.com/FJuette/Dienstleistungsstundenabrechnung/wiki/Installation) lesen
 
 ## Was wird zum Entwickeln benötigt?
-* Eclipse mit dem Vaadin-Plugin (https://vaadin.com/eclipse) und Apache Ivy
+* Eclipse ab Version 4.4 mit dem Vaadin-Plugin (https://vaadin.com/eclipse) und Apache Ivy
 * Webserver wie Jetty oder Tomcat zum ausführen
 
 ## Unterstüzung
