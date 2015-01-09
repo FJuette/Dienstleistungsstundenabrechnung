@@ -15,7 +15,7 @@ Zum Entwickeln wird benötigt:
 * Webserver wie Jetty oder Tomcat zum ausführen
 
 ## Unterstüzung
-* Ich gebe gerne Unterstützung bei der Einrichtung der Anwendung, die Weiterentwicklung um neue Features werde ich nur bei Bedarf fortführen. 
+* Ich gebe gerne Unterstützung bei der Einrichtung der Anwendung, die Weiterentwicklung um neue Features werde ich nur bei Bedarf fortführen
 * Ein Bugfixing werde ich soweit es Zeitlich machbar ist schnell durchführen
 * Bugs und Wünsche bitte als Issues hier auf Github zum Projekt anlegen
 
