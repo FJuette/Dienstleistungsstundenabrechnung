@@ -9,7 +9,7 @@ import org.junit.Test;
 import de.juette.dlsa.MyDateRangeValidator;
 import de.juette.dlsa.filter.MyDateRangeFilter;
 
-public class FilterTests {
+public class TestFilter {
 
 	DateTimeFormatter dateStringFormat = DateTimeFormat.forPattern("dd.MM.yyyy");
 	

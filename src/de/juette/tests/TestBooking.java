@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import de.juette.dlsa.MyDlsValidator;
 
-public class BookingTests {
+public class TestBooking {
 	
 	private MyDlsValidator gv;
 	
