@@ -1,7 +1,5 @@
 package de.juette.views;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
@@ -13,21 +11,14 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
 import de.juette.dlsa.GeneralHandler;
-import de.juette.model.Booking;
-import de.juette.model.Category;
-import de.juette.model.Group;
-import de.juette.model.HibernateUtil;
-import de.juette.model.Member;
-import de.juette.model.Sector;
 
-public class StatisticsView extends VerticalLayout implements View {
+public class StatisticsView extends VerticalLayout implements View, IStatisticsView {
 
 	private static final long serialVersionUID = -6517121952079289467L;
-	private List<Member> members = new ArrayList<Member>();
-
-	public StatisticsView() {
-		// TODO Auto-generated constructor stub
-	}
+	
+	Label lblCategory = new Label("<strong>Aktuell gebuchte DLS pro Sparte:</strong>", ContentMode.HTML);
+	Label lblGroup = new Label("<strong>Aktuell gebuchte DLS pro Gruppe:</strong>", ContentMode.HTML);
+	Label lblSection = new Label("<strong>Aktuell gebuchte DLS pro Bereich:</strong>", ContentMode.HTML);
 	
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -39,118 +30,38 @@ public class StatisticsView extends VerticalLayout implements View {
 		addComponent(title);
 		addStyleName("myHeaderLabel");
 		
-		members.addAll(HibernateUtil.getAllAsList(Member.class));
-		
-		dlsPerSection();
-		dlsPerGroup();
-		dlsPerCategory();
-	}
-	
-	private void dlsPerCategory() {
-		Label title = new Label("<strong>Aktuell gebuchte DLS pro Sparte:</strong>", ContentMode.HTML);
-		title.addStyleName("myFormLayout");
-		addComponent(title);
-		
-		List<Member> members = new ArrayList<Member>();
-		members.addAll(HibernateUtil.getAllAsList(Member.class));
-		
-		for (Category c : HibernateUtil.getAllAsList(Category.class)) {
-			double dlsCount = 0;
-			for (Member m : members) {
-				if (m.getCategories().contains(c)) {
-					for (Booking b : HibernateUtil.getBookings(m)) {
-						dlsCount += b.getCountDls();
-					}
-				}
-				
-			}
-			
-			Label lblEntry = new Label("<strong>" + c.getCategoryName() + ":</strong> " + dlsCount, ContentMode.HTML);
-			lblEntry.addStyleName("myHeaderLabel");
-			addComponent(lblEntry);
-		}
-		
+		lblCategory.addStyleName("myFormLayout");
+		lblGroup.addStyleName("myFormLayout");
+		lblSection.addStyleName("myFormLayout");
 	}
 
-	private void dlsPerGroup() {
-		Label title = new Label("<strong>Aktuell gebuchte DLS pro Gruppe:</strong>", ContentMode.HTML);
-		title.addStyleName("myFormLayout");
-		addComponent(title);
-
-		for (Group g : HibernateUtil.getAllAsList(Group.class)) {
-			bookingIds = new ArrayList<String>();
-			double dlsCount = getDlsForGroup(g);
-			Label lblEntry = new Label("<strong>" + g.getGroupName() + ":</strong> " + dlsCount, ContentMode.HTML);
-			lblEntry.addStyleName("myHeaderLabel");
-			addComponent(lblEntry);
-		}
-		
-	}
-
-	private Collection<String> bookingIds;
-	private void dlsPerSection() {
-		Label title = new Label("<strong>Aktuell gebuchte DLS pro Bereich:</strong>", ContentMode.HTML);
-		title.addStyleName("myFormLayout");
-		addComponent(title);
-		
-		List<Member> members = new ArrayList<Member>();
-		members.addAll(HibernateUtil.getAllAsList(Member.class));
-		
-		
-		for (Sector s : HibernateUtil.getAllAsList(Sector.class)) {
-			bookingIds = new ArrayList<String>();
-			double dlsCount = 0;
-			for (Group g : s.getGroups()) {
-				dlsCount += getDlsForGroup(g);
-			}
-			
-			Label lblEntry = new Label("<strong>" + s.getSectorname() + ":</strong> " + dlsCount, ContentMode.HTML);
-			lblEntry.addStyleName("myHeaderLabel");
-			addComponent(lblEntry);
-		}
-		
-	}
-	
-	private double getDlsForGroup(Group g) {
-		double dlsCount = 0;
-		for (Member m : members) {
-			if (m.getGroups().contains(g)) {
-				for (Booking b : HibernateUtil.getBookings(m)) {
-					if (!bookingIds.contains(b.getId().toString())) { // Do not count the same booking twice
-						System.out.println("Gesucht: " + b.getId().toString() + " Booking IDs enhält:");
-						bookingIds.forEach(item -> {
-							System.out.print(item + ", ");
-						});
-						bookingIds.add(b.getId().toString());
-						dlsCount += b.getCountDls();
-					}
-				}
-			}
-		}
-		return dlsCount;
-	}
-	
-	/*
-	private void dlsForCampaign() {
-		Label title = new Label("<strong>Aktuell gebuchte DLS pro Aktion:</strong>", ContentMode.HTML);
-		title.addStyleName("myFormLayout");
-		addComponent(title);
-		
-		List<Member> members = new ArrayList<Member>();
-		members.addAll(HibernateUtil.getAllAsList(Member.class));
-		
-		
-		for (Campaign c : HibernateUtil.getAllAsList(Campaign.class)) {
-			double dlsCount = 0;
-			for (Booking b : HibernateUtil.getFilterAsList(Booking.class, "campaign = " + c)) {
-				dlsCount += b.getCountDls();
-			}
-			
-			Label lblEntry = new Label("<strong>" + c.getDescription() + ":</strong> " + dlsCount, ContentMode.HTML);
+	@Override
+	public void setCategoryData(List<String> value) {
+		addComponent(lblCategory);
+		for (String item : value) {
+			Label lblEntry = new Label(item, ContentMode.HTML);
 			lblEntry.addStyleName("myHeaderLabel");
 			addComponent(lblEntry);
 		}
 	}
-	*/
 
+	@Override
+	public void setGroupData(List<String> value) {
+		addComponent(lblGroup);
+		for (String item : value) {
+			Label lblEntry = new Label(item, ContentMode.HTML);
+			lblEntry.addStyleName("myHeaderLabel");
+			addComponent(lblEntry);
+		}
+	}
+
+	@Override
+	public void setSectionData(List<String> value) {
+		addComponent(lblSection);
+		for (String item : value) {
+			Label lblEntry = new Label(item, ContentMode.HTML);
+			lblEntry.addStyleName("myHeaderLabel");
+			addComponent(lblEntry);
+		}
+	}
 }

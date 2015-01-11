@@ -35,6 +35,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import de.juette.Presenter.StatisticsPresenter;
 import de.juette.dlsa.layout.ValoMenuLayout;
 import de.juette.model.HibernateUtil;
 import de.juette.model.Role;
@@ -249,6 +250,9 @@ public class MainUI extends UI implements ViewChangeListener {
 		if (!isAuthenticated && !"".equals(event.getViewName())) {
 			getNavigator().navigateTo("");
 			return false;
+		}
+		if ("statistic".equals(event.getViewName())) {
+			new StatisticsPresenter(event.getNewView());
 		}
 		return true;
 	}
