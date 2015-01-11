@@ -10,7 +10,6 @@ import org.joda.time.format.DateTimeFormatter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
@@ -41,16 +40,7 @@ public class GroupsView extends EditableTable<Group> implements View {
 		beans = new BeanItemContainer<>(Group.class);
 		beans.addAll(HibernateUtil.getAllAsList(Group.class));
 
-		for (Group g : beans.getItemIds()) {
-			g.addPropertyChangeListener(e -> {
-				GroupChanges gc = new GroupChanges();
-				gc.setGroupId(g.getId());
-				gc.setOldValue((Boolean) e.getOldValue());
-				gc.setNewValue((Boolean) e.getNewValue());
-				gc.setRefDate(DateTime.now().toDate());
-				HibernateUtil.save(gc);
-			});
-		}
+		registerPropertyChangeListener();
 
 		btnNew.setCaption("Neue Gruppe");
 		initLayout("Gruppenverwaltung");
@@ -79,6 +69,20 @@ public class GroupsView extends EditableTable<Group> implements View {
 						Notification.Type.ERROR_MESSAGE);
 			}
 		});
+	}
+	
+	private void registerPropertyChangeListener() {
+		for (Group g : beans.getItemIds()) {
+			g.removeAllPropertyChangeListeners();
+			g.addPropertyChangeListener(e -> {
+				GroupChanges gc = new GroupChanges();
+				gc.setGroupId(g.getId());
+				gc.setOldValue((Boolean) e.getOldValue());
+				gc.setNewValue((Boolean) e.getNewValue());
+				gc.setRefDate(DateTime.now().toDate());
+				HibernateUtil.save(gc);
+			});
+		}
 	}
 
 	@Override
@@ -121,10 +125,8 @@ public class GroupsView extends EditableTable<Group> implements View {
 			HibernateUtil.save(bg);
 			g.setBasicGroup(bg);
 			HibernateUtil.save(g);
-			// needed to register the change listener to all bean entrys
-				Page.getCurrent().reload();
-				window.close();
-			});
+			registerPropertyChangeListener();
+		});
 
 		getUI().addWindow(window);
 

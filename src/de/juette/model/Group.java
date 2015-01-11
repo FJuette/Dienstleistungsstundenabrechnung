@@ -80,4 +80,10 @@ public class Group extends AbstractEntity {
 	public void removePropertyChangeListener(PropertyChangeListener l) {
 		changes.removePropertyChangeListener(l);
 	}
+	
+	public void removeAllPropertyChangeListeners() {
+		for (PropertyChangeListener l : changes.getPropertyChangeListeners()) {
+			changes.removePropertyChangeListener(l);
+		} 
+	}
 }
