@@ -126,6 +126,7 @@ public class GroupsView extends EditableTable<Group> implements View {
 			g.setBasicGroup(bg);
 			HibernateUtil.save(g);
 			registerPropertyChangeListener();
+			window.close();
 		});
 
 		getUI().addWindow(window);

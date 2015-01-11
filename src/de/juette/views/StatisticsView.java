@@ -20,12 +20,7 @@ public class StatisticsView extends VerticalLayout implements View, IStatisticsV
 	Label lblGroup = new Label("<strong>Aktuell gebuchte DLS pro Gruppe:</strong>", ContentMode.HTML);
 	Label lblSection = new Label("<strong>Aktuell gebuchte DLS pro Bereich:</strong>", ContentMode.HTML);
 	
-	@Override
-	public void enter(ViewChangeEvent event) {
-		if (SecurityUtils.getSubject().hasRole("Gast")) {
-			addComponent(GeneralHandler.getNoGuestLabel());
-			return;
-		}
+	public StatisticsView() {
 		Label title = new Label("<h3><strong>Statistik</strong></h3>", ContentMode.HTML);
 		addComponent(title);
 		addStyleName("myHeaderLabel");
@@ -33,6 +28,14 @@ public class StatisticsView extends VerticalLayout implements View, IStatisticsV
 		lblCategory.addStyleName("myFormLayout");
 		lblGroup.addStyleName("myFormLayout");
 		lblSection.addStyleName("myFormLayout");
+	}
+	
+	@Override
+	public void enter(ViewChangeEvent event) {
+		if (SecurityUtils.getSubject().hasRole("Gast")) {
+			addComponent(GeneralHandler.getNoGuestLabel());
+			return;
+		}
 	}
 
 	@Override
