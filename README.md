@@ -16,7 +16,7 @@ https://dl.dropboxusercontent.com/u/33844222/Benutzerdokumentation.pdf
 heruntergeladen werden. 
 
 ## Kann ich an dem Projekt mitwirken?
-* Jeder kann sich gerne an dem Projekt beteiligen, bitte dafür Issues erstellen und ggf. per Pull Request einspielen
+* Jeder kann sich gerne an dem Projekt beteiligen, bitte dafür Issues erstellen und ggf. per Pull Request einspielen.
 Zum Entwickeln wird benötigt:
 * Eclipse ab Version 4.4 mit dem Vaadin-Plugin (https://vaadin.com/eclipse) und Apache Ivy (http://ant.apache.org/ivy/)
 * Webserver wie Jetty oder Tomcat zum ausführen
