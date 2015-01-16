@@ -8,6 +8,13 @@ Weiteres dazu im [Wiki](https://github.com/FJuette/Dienstleistungsstundenabrechn
 * Zum testen der Anwendung bitte [hier](https://github.com/FJuette/Dienstleistungsstundenabrechnung/wiki/Portable-Version) lesen
 * Zum installieren der Anwendung bitte [hier](https://github.com/FJuette/Dienstleistungsstundenabrechnung/wiki/Installation) lesen
 
+## Dokumentation?
+Die Benutzerdokumentation (Version 0.1a) kann unter 
+
+https://dl.dropboxusercontent.com/u/33844222/Benutzerdokumentation.pdf
+
+heruntergeladen werden. 
+
 ## Kann ich an dem Projekt mitwirken?
 * Jeder kann sich gerne an dem Projekt beteiligen, bitte dafür Issues erstellen und ggf. per Pull Request einspielen
 Zum Entwickeln wird benötigt:
